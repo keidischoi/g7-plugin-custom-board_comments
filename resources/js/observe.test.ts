@@ -24,4 +24,17 @@ describe('observe', () => {
         } as MutationRecord;
         expect(mutationNeedsCommentSync([record])).toBe(true);
     });
+
+    it('ignores comment rows moving inside the sorted stack', () => {
+        document.body.innerHTML = '<div class="space-y-4 cbc-comment-stack"><div data-cbc-comment-id="2"></div><div data-cbc-comment-id="3"></div></div>';
+        const stack = document.querySelector('.cbc-comment-stack') as HTMLElement;
+        const row = stack.firstElementChild as HTMLElement;
+        const record = {
+            type: 'childList',
+            addedNodes: [row] as unknown as NodeList,
+            removedNodes: [row] as unknown as NodeList,
+            target: stack,
+        } as MutationRecord;
+        expect(mutationNeedsCommentSync([record])).toBe(false);
+    });
 });

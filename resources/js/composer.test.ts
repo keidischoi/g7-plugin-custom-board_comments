@@ -73,7 +73,9 @@ describe('composer', () => {
         expect(document.querySelector('[data-cbc-stickers]')?.className).toContain('cbc-stickers--animated');
         expect(document.querySelector('[data-cbc-sticker-id]')?.tagName).toBe('DIV');
         expect(document.querySelector('[data-cbc-sticker-id]')?.getAttribute('role')).toBe('button');
-        expect(document.querySelector('.cbc-sticker-emoji')?.getAttribute('data-cbc-motion')).toBeTruthy();
+        expect(document.querySelector('.cbc-sticker-icon')?.getAttribute('data-cbc-motion')).toBeTruthy();
+        expect(document.querySelector('.cbc-sticker-pick')?.getAttribute('data-cbc-motion')).toBeNull();
+        expect(document.querySelector('.cbc-sticker-name')?.getAttribute('data-cbc-motion')).toBeNull();
     });
 
     it('keeps stickers still when animation is off', () => {

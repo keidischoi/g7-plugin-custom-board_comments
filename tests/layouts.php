@@ -31,7 +31,7 @@ $plugin = json_decode((string) file_get_contents($root.'/plugin.json'), true);
 expect('identifier', $plugin['identifier'] ?? null, 'g7-plugin-custom-board_comments');
 expect('g7 version', $plugin['g7_version'] ?? null, '>=7.0.0');
 expectTrue('js asset', ($plugin['assets']['js']['output'] ?? '') === 'dist/js/plugin.iife.js');
-expect('plugin version', $plugin['version'] ?? null, '0.1.13');
+expect('plugin version', $plugin['version'] ?? null, '0.1.15');
 $iife = (string) file_get_contents($root.'/dist/js/plugin.iife.js');
 expectTrue('iife exists', $iife !== '');
 expectTrue('iife mounts overlay toolbar', str_contains($iife, 'cbc-toolbar--overlay') && str_contains($iife, 'data-cbc-boot'));
@@ -43,7 +43,8 @@ expectTrue('iife uses css sort order', str_contains($iife, 'cbc-comment-stack'))
 expectTrue('iife closes stickers', str_contains($iife, 'cbc-close') && str_contains($iife, 'focusin'));
 expectTrue('iife has pack sizes', str_contains($iife, '"12"') && str_contains($iife, '"96"') && str_contains($iife, '"384"') && str_contains($iife, 'cbc-stickers--animated'));
 $css = (string) file_get_contents($root.'/dist/css/plugin.css');
-expectTrue('css has sticker motion', str_contains($css, 'cbc-stickers-animated') && str_contains($css, 'cbc-bob') && str_contains($css, 'cbc-pick'));
+expectTrue('css has sticker motion', str_contains($css, 'cbc-stickers-animated') && str_contains($css, 'cbc-bob') && str_contains($css, 'cbc-sticker-icon'));
+expectTrue('css does not shake picker tiles', ! str_contains($css, 'cbc-pick'));
 
 $layout = json_decode((string) file_get_contents($root.'/resources/layouts/admin/plugin_settings.json'), true);
 expect('layout name', $layout['layout_name'] ?? null, 'plugin_settings');
