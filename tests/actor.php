@@ -15,4 +15,17 @@ $user = (object) ['uuid' => 'user-uuid-1', 'id' => 99];
 expect('request user uuid', ActorRules::id(null, $user), 'user-uuid-1');
 expect('auth wins over request user', ActorRules::id(7, $user), '7');
 
+$sanctumRequest = new class {
+    public function user(?string $guard = null): ?object
+    {
+        if ($guard === 'sanctum') {
+            return (object) ['uuid' => 'sanctum-uuid'];
+        }
+
+        return (object) ['id' => 1];
+    }
+};
+expect('from request uses sanctum user', ActorRules::fromRequest($sanctumRequest), 'sanctum-uuid');
+expect('from request guest', ActorRules::fromRequest(null), '');
+
 finish();

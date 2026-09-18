@@ -5,8 +5,8 @@ namespace Plugins\G7\Plugin\Custom\BoardComments\Http\Controllers;
 use App\Helpers\ResponseHelper;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Plugins\G7\Plugin\Custom\BoardComments\Services\CommentLikeService;
+use Plugins\G7\Plugin\Custom\BoardComments\Support\ActorRules;
 use Plugins\G7\Plugin\Custom\BoardComments\Support\LikeRules;
 use RuntimeException;
 
@@ -23,7 +23,7 @@ class CommentLikeController
 
     public function summary(Request $request, int $postId): JsonResponse
     {
-        $userId = Auth::id();
+        $userId = ActorRules::fromRequest($request);
         $guestHash = LikeRules::guestHash((string) $request->ip(), (string) $request->userAgent());
 
         return $this->ok($this->likes->summary(
@@ -42,7 +42,7 @@ class CommentLikeController
             return $this->fail('게시글과 댓글 정보가 필요합니다.', 422);
         }
 
-        $userId = Auth::id();
+        $userId = ActorRules::fromRequest($request);
         $guestHash = LikeRules::guestHash((string) $request->ip(), (string) $request->userAgent());
 
         try {

@@ -24,7 +24,7 @@ import { boardPostApiUrl, parseBoardShowPath, isBoardPostApi, unwrapApiData } fr
 import { mutationNeedsCommentSync } from './observe';
 import { ensureComposerControls } from './composer';
 import { paintTokens } from './tokens';
-import { pluginRequestHeaders } from './auth';
+import { pluginFetch } from './auth';
 import type { BoardComment } from './sort';
 
 type Runtime = {
@@ -67,13 +67,7 @@ function asComments(raw: unknown): BoardComment[] {
 }
 
 async function fetchJson(url: string, init?: RequestInit): Promise<unknown> {
-    const { headers: extraHeaders, ...rest } = init ?? {};
-    const headers = pluginRequestHeaders((extraHeaders ?? {}) as Record<string, string>);
-    const response = await window.fetch(url, {
-        credentials: 'same-origin',
-        headers,
-        ...rest,
-    });
+    const response = await pluginFetch(url, init);
     const payload = await response.json().catch(() => null);
     if (!response.ok) {
         const message = payload && typeof payload === 'object' && 'message' in payload
@@ -201,10 +195,8 @@ function boot(): void {
             const body = new FormData();
             body.append('file', file);
             body.append('post_id', String(ref.postId));
-            const response = await window.fetch(`${API_PREFIX}/media`, {
+            const response = await pluginFetch(`${API_PREFIX}/media`, {
                 method: 'POST',
-                credentials: 'same-origin',
-                headers: pluginRequestHeaders(),
                 body,
             });
             const payload = await response.json().catch(() => null);
@@ -381,7 +373,7 @@ function boot(): void {
         }
     });
     observer.observe(document.documentElement, { childList: true, subtree: true });
-    document.documentElement.setAttribute('data-cbc-boot', '0.1.12');
+    document.documentElement.setAttribute('data-cbc-boot', '0.1.13');
 
     void (async () => {
         try {

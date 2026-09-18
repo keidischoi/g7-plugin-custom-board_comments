@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it } from 'vitest';
-import { pluginRequestHeaders, readAuthToken } from './auth';
+import { pluginFetch, pluginRequestHeaders, readAuthToken } from './auth';
 
 afterEach(() => {
     localStorage.clear();
@@ -36,5 +36,31 @@ describe('auth headers', () => {
         localStorage.setItem('auth_token', 'undefined');
         expect(readAuthToken()).toBeNull();
         expect(pluginRequestHeaders().Authorization).toBeUndefined();
+    });
+
+    it('retries once after AuthManager refreshes a 401', async () => {
+        localStorage.setItem('auth_token', 'old-token');
+        window.G7Core = {
+            AuthManager: {
+                getInstance: () => ({
+                    refreshToken: async () => {
+                        localStorage.setItem('auth_token', 'new-token');
+                        return true;
+                    },
+                }),
+            },
+        };
+        const calls: Array<string | undefined> = [];
+        const fetchImpl: typeof fetch = async (_url, init) => {
+            const headers = new Headers(init?.headers);
+            calls.push(headers.get('Authorization') ?? undefined);
+            if (calls.length === 1) {
+                return new Response(JSON.stringify({ message: 'unauthenticated' }), { status: 401 });
+            }
+            return new Response(JSON.stringify({ ok: true }), { status: 200 });
+        };
+        const response = await pluginFetch('/api/plugins/g7-plugin-custom-board_comments/media', { method: 'POST' }, window, fetchImpl);
+        expect(response.status).toBe(200);
+        expect(calls).toEqual(['Bearer old-token', 'Bearer new-token']);
     });
 });
