@@ -1,6 +1,6 @@
 {
     "_meta": {
-        "version": "0.1.0",
+        "version": "0.1.1",
         "description": "게시판 댓글 확장 플러그인 기본값과 프론트엔드 공개 설정"
     },
     "defaults": {
@@ -10,7 +10,7 @@
         "best_threshold": 5,
         "best_limit": 3,
         "default_sort": "latest",
-        "board_slugs": "",
+        "board_slugs": "free",
         "style_enabled": true
     },
     "frontend_schema": {

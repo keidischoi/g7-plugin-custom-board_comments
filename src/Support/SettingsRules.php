@@ -18,7 +18,7 @@ final class SettingsRules
             'best_threshold' => 5,
             'best_limit' => 3,
             'default_sort' => 'latest',
-            'board_slugs' => '',
+            'board_slugs' => 'free',
             'style_enabled' => true,
         ];
     }
@@ -44,7 +44,9 @@ final class SettingsRules
             'best_threshold' => self::clampInt($input['best_threshold'] ?? $defaults['best_threshold'], 1, 999, 5),
             'best_limit' => self::clampInt($input['best_limit'] ?? $defaults['best_limit'], 1, 20, 3),
             'default_sort' => $sort,
-            'board_slugs' => self::normalizeSlugString($input['board_slugs'] ?? ''),
+            'board_slugs' => self::normalizeSlugString(
+                array_key_exists('board_slugs', $input) ? $input['board_slugs'] : $defaults['board_slugs']
+            ),
             'style_enabled' => self::boolish($input['style_enabled'] ?? $defaults['style_enabled']),
         ];
     }

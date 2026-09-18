@@ -21,7 +21,7 @@ export const DEFAULT_CONFIG: PluginConfig = {
     bestThreshold: 5,
     bestLimit: 3,
     defaultSort: 'latest',
-    boardSlugs: [],
+    boardSlugs: ['free'],
     styleEnabled: true,
 };
 
@@ -53,6 +53,16 @@ export function appliesToBoard(slug: string, slugs: string[]): boolean {
     return slugs.length === 0 || slugs.includes(slug.trim().toLowerCase());
 }
 
+function resolveSlugs(input: Record<string, unknown>): string[] {
+    if (Object.prototype.hasOwnProperty.call(input, 'board_slugs')) {
+        return parseSlugs(input.board_slugs);
+    }
+    if (Object.prototype.hasOwnProperty.call(input, 'boardSlugs')) {
+        return parseSlugs(input.boardSlugs);
+    }
+    return [...DEFAULT_CONFIG.boardSlugs];
+}
+
 export function normalizeConfig(raw: unknown): PluginConfig {
     const input = (raw && typeof raw === 'object') ? raw as Record<string, unknown> : {};
     const sort = String(input.default_sort ?? input.defaultSort ?? DEFAULT_CONFIG.defaultSort);
@@ -63,7 +73,7 @@ export function normalizeConfig(raw: unknown): PluginConfig {
         bestThreshold: clampInt(input.best_threshold ?? input.bestThreshold, 1, 999, 5),
         bestLimit: clampInt(input.best_limit ?? input.bestLimit, 1, 20, 3),
         defaultSort: (SORTS as readonly string[]).includes(sort) ? sort as SortKind : 'latest',
-        boardSlugs: parseSlugs(input.board_slugs ?? input.boardSlugs),
+        boardSlugs: resolveSlugs(input),
         styleEnabled: boolish(input.style_enabled ?? input.styleEnabled, true),
     };
 }
