@@ -1,5 +1,13 @@
 import { describe, expect, it } from 'vitest';
-import { bindCommentRows, commentRows, ensureToolbar, findCommentSection, paintLikes } from './enhance';
+import {
+    applySort,
+    bindCommentRows,
+    bindToolbarSort,
+    commentRows,
+    ensureToolbar,
+    findCommentSection,
+    paintLikes,
+} from './enhance';
 import { DEFAULT_CONFIG } from './config';
 import type { BoardComment } from './sort';
 
@@ -112,5 +120,43 @@ describe('enhance', () => {
         expect(toolbar.parentElement).toBe(document.body);
         expect(toolbar.dataset.cbcAnchored).toBe('0');
         expect(toolbar.querySelector('[data-cbc-sort="oldest"]')?.classList.contains('is-active')).toBe(true);
+    });
+
+    it('keeps comment ids after sorting so 등록순/최신순 actually reorder', () => {
+        document.body.innerHTML = `
+            <div class="bg-white rounded-lg shadow" data-cbc-section="1">
+                <h3>댓글 4</h3>
+                <div class="space-y-4">
+                    <div class="border-b"><div class="flex-1">최경동 11111</div></div>
+                    <div class="border-b"><div class="flex-1">최경동 4353535353</div></div>
+                    <div class="border-b"><div class="flex-1">최경동 111111111111111</div></div>
+                    <div class="border-b"><div class="flex-1">최경동 😍fgbgbgfg</div></div>
+                </div>
+            </div>
+        `;
+        const section = document.querySelector('[data-cbc-section]') as HTMLElement;
+        const liveComments: BoardComment[] = [
+            { id: 2, parent_id: null, depth: 0, created_at: '2026-09-18 16:32:24', content: '11111' },
+            { id: 3, parent_id: null, depth: 0, created_at: '2026-09-18 16:32:29', content: '4353535353' },
+            { id: 4, parent_id: null, depth: 0, created_at: '2026-09-18 16:32:33', content: '111111111111111' },
+            { id: 5, parent_id: null, depth: 0, created_at: '2026-09-18 16:56:34', content: '[[s:love]]fgbgbgfg' },
+        ];
+        const summary = { counts: {}, liked: [], best: [] };
+        bindCommentRows(section, liveComments);
+        expect(commentRows(section).map((row) => row.getAttribute('data-cbc-comment-id'))).toEqual(['2', '3', '4', '5']);
+
+        applySort(section, liveComments, 'latest', summary, DEFAULT_CONFIG);
+        expect(commentRows(section).map((row) => row.getAttribute('data-cbc-comment-id'))).toEqual(['5', '4', '3', '2']);
+
+        bindCommentRows(section, liveComments);
+        applySort(section, liveComments, 'latest', summary, DEFAULT_CONFIG);
+        expect(commentRows(section).map((row) => row.getAttribute('data-cbc-comment-id'))).toEqual(['5', '4', '3', '2']);
+
+        const toolbar = ensureToolbar(section, 'latest', copy);
+        bindToolbarSort(toolbar, (next) => {
+            applySort(section, liveComments, next, summary, DEFAULT_CONFIG);
+        });
+        toolbar.querySelector<HTMLButtonElement>('[data-cbc-sort="oldest"]')?.click();
+        expect(commentRows(section).map((row) => row.getAttribute('data-cbc-comment-id'))).toEqual(['2', '3', '4', '5']);
     });
 });

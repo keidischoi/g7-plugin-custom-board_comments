@@ -11,6 +11,7 @@ $files = [
     __DIR__.'/api_contracts.php',
     __DIR__.'/boot.php',
     __DIR__.'/media.php',
+    __DIR__.'/actor.php',
 ];
 
 $failed = 0;
