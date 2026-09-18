@@ -31,12 +31,16 @@ class CommentDeletedCleanupListener implements HookListenerInterface
 
     public function onCommentDeleted(...$args): void
     {
-        $comment = $args[0] ?? null;
-        $commentId = is_object($comment) ? (int) ($comment->id ?? 0) : 0;
-        if ($commentId <= 0) {
-            return;
-        }
+        try {
+            $comment = $args[0] ?? null;
+            $commentId = is_object($comment) ? (int) ($comment->id ?? 0) : 0;
+            if ($commentId <= 0) {
+                return;
+            }
 
-        app(CommentLikeService::class)->forgetComment($commentId);
+            app(CommentLikeService::class)->forgetComment($commentId);
+        } catch (\Throwable) {
+            // Boot and comment-delete paths must not take the site down.
+        }
     }
 }

@@ -104,7 +104,25 @@ class Plugin extends AbstractPlugin
      */
     public function getConfigValues(): array
     {
-        return SettingsRules::defaults();
+        $file = __DIR__.'/src/Support/SettingsRules.php';
+        if (is_file($file)) {
+            require_once $file;
+        }
+
+        if (class_exists(SettingsRules::class, false)) {
+            return SettingsRules::defaults();
+        }
+
+        return [
+            'enabled' => true,
+            'allow_guest_likes' => false,
+            'best_enabled' => true,
+            'best_threshold' => 5,
+            'best_limit' => 3,
+            'default_sort' => 'latest',
+            'board_slugs' => 'free',
+            'style_enabled' => true,
+        ];
     }
 
     /**
