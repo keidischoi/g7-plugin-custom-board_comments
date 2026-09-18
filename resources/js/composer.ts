@@ -142,7 +142,7 @@ function toggleStickerPanel(
     panel.style.zIndex = '2147483001';
     panel.innerHTML = stickersForPack(config.stickerPack).map((sticker) => (
         `<button type="button" class="cbc-sticker-pick" data-cbc-sticker-id="${sticker.id}" data-cbc-motion="${stickerMotion(sticker.id)}" title="${sticker.label.ko}">`
-        + `<span class="cbc-sticker-emoji">${sticker.emoji}</span>`
+        + `<span class="cbc-sticker cbc-sticker-emoji" data-cbc-motion="${stickerMotion(sticker.id)}">${sticker.emoji}</span>`
         + `<span class="cbc-sticker-name">${sticker.label.ko}</span>`
         + `</button>`
     )).join('');
