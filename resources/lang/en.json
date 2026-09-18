@@ -1,0 +1,67 @@
+{
+  "editor": {
+    "data_source": {
+      "settings": "Board comment extras"
+    }
+  },
+  "name": "Custom Board Comments",
+  "description": "Adds likes, best comments, and sorting to official board comments.",
+  "ui": {
+    "like": "Like",
+    "liked": "Liked",
+    "best": "Best",
+    "sort": "Sort",
+    "latest": "Latest",
+    "oldest": "Oldest",
+    "popular": "Most liked",
+    "login_to_like": "Sign in to like a comment."
+  },
+  "settings": {
+    "title": "Board comment extras",
+    "description": "Show likes, best comments, and sorting on post pages without editing the theme.",
+    "notice": "Refresh a post page after saving. The sirsoft-board module must be active.",
+    "sections": {
+      "general": "General",
+      "best": "Best comments"
+    },
+    "options": {
+      "latest": "Latest",
+      "oldest": "Oldest",
+      "popular": "Most liked"
+    },
+    "fields": {
+      "enabled": {
+        "label": "Enable comment extras",
+        "hint": "Shows likes, best comments, and sorting on post comment sections."
+      },
+      "allow_guest_likes": {
+        "label": "Allow guest likes",
+        "hint": "When off, only signed-in members can like. Guests are limited to one like per IP."
+      },
+      "style_enabled": {
+        "label": "Comment card styling",
+        "hint": "Applies like-button and best-badge styles."
+      },
+      "default_sort": {
+        "label": "Default sort",
+        "hint": "The first comment order visitors see."
+      },
+      "board_slugs": {
+        "label": "Board slugs",
+        "hint": "Comma or newline separated. Leave empty to apply to every board."
+      },
+      "best_enabled": {
+        "label": "Enable best comments",
+        "hint": "Pins comments at or above the like threshold and shows a badge."
+      },
+      "best_threshold": {
+        "label": "Best-comment like threshold",
+        "hint": "Only comments with at least this many likes become best comments."
+      },
+      "best_limit": {
+        "label": "Maximum best comments",
+        "hint": "How many best comments to pin at the top."
+      }
+    }
+  }
+}

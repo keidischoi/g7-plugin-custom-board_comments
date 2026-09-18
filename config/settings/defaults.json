@@ -1,0 +1,26 @@
+{
+    "_meta": {
+        "version": "0.1.0",
+        "description": "게시판 댓글 확장 플러그인 기본값과 프론트엔드 공개 설정"
+    },
+    "defaults": {
+        "enabled": true,
+        "allow_guest_likes": false,
+        "best_enabled": true,
+        "best_threshold": 5,
+        "best_limit": 3,
+        "default_sort": "latest",
+        "board_slugs": "",
+        "style_enabled": true
+    },
+    "frontend_schema": {
+        "enabled": { "type": "boolean", "expose": true },
+        "allow_guest_likes": { "type": "boolean", "expose": true },
+        "best_enabled": { "type": "boolean", "expose": true },
+        "best_threshold": { "type": "integer", "expose": true },
+        "best_limit": { "type": "integer", "expose": true },
+        "default_sort": { "type": "string", "expose": true },
+        "board_slugs": { "type": "string", "expose": true },
+        "style_enabled": { "type": "boolean", "expose": true }
+    }
+}
