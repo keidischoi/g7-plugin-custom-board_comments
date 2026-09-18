@@ -1,5 +1,5 @@
 import type { PluginConfig } from './config';
-import { stickerToken } from './stickers';
+import { STICKERS, stickerToken } from './stickers';
 
 type Copy = {
     sticker: string;
