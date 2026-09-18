@@ -194,7 +194,7 @@ function bindStickerDismiss(panel: HTMLElement, toolbar: HTMLElement): void {
 function placePanel(panel: HTMLElement, toolbar: HTMLElement): void {
     const rect = toolbar.getBoundingClientRect();
     panel.style.top = `${Math.max(8, rect.bottom + 8)}px`;
-    panel.style.left = `${Math.max(8, Math.min(window.innerWidth - 320, rect.left))}px`;
+    panel.style.left = `${Math.max(8, Math.min(window.innerWidth - 420, rect.left))}px`;
 }
 
 function pickImage(
