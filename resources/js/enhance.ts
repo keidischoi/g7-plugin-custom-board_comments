@@ -2,6 +2,7 @@ import type { PluginConfig, SortKind } from './config';
 import { PLUGIN_ID } from './config';
 import { bestIds, pinBest, sortTree, visibleComments, type BoardComment } from './sort';
 import { stickerById } from './stickers';
+import { hideComposerUi } from './composer';
 
 export type LikeSummary = {
     counts: Record<string, number>;
@@ -216,8 +217,7 @@ export function ensureToolbar(section: Element | null, sort: SortKind, copy: typ
 
 export function hideToolbar(): void {
     document.querySelector('[data-cbc-toolbar]')?.remove();
-    document.querySelector('[data-cbc-stickers]')?.remove();
-    document.querySelector('[data-cbc-file]')?.remove();
+    hideComposerUi();
 }
 
 export function placeToolbar(toolbar: HTMLElement, section: Element | null): void {
