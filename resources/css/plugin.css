@@ -181,3 +181,13 @@
     letter-spacing: 0.02em;
     padding: 0.12rem 0.45rem;
 }
+
+.cbc-comment-stack {
+    display: flex !important;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.cbc-comment-stack > * {
+    margin-top: 0 !important;
+}

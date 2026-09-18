@@ -1,6 +1,6 @@
 {
     "_meta": {
-        "version": "0.1.10",
+        "version": "0.1.11",
         "description": "게시판 댓글 확장 플러그인 기본값과 프론트엔드 공개 설정"
     },
     "defaults": {

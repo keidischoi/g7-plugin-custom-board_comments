@@ -31,7 +31,7 @@ $plugin = json_decode((string) file_get_contents($root.'/plugin.json'), true);
 expect('identifier', $plugin['identifier'] ?? null, 'g7-plugin-custom-board_comments');
 expect('g7 version', $plugin['g7_version'] ?? null, '>=7.0.0');
 expectTrue('js asset', ($plugin['assets']['js']['output'] ?? '') === 'dist/js/plugin.iife.js');
-expect('plugin version', $plugin['version'] ?? null, '0.1.10');
+expect('plugin version', $plugin['version'] ?? null, '0.1.11');
 $iife = (string) file_get_contents($root.'/dist/js/plugin.iife.js');
 expectTrue('iife exists', $iife !== '');
 expectTrue('iife mounts overlay toolbar', str_contains($iife, 'cbc-toolbar--overlay') && str_contains($iife, 'data-cbc-boot'));
@@ -39,6 +39,7 @@ expectTrue('iife has sticker button', str_contains($iife, 'data-cbc-sticker') &&
 expectTrue('iife has expanded sticker set', str_contains($iife, 'pleading') && str_contains($iife, 'bubbletea'));
 expectTrue('iife sends bearer token', str_contains($iife, 'Authorization') && str_contains($iife, 'auth_token'));
 expectTrue('iife keeps sort ids', str_contains($iife, 'data-cbc-comment-id'));
+expectTrue('iife uses css sort order', str_contains($iife, 'cbc-comment-stack'));
 
 $layout = json_decode((string) file_get_contents($root.'/resources/layouts/admin/plugin_settings.json'), true);
 expect('layout name', $layout['layout_name'] ?? null, 'plugin_settings');
