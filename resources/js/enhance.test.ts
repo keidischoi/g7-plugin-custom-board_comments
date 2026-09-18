@@ -68,5 +68,26 @@ describe('enhance', () => {
         expect(section).not.toBeNull();
         const toolbar = ensureToolbar(section as Element, 'latest', copy);
         expect(toolbar.querySelector('[data-cbc-sort="latest"]')?.textContent).toBe('최신순');
+        expect(section?.querySelector('h3')?.nextElementSibling).toBe(toolbar);
+    });
+
+    it('finds the live 3D Store comment card and places the toolbar beside the heading', () => {
+        document.body.innerHTML = `
+            <div class="mt-6">
+                <div class="bg-white dark:bg-gray-800 rounded-lg shadow">
+                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white flex items-center justify-between px-6 pt-6 pb-4">
+                        <div class="flex items-center gap-2"><span>댓글</span><span>0</span></div>
+                    </h3>
+                    <div class="border-b border-gray-200 dark:border-gray-700"></div>
+                    <div class="px-6 py-8 text-center">댓글 작성 권한이 없습니다</div>
+                </div>
+            </div>
+        `;
+        const section = findCommentSection();
+        expect(section).not.toBeNull();
+        const toolbar = ensureToolbar(section as Element, 'latest', copy);
+        expect(toolbar.parentElement).toBe(section);
+        expect(section?.querySelector('h3')?.nextElementSibling).toBe(toolbar);
+        expect(toolbar.textContent).toContain('최신순');
     });
 });

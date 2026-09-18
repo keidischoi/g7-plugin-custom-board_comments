@@ -17,6 +17,7 @@ import {
     type LikeSummary,
 } from './enhance';
 import { boardPostApiUrl, parseBoardShowPath, isBoardPostApi, unwrapApiData } from './url';
+import { mutationNeedsCommentSync } from './observe';
 import type { BoardComment } from './sort';
 
 type Runtime = {
@@ -228,6 +229,8 @@ function boot(): void {
     };
 
     let syncTimer: number | null = null;
+    let retryTimer: number | null = null;
+    let retries = 0;
     const scheduleSync = (): void => {
         if (stopped) {
             return;
@@ -240,6 +243,26 @@ function boot(): void {
             void sync().catch(() => undefined);
         }, 50);
     };
+    const retryUntilVisible = (): void => {
+        retries = 0;
+        if (retryTimer !== null) {
+            window.clearInterval(retryTimer);
+        }
+        retryTimer = window.setInterval(() => {
+            if (stopped) {
+                return;
+            }
+            scheduleSync();
+            retries += 1;
+            if (retries >= 20) {
+                if (retryTimer !== null) {
+                    window.clearInterval(retryTimer);
+                    retryTimer = null;
+                }
+            }
+        }, 200);
+        scheduleSync();
+    };
 
     window.fetch = async (input: RequestInfo | URL, init?: RequestInit): Promise<Response> => {
         const response = await originalFetch(input, init);
@@ -247,7 +270,7 @@ function boot(): void {
             if (isBoardPostApi(requestUrl(input))) {
                 void response.clone().json().then((payload) => {
                     if (ingestPost(payload)) {
-                        scheduleSync();
+                        retryUntilVisible();
                     }
                 }).catch(() => undefined);
             }
@@ -270,7 +293,7 @@ function boot(): void {
             }
             try {
                 if (ingestPost(JSON.parse(this.responseText))) {
-                    scheduleSync();
+                    retryUntilVisible();
                 }
             } catch {
                 // ignore
@@ -287,7 +310,7 @@ function boot(): void {
         postFetched = false;
         config = readInlineConfig();
         sort = config.defaultSort;
-        scheduleSync();
+        retryUntilVisible();
     };
     window.addEventListener('popstate', onRoute);
     history.pushState = function (...args: Parameters<History['pushState']>) {
@@ -303,19 +326,7 @@ function boot(): void {
     historyPatched = true;
 
     observer = new MutationObserver((mutations) => {
-        const relevant = mutations.some((mutation) => [...mutation.addedNodes].some((node) => {
-            if (!(node instanceof Element)) {
-                return false;
-            }
-            if (node.matches?.('[data-cbc-like], [data-cbc-toolbar], [data-cbc-best]')) {
-                return false;
-            }
-            return Boolean(
-                node.querySelector?.('h3, h2, .space-y-4')
-                || /댓글|comment/i.test(node.textContent ?? ''),
-            );
-        }));
-        if (relevant) {
+        if (mutationNeedsCommentSync(mutations)) {
             scheduleSync();
         }
     });
@@ -328,7 +339,7 @@ function boot(): void {
         } catch {
             config = readInlineConfig();
         }
-        scheduleSync();
+        retryUntilVisible();
     })();
 
     window.__g7CustomBoardComments = {
@@ -339,6 +350,10 @@ function boot(): void {
             if (syncTimer !== null) {
                 window.clearTimeout(syncTimer);
                 syncTimer = null;
+            }
+            if (retryTimer !== null) {
+                window.clearInterval(retryTimer);
+                retryTimer = null;
             }
             if (fetchPatched) {
                 window.fetch = originalFetch;

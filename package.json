@@ -1,6 +1,6 @@
 {
     "name": "@g7/plugin-custom-board-comments",
-    "version": "0.1.4",
+    "version": "0.1.5",
     "description": "Custom board comment likes and sorting for Gnuboard7",
     "private": true,
     "type": "module",

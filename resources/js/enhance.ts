@@ -92,20 +92,21 @@ export function bindCommentRows(section: Element, comments: BoardComment[]): voi
 
 export function ensureToolbar(section: Element, sort: SortKind, copy: typeof COPY.ko): HTMLElement {
     let toolbar = section.querySelector<HTMLElement>('[data-cbc-toolbar]');
-    if (toolbar) {
+    if (!toolbar) {
+        toolbar = document.createElement('div');
+        toolbar.setAttribute('data-cbc-toolbar', '1');
+        toolbar.className = 'cbc-toolbar';
+        toolbar.innerHTML = SORTS_HTML(copy, sort);
+    } else {
         syncSortButtons(toolbar, sort);
-        return toolbar;
     }
 
-    toolbar = document.createElement('div');
-    toolbar.setAttribute('data-cbc-toolbar', '1');
-    toolbar.className = 'cbc-toolbar';
-    toolbar.innerHTML = SORTS_HTML(copy, sort);
-
-    const heading = section.querySelector('h3');
+    const heading = section.querySelector('h3, h2, h4');
     if (heading) {
-        heading.appendChild(toolbar);
-    } else {
+        if (toolbar.previousElementSibling !== heading) {
+            heading.insertAdjacentElement('afterend', toolbar);
+        }
+    } else if (toolbar.parentElement !== section) {
         section.prepend(toolbar);
     }
     return toolbar;
