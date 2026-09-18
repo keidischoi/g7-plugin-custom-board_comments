@@ -13,7 +13,10 @@ describe('isBoardPostApi', () => {
     it('matches the post detail endpoint only', () => {
         expect(isBoardPostApi('/api/modules/sirsoft-board/boards/free/posts/12')).toBe(true);
         expect(isBoardPostApi('/api/modules/sirsoft-board/boards/free/posts/12?del_cmt=1')).toBe(true);
+        expect(isBoardPostApi('https://3ds.liveon.synology.me/api/modules/sirsoft-board/boards/free/posts/3')).toBe(true);
+        expect(isBoardPostApi('/api/modules/sirsoft-board/boards/free/posts/12/comments')).toBe(true);
         expect(isBoardPostApi('/api/modules/sirsoft-board/boards/free/posts/12/navigation')).toBe(false);
+        expect(isBoardPostApi('/api/modules/sirsoft-board/boards/free/posts')).toBe(false);
     });
 });
 

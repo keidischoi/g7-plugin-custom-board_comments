@@ -11,11 +11,12 @@ import {
     applySort,
     bindCommentRows,
     ensureToolbar,
+    findCommentSection,
     localeCopy,
     paintLikes,
     type LikeSummary,
 } from './enhance';
-import { parseBoardShowPath, isBoardPostApi, unwrapApiData } from './url';
+import { boardPostApiUrl, parseBoardShowPath, isBoardPostApi, unwrapApiData } from './url';
 import type { BoardComment } from './sort';
 
 type Runtime = {
@@ -32,10 +33,14 @@ declare global {
 const API_PREFIX = `/api/plugins/${PLUGIN_ID}`;
 
 function asComments(raw: unknown): BoardComment[] {
-    if (!Array.isArray(raw)) {
+    let list = raw;
+    if (list && typeof list === 'object' && !Array.isArray(list) && Array.isArray((list as { data?: unknown }).data)) {
+        list = (list as { data: unknown[] }).data;
+    }
+    if (!Array.isArray(list)) {
         return [];
     }
-    return raw.map((item) => {
+    return list.map((item) => {
         const row = item && typeof item === 'object' ? item as Record<string, unknown> : {};
         return {
             id: Number(row.id) || 0,
@@ -50,23 +55,8 @@ function asComments(raw: unknown): BoardComment[] {
     }).filter((comment) => comment.id > 0);
 }
 
-function findCommentSection(root: ParentNode = document): Element | null {
-    const existing = root.querySelector('[data-cbc-section]');
-    if (existing) {
-        return existing;
-    }
-    const headings = [...root.querySelectorAll('h3')];
-    const heading = headings.find((node) => /댓글|comment/i.test(node.textContent ?? ''));
-    const section = heading?.closest('.bg-white, .rounded-lg') ?? heading?.parentElement;
-    if (section instanceof HTMLElement) {
-        section.setAttribute('data-cbc-section', '1');
-        return section;
-    }
-    return null;
-}
-
 async function fetchJson(url: string, init?: RequestInit): Promise<unknown> {
-    const response = await fetch(url, {
+    const response = await window.fetch(url, {
         credentials: 'same-origin',
         headers: {
             Accept: 'application/json',
@@ -113,6 +103,16 @@ function parseSummary(payload: unknown): LikeSummary {
     };
 }
 
+function requestUrl(input: RequestInfo | URL): string {
+    if (typeof input === 'string') {
+        return input;
+    }
+    if (input instanceof URL) {
+        return input.toString();
+    }
+    return input.url;
+}
+
 function boot(): void {
     window.__g7CustomBoardComments?.stop();
 
@@ -123,11 +123,29 @@ function boot(): void {
     let sort: SortKind = config.defaultSort;
     let observer: MutationObserver | null = null;
     let fetchPatched = false;
+    let xhrPatched = false;
+    let historyPatched = false;
     const originalFetch = window.fetch.bind(window);
+    const originalXhrOpen = XMLHttpRequest.prototype.open;
+    const originalXhrSend = XMLHttpRequest.prototype.send;
+    const originalPush = history.pushState.bind(history);
+    const originalReplace = history.replaceState.bind(history);
     let stopped = false;
+    let loadingPost = false;
+    let postFetched = false;
 
     const page = () => parseBoardShowPath(window.location.pathname);
     const copy = () => localeCopy(document.documentElement.lang || 'ko');
+
+    const ingestPost = (payload: unknown): boolean => {
+        const data = unwrapApiData(payload);
+        if (!data) {
+            return false;
+        }
+        comments = asComments(data.comments);
+        boardId = Number(data.board_id ?? (data.board && typeof data.board === 'object' ? (data.board as { id?: unknown }).id : 0)) || 0;
+        return true;
+    };
 
     const sync = async (): Promise<void> => {
         if (stopped) {
@@ -139,12 +157,23 @@ function boot(): void {
             return;
         }
 
+        if (!postFetched && comments.length === 0 && !loadingPost) {
+            postFetched = true;
+            loadingPost = true;
+            try {
+                ingestPost(await fetchJson(boardPostApiUrl(ref.slug, ref.postId)));
+            } catch {
+                // keep empty comments; toolbar can still render
+            } finally {
+                loadingPost = false;
+            }
+        }
+
         const section = findCommentSection();
-        if (!section || comments.length === 0) {
+        if (!section) {
             return;
         }
 
-        bindCommentRows(section, comments);
         const toolbar = ensureToolbar(section, sort, copy());
         toolbar.querySelectorAll<HTMLButtonElement>('[data-cbc-sort]').forEach((button) => {
             button.onclick = () => {
@@ -153,6 +182,11 @@ function boot(): void {
             };
         });
 
+        if (comments.length === 0) {
+            return;
+        }
+
+        bindCommentRows(section, comments);
         try {
             summary = parseSummary(await fetchJson(`${API_PREFIX}/posts/${ref.postId}/likes?slug=${encodeURIComponent(ref.slug)}`));
         } catch {
@@ -193,32 +227,11 @@ function boot(): void {
         });
     };
 
-    const ingestPost = (payload: unknown): void => {
-        const data = unwrapApiData(payload);
-        if (!data) {
-            return;
-        }
-        comments = asComments(data.comments);
-        boardId = Number(data.board_id ?? (data.board && typeof data.board === 'object' ? (data.board as { id?: unknown }).id : 0)) || 0;
-        void sync();
-    };
-
-    window.fetch = async (input: RequestInfo | URL, init?: RequestInit): Promise<Response> => {
-        const response = await originalFetch(input, init);
-        try {
-            const url = typeof input === 'string' ? input : input instanceof URL ? input.toString() : input.url;
-            if (isBoardPostApi(url)) {
-                void response.clone().json().then(ingestPost).catch(() => undefined);
-            }
-        } catch {
-            // ignore parse errors
-        }
-        return response;
-    };
-    fetchPatched = true;
-
     let syncTimer: number | null = null;
     const scheduleSync = (): void => {
+        if (stopped) {
+            return;
+        }
         if (syncTimer !== null) {
             return;
         }
@@ -228,32 +241,85 @@ function boot(): void {
         }, 50);
     };
 
+    window.fetch = async (input: RequestInfo | URL, init?: RequestInit): Promise<Response> => {
+        const response = await originalFetch(input, init);
+        try {
+            if (isBoardPostApi(requestUrl(input))) {
+                void response.clone().json().then((payload) => {
+                    if (ingestPost(payload)) {
+                        scheduleSync();
+                    }
+                }).catch(() => undefined);
+            }
+        } catch {
+            // ignore parse errors
+        }
+        return response;
+    };
+    fetchPatched = true;
+
+    XMLHttpRequest.prototype.open = function (this: XMLHttpRequest, ...args: unknown[]) {
+        (this as XMLHttpRequest & { __cbcUrl?: string }).__cbcUrl = String(args[1]);
+        return Reflect.apply(originalXhrOpen, this, args);
+    };
+    XMLHttpRequest.prototype.send = function (this: XMLHttpRequest, ...args: unknown[]) {
+        this.addEventListener('load', () => {
+            const url = (this as XMLHttpRequest & { __cbcUrl?: string }).__cbcUrl ?? '';
+            if (!isBoardPostApi(url)) {
+                return;
+            }
+            try {
+                if (ingestPost(JSON.parse(this.responseText))) {
+                    scheduleSync();
+                }
+            } catch {
+                // ignore
+            }
+        });
+        return originalXhrSend.apply(this, args as []);
+    };
+    xhrPatched = true;
+
+    const onRoute = (): void => {
+        comments = [];
+        boardId = 0;
+        summary = emptySummary();
+        postFetched = false;
+        config = readInlineConfig();
+        sort = config.defaultSort;
+        scheduleSync();
+    };
+    window.addEventListener('popstate', onRoute);
+    history.pushState = function (...args: Parameters<History['pushState']>) {
+        const result = originalPush(...args);
+        onRoute();
+        return result;
+    };
+    history.replaceState = function (...args: Parameters<History['replaceState']>) {
+        const result = originalReplace(...args);
+        onRoute();
+        return result;
+    };
+    historyPatched = true;
+
     observer = new MutationObserver((mutations) => {
         const relevant = mutations.some((mutation) => [...mutation.addedNodes].some((node) => {
             if (!(node instanceof Element)) {
                 return false;
             }
-            if (node.closest('[data-cbc-like], [data-cbc-toolbar], [data-cbc-best], [data-cbc-section]')) {
-                return node.querySelector('.space-y-4, [data-cbc-comment-id]') !== null
-                    && node.querySelector('[data-cbc-like]') === null;
+            if (node.matches?.('[data-cbc-like], [data-cbc-toolbar], [data-cbc-best]')) {
+                return false;
             }
-            return Boolean(node.querySelector?.('h3, .space-y-4'));
+            return Boolean(
+                node.querySelector?.('h3, h2, .space-y-4')
+                || /댓글|comment/i.test(node.textContent ?? ''),
+            );
         }));
         if (relevant) {
             scheduleSync();
         }
     });
     observer.observe(document.documentElement, { childList: true, subtree: true });
-
-    const onRoute = (): void => {
-        comments = [];
-        boardId = 0;
-        summary = emptySummary();
-        config = readInlineConfig();
-        sort = config.defaultSort;
-        void sync();
-    };
-    window.addEventListener('popstate', onRoute);
 
     void (async () => {
         try {
@@ -262,7 +328,7 @@ function boot(): void {
         } catch {
             config = readInlineConfig();
         }
-        void sync();
+        scheduleSync();
     })();
 
     window.__g7CustomBoardComments = {
@@ -277,6 +343,16 @@ function boot(): void {
             if (fetchPatched) {
                 window.fetch = originalFetch;
                 fetchPatched = false;
+            }
+            if (xhrPatched) {
+                XMLHttpRequest.prototype.open = originalXhrOpen;
+                XMLHttpRequest.prototype.send = originalXhrSend;
+                xhrPatched = false;
+            }
+            if (historyPatched) {
+                history.pushState = originalPush;
+                history.replaceState = originalReplace;
+                historyPatched = false;
             }
         },
     };

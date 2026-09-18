@@ -17,7 +17,17 @@ export function parseBoardShowPath(pathname: string): BoardShowRef | null {
 }
 
 export function isBoardPostApi(url: string): boolean {
-    return /\/api\/modules\/sirsoft-board\/boards\/[^/?#]+\/posts\/\d+(?:[?#]|$)/.test(url);
+    try {
+        const path = url.startsWith('http') ? new URL(url, 'https://example.invalid').pathname : url.split('?')[0];
+        return /\/api\/modules\/sirsoft-board\/boards\/[^/]+\/posts\/\d+$/.test(path)
+            || /\/api\/modules\/sirsoft-board\/boards\/[^/]+\/posts\/\d+\/comments$/.test(path);
+    } catch {
+        return false;
+    }
+}
+
+export function boardPostApiUrl(slug: string, postId: number): string {
+    return `/api/modules/sirsoft-board/boards/${encodeURIComponent(slug)}/posts/${postId}`;
 }
 
 export function unwrapApiData(payload: unknown): Record<string, unknown> | null {
