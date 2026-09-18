@@ -4,10 +4,10 @@ namespace Plugins\G7\Plugin\Custom\BoardComments\Services;
 
 use App\Services\PluginSettingsService;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\Schema;
 use Plugins\G7\Plugin\Custom\BoardComments\Models\CommentLike;
 use Plugins\G7\Plugin\Custom\BoardComments\Support\CommentEnhanceRules;
 use Plugins\G7\Plugin\Custom\BoardComments\Support\LikeRules;
+use Plugins\G7\Plugin\Custom\BoardComments\Support\LikeTable;
 use Plugins\G7\Plugin\Custom\BoardComments\Support\SettingsRules;
 use RuntimeException;
 
@@ -183,11 +183,7 @@ class CommentLikeService
 
     private function tableReady(): bool
     {
-        try {
-            return Schema::hasTable('custom_board_comment_likes');
-        } catch (\Throwable) {
-            return false;
-        }
+        return LikeTable::ensure();
     }
 
     /**

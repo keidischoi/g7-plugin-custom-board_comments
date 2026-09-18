@@ -19,7 +19,7 @@ class CommentLike extends Model
 {
     public $timestamps = false;
 
-    protected $table = 'custom_board_comment_likes';
+    protected $table = \Plugins\G7\Plugin\Custom\BoardComments\Support\LikeTable::NAME;
 
     /**
      * @var list<string>

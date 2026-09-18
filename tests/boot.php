@@ -6,13 +6,16 @@ require __DIR__.'/bootstrap.php';
 
 $root = dirname(__DIR__);
 $pluginPhp = (string) file_get_contents($root.'/plugin.php');
-$providerDir = $root.'/src/Providers';
 
-expectFalse('no custom service provider dir', is_dir($providerDir));
-expectFalse('plugin.php does not autoload Plugin class for identifier', (bool) preg_match('/=\s*\\\\?SettingsRules::/', $pluginPhp));
+expectFalse('no custom service provider dir', is_dir($root.'/src/Providers'));
+expectFalse('no hook listener dir', is_dir($root.'/src/Listeners'));
+expectFalse('no install migrations', is_dir($root.'/database/migrations'));
 expectTrue('plugin identifier is a literal', str_contains($pluginPhp, "IDENTIFIER = 'g7-plugin-custom-board_comments'"));
-expectTrue('install loads settings without composer autoload', str_contains($pluginPhp, "require_once \$file"));
-expectTrue('settings class exists for require_once', is_file($root.'/src/Support/SettingsRules.php'));
+expectTrue('inline config values', str_contains($pluginPhp, "'board_slugs' => 'free'"));
+expectFalse('plugin.php does not import src classes', str_contains($pluginPhp, 'Plugins\\G7\\Plugin\\Custom\\BoardComments\\Support'));
+expectFalse('plugin.php has no hook listeners', str_contains($pluginPhp, 'getHookListeners'));
+expectTrue('install skips artisan migrate', str_contains($pluginPhp, 'function getMigrations()'));
+expectTrue('like table helper exists', is_file($root.'/src/Support/LikeTable.php'));
 
 $iterator = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($root.'/src', FilesystemIterator::SKIP_DOTS));
 foreach ($iterator as $file) {
@@ -26,5 +29,6 @@ foreach ($iterator as $file) {
 }
 
 expect('settings plugin id', \Plugins\G7\Plugin\Custom\BoardComments\Support\SettingsRules::PLUGIN_ID, 'g7-plugin-custom-board_comments');
+expect('like table name', \Plugins\G7\Plugin\Custom\BoardComments\Support\LikeTable::NAME, 'custom_board_comment_likes');
 
 finish();
