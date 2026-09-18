@@ -141,16 +141,16 @@ function toggleStickerPanel(
     panel.style.position = 'fixed';
     panel.style.zIndex = '2147483001';
     panel.innerHTML = stickersForPack(config.stickerPack).map((sticker) => (
-        `<button type="button" class="cbc-sticker-pick" data-cbc-sticker-id="${sticker.id}" data-cbc-motion="${stickerMotion(sticker.id)}" title="${sticker.label.ko}">`
+        `<div role="button" tabindex="0" class="cbc-sticker-pick" data-cbc-sticker-id="${sticker.id}" data-cbc-motion="${stickerMotion(sticker.id)}" title="${sticker.label.ko}">`
         + `<span class="cbc-sticker cbc-sticker-emoji" data-cbc-motion="${stickerMotion(sticker.id)}">${sticker.emoji}</span>`
         + `<span class="cbc-sticker-name">${sticker.label.ko}</span>`
-        + `</button>`
+        + `</div>`
     )).join('');
     document.body.appendChild(panel);
     placePanel(panel, toolbar);
     bindStickerDismiss(panel);
-    panel.querySelectorAll<HTMLButtonElement>('[data-cbc-sticker-id]').forEach((button) => {
-        button.onclick = () => {
+    panel.querySelectorAll<HTMLElement>('[data-cbc-sticker-id]').forEach((button) => {
+        const pick = (): void => {
             const id = button.getAttribute('data-cbc-sticker-id') ?? '';
             const composer = findComposer(section);
             if (!composer || !insertIntoComposer(composer, stickerToken(id))) {
@@ -158,6 +158,13 @@ function toggleStickerPanel(
                 return;
             }
             closeStickerPanel(panel);
+        };
+        button.onclick = pick;
+        button.onkeydown = (event) => {
+            if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault();
+                pick();
+            }
         };
     });
 }

@@ -71,7 +71,8 @@ describe('composer', () => {
         openStickerPanel({ ...DEFAULT_CONFIG, stickerPack: 'simple' });
         expect(document.querySelectorAll('[data-cbc-sticker-id]').length).toBe(SIMPLE_STICKER_IDS.length);
         expect(document.querySelector('[data-cbc-stickers]')?.className).toContain('cbc-stickers--animated');
-        expect(document.querySelector('.cbc-sticker-emoji')?.classList.contains('cbc-sticker')).toBe(true);
+        expect(document.querySelector('[data-cbc-sticker-id]')?.tagName).toBe('DIV');
+        expect(document.querySelector('[data-cbc-sticker-id]')?.getAttribute('role')).toBe('button');
         expect(document.querySelector('.cbc-sticker-emoji')?.getAttribute('data-cbc-motion')).toBeTruthy();
     });
 

@@ -255,8 +255,8 @@ html.cbc-stickers-animated .cbc-sticker[data-cbc-motion="pop"] {
 }
 
 @keyframes cbc-pick {
-    0%, 100% { transform: scale(1) rotate(0deg); }
-    50% { transform: scale(1.1) rotate(-6deg); }
+    0%, 100% { transform: scale(1) rotate(0deg); filter: brightness(1); }
+    50% { transform: scale(1.12) rotate(-7deg); filter: brightness(1.2); }
 }
 
 @media (prefers-reduced-motion: reduce) {
