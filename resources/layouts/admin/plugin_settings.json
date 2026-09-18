@@ -32,7 +32,7 @@
     "board_slugs": { "type": "string", "default": "free" },
     "style_enabled": { "type": "boolean", "default": true },
     "stickers_enabled": { "type": "boolean", "default": true },
-    "sticker_pack": { "type": "enum", "options": ["12", "24", "48", "96", "192", "384", "full"], "default": "full" },
+    "sticker_pack": { "type": "enum", "options": ["pack_12", "pack_24", "pack_48", "pack_96", "pack_192", "pack_384", "full"], "default": "full" },
     "stickers_animated": { "type": "boolean", "default": true },
     "images_enabled": { "type": "boolean", "default": true }
   },
@@ -216,12 +216,12 @@
                         "name": "Select",
                         "props": { "id": "sticker_pack", "name": "sticker_pack", "className": "lg:col-span-1" },
                         "children": [
-                          { "type": "basic", "name": "Option", "props": { "value": "12" }, "text": "$t:g7-plugin-custom-board_comments.settings.options.pack_12" },
-                          { "type": "basic", "name": "Option", "props": { "value": "24" }, "text": "$t:g7-plugin-custom-board_comments.settings.options.pack_24" },
-                          { "type": "basic", "name": "Option", "props": { "value": "48" }, "text": "$t:g7-plugin-custom-board_comments.settings.options.pack_48" },
-                          { "type": "basic", "name": "Option", "props": { "value": "96" }, "text": "$t:g7-plugin-custom-board_comments.settings.options.pack_96" },
-                          { "type": "basic", "name": "Option", "props": { "value": "192" }, "text": "$t:g7-plugin-custom-board_comments.settings.options.pack_192" },
-                          { "type": "basic", "name": "Option", "props": { "value": "384" }, "text": "$t:g7-plugin-custom-board_comments.settings.options.pack_384" },
+                          { "type": "basic", "name": "Option", "props": { "value": "pack_12" }, "text": "$t:g7-plugin-custom-board_comments.settings.options.pack_12" },
+                          { "type": "basic", "name": "Option", "props": { "value": "pack_24" }, "text": "$t:g7-plugin-custom-board_comments.settings.options.pack_24" },
+                          { "type": "basic", "name": "Option", "props": { "value": "pack_48" }, "text": "$t:g7-plugin-custom-board_comments.settings.options.pack_48" },
+                          { "type": "basic", "name": "Option", "props": { "value": "pack_96" }, "text": "$t:g7-plugin-custom-board_comments.settings.options.pack_96" },
+                          { "type": "basic", "name": "Option", "props": { "value": "pack_192" }, "text": "$t:g7-plugin-custom-board_comments.settings.options.pack_192" },
+                          { "type": "basic", "name": "Option", "props": { "value": "pack_384" }, "text": "$t:g7-plugin-custom-board_comments.settings.options.pack_384" },
                           { "type": "basic", "name": "Option", "props": { "value": "full" }, "text": "$t:g7-plugin-custom-board_comments.settings.options.full" }
                         ]
                       }

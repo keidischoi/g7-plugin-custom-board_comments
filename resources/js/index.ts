@@ -2,7 +2,7 @@ import '../css/plugin.css';
 import {
     applyPluginClasses,
     appliesToBoard,
-    normalizeConfig,
+    overlayConfig,
     PLUGIN_ID,
     readInlineConfig,
     type PluginConfig,
@@ -404,7 +404,7 @@ function boot(): void {
 
     void (async () => {
         try {
-            config = normalizeConfig(unwrapData(await fetchJson(`${API_PREFIX}/settings`)));
+            config = overlayConfig(readInlineConfig(), unwrapData(await fetchJson(`${API_PREFIX}/settings`)));
             settingsReady = true;
             applyPluginClasses(config);
             sort = config.defaultSort;

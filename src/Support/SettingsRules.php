@@ -45,7 +45,7 @@ final class SettingsRules
             $sort = $defaults['default_sort'];
         }
 
-        $pack = self::normalizeStickerPack($input['sticker_pack'] ?? $defaults['sticker_pack']);
+        $pack = self::normalizeStickerPack($input['sticker_pack'] ?? $input['stickerPack'] ?? $defaults['sticker_pack']);
 
         return [
             'enabled' => self::boolish($input['enabled'] ?? $defaults['enabled']),
@@ -68,6 +68,9 @@ final class SettingsRules
     public static function normalizeStickerPack(mixed $raw): string
     {
         $text = strtolower(trim((string) $raw));
+        if (preg_match('/^(?:pack_|p|size_)?(\d+)$/', $text, $match) === 1) {
+            $text = $match[1];
+        }
         if ($text === 'simple') {
             return '48';
         }
@@ -79,6 +82,65 @@ final class SettingsRules
         }
 
         return 'full';
+    }
+
+    /**
+     * G7 설정 서비스가 플러그인 설정을 여러 겹으로 감싸거나, 빈 active 목록만 줄 때 실제 값을 꺼냅니다.
+     *
+     * @param  list<mixed>  $chunks
+     * @return array<string, mixed>|null
+     */
+    public static function firstSettings(array $chunks): ?array
+    {
+        $merged = [];
+        foreach ($chunks as $chunk) {
+            $extracted = self::extractSettings($chunk);
+            if ($extracted === null || $extracted === []) {
+                continue;
+            }
+            $merged = array_merge($merged, $extracted);
+        }
+
+        return $merged === [] ? null : $merged;
+    }
+
+    /**
+     * @return array<string, mixed>|null
+     */
+    public static function extractSettings(mixed $raw): ?array
+    {
+        if (is_string($raw)) {
+            $decoded = json_decode($raw, true);
+
+            return is_array($decoded) ? self::extractSettings($decoded) : null;
+        }
+        if (! is_array($raw)) {
+            return null;
+        }
+        if (isset($raw[self::PLUGIN_ID])) {
+            return self::extractSettings($raw[self::PLUGIN_ID]);
+        }
+        foreach (['settings', 'data', 'values', 'config'] as $key) {
+            if (isset($raw[$key]) && is_array($raw[$key]) && ! self::looksLikePluginSettings($raw)) {
+                return self::extractSettings($raw[$key]);
+            }
+        }
+
+        return self::looksLikePluginSettings($raw) ? $raw : null;
+    }
+
+    /**
+     * @param  array<string, mixed>  $raw
+     */
+    private static function looksLikePluginSettings(array $raw): bool
+    {
+        foreach (['sticker_pack', 'stickerPack', 'stickers_animated', 'stickers_enabled', 'board_slugs', 'default_sort', 'allow_guest_likes', 'best_threshold'] as $key) {
+            if (array_key_exists($key, $raw)) {
+                return true;
+            }
+        }
+
+        return array_key_exists('enabled', $raw) && count($raw) <= 20 && ! isset($raw[self::PLUGIN_ID]);
     }
 
     /**

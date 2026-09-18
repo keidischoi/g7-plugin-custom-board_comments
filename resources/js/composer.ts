@@ -137,6 +137,7 @@ function toggleStickerPanel(
     }
     const panel = document.createElement('div');
     panel.setAttribute('data-cbc-stickers', '1');
+    panel.setAttribute('data-cbc-pack', config.stickerPack);
     panel.className = config.stickersAnimated ? 'cbc-stickers cbc-stickers--animated' : 'cbc-stickers';
     panel.tabIndex = -1;
     panel.style.position = 'fixed';

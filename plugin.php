@@ -106,7 +106,7 @@ class Plugin extends AbstractPlugin
             ],
             'sticker_pack' => [
                 'type' => 'enum',
-                'options' => ['12', '24', '48', '96', '192', '384', 'full'],
+                'options' => ['pack_12', 'pack_24', 'pack_48', 'pack_96', 'pack_192', 'pack_384', 'full'],
                 'default' => 'full',
                 'label' => ['ko' => '스티커 세트', 'en' => 'Sticker pack'],
                 'hint' => [

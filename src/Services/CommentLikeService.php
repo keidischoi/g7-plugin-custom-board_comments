@@ -169,16 +169,18 @@ class CommentLikeService
             return null;
         }
 
+        $chunks = [];
         if (method_exists($this->pluginSettings, 'getAllActiveSettings')) {
-            $active = $this->pluginSettings->getAllActiveSettings();
-            $loaded = is_array($active[SettingsRules::PLUGIN_ID] ?? null) ? $active[SettingsRules::PLUGIN_ID] : [];
-
-            return is_array($loaded) ? $loaded : null;
+            $chunks[] = $this->pluginSettings->getAllActiveSettings();
+        }
+        if (method_exists($this->pluginSettings, 'get')) {
+            $chunks[] = $this->pluginSettings->get(SettingsRules::PLUGIN_ID);
+        }
+        if (method_exists($this->pluginSettings, 'getSettings')) {
+            $chunks[] = $this->pluginSettings->getSettings(SettingsRules::PLUGIN_ID);
         }
 
-        $loaded = $this->pluginSettings->get(SettingsRules::PLUGIN_ID);
-
-        return is_array($loaded) ? $loaded : null;
+        return SettingsRules::firstSettings($chunks);
     }
 
     private function tableReady(): bool

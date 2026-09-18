@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { applyPluginClasses, applyStickerMotionClass, appliesToBoard, normalizeConfig, parseSlugs } from './config';
+import { applyPluginClasses, applyStickerMotionClass, appliesToBoard, DEFAULT_CONFIG, normalizeConfig, overlayConfig, parseSlugs } from './config';
 
 describe('normalizeConfig', () => {
     it('uses safe defaults', () => {
@@ -30,6 +30,8 @@ describe('normalizeConfig', () => {
             stickersAnimated: false,
         });
         expect(normalizeConfig({ sticker_pack: '96' }).stickerPack).toBe('96');
+        expect(normalizeConfig({ sticker_pack: 'pack_12' }).stickerPack).toBe('12');
+        expect(normalizeConfig({ sticker_pack: 24 }).stickerPack).toBe('24');
         expect(normalizeConfig({ sticker_pack: 'all' }).stickerPack).toBe('full');
     });
 
@@ -54,5 +56,13 @@ describe('normalizeConfig', () => {
         }, root);
         expect(root.classList.contains('cbc-styled')).toBe(true);
         expect(root.classList.contains('cbc-stickers-animated')).toBe(true);
+    });
+
+    it('keeps inline pack size when the settings payload omits it', () => {
+        const merged = overlayConfig({ ...DEFAULT_CONFIG, stickerPack: '12', stickersAnimated: false }, {
+            stickers_animated: true,
+        });
+        expect(merged.stickerPack).toBe('12');
+        expect(merged.stickersAnimated).toBe(true);
     });
 });
