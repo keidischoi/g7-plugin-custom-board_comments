@@ -2,16 +2,17 @@
 
 그누보드7 공식 게시판(`sirsoft-board`) 댓글에 **추천**, **베스트 댓글**, **정렬**을 붙이는 플러그인입니다. 테마와 게시판 모듈 파일은 수정하지 않습니다.
 
-버전 **0.1.11**. 처음 연결 대상은 [자유게시판](https://3ds.liveon.synology.me/board/free) 입니다. 목록이 아니라 **글 제목을 연 화면**(`/board/free/{번호}`)에 댓글 정렬·스티커·이미지 버튼이 보입니다.
+버전 **0.1.12**. 처음 연결 대상은 [자유게시판](https://3ds.liveon.synology.me/board/free) 입니다. 목록이 아니라 **글 제목을 연 화면**(`/board/free/{번호}`)에 댓글 정렬·스티커·이미지 버튼이 보입니다.
 
-이전 버전은 설치·활성화 때 사이트 전체가 Laravel **Server Error**가 나거나, 글 상세에 정렬 바가 안 보일 수 있습니다. 그 경우 플러그인을 완전히 제거한 뒤 **0.1.11**만 다시 설치하세요.
+이전 버전은 설치·활성화 때 사이트 전체가 Laravel **Server Error**가 나거나, 글 상세에 정렬 바가 안 보일 수 있습니다. 그 경우 플러그인을 완전히 제거한 뒤 **0.1.12**만 다시 설치하세요.
 
 ## 기능
 
 - 댓글 추천 토글 (기본: 로그인 회원만, 설정에서 비회원 IP 1회 허용)
 - 추천 수가 기준 이상이면 **베스트** 배지와 상단 고정
 - 최신순 / 등록순 / 추천순
-- 댓글 스티커 삽입
+- 댓글 스티커 삽입 (설정에서 12·24·48·96개 배수 / 전체, 움직이는 스티커)
+- 스티커 창은 바깥을 누르거나 포커스를 잃으면 닫힘
 - 댓글 이미지 삽입 (로그인 회원, 2MB, jpg/png/gif/webp)
 - 적용할 게시판 슬러그 (기본 `free`, 비우면 전체)
 - 다크 테마에 맞춘 추천 버튼·베스트 배지
@@ -70,6 +71,8 @@ Prefix: `/api/plugins/g7-plugin-custom-board_comments`
 | `board_slugs` | `free` | 적용 게시판. 비우면 전체 |
 | `style_enabled` | true | 추천 버튼·배지 CSS |
 | `stickers_enabled` | true | 스티커 삽입 |
+| `sticker_pack` | `full` | 12 / 24 / 48 / 96 / 192 / 384 / full |
+| `stickers_animated` | true | 스티커가 뛰고 흔들림 |
 | `images_enabled` | true | 이미지 삽입 |
 
 ## 테스트
@@ -101,7 +104,7 @@ npm run build
 | vendor | `g7` |
 | namespace | `Plugins\\G7\\Plugin\\Custom\\BoardComments` |
 | github_url | `https://github.com/keidischoi/g7-plugin-custom-board_comments` |
-| version | `0.1.11` |
+| version | `0.1.12` |
 
 ## 라이선스
 

@@ -1,7 +1,9 @@
 export const PLUGIN_ID = 'g7-plugin-custom-board_comments';
 export const SORTS = ['latest', 'oldest', 'popular'] as const;
+export const STICKER_PACKS = ['12', '24', '48', '96', '192', '384', 'full'] as const;
 
 export type SortKind = (typeof SORTS)[number];
+export type StickerPack = (typeof STICKER_PACKS)[number];
 
 export type PluginConfig = {
     enabled: boolean;
@@ -13,6 +15,8 @@ export type PluginConfig = {
     boardSlugs: string[];
     styleEnabled: boolean;
     stickersEnabled: boolean;
+    stickerPack: StickerPack;
+    stickersAnimated: boolean;
     imagesEnabled: boolean;
 };
 
@@ -26,6 +30,8 @@ export const DEFAULT_CONFIG: PluginConfig = {
     boardSlugs: ['free'],
     styleEnabled: true,
     stickersEnabled: true,
+    stickerPack: 'full',
+    stickersAnimated: true,
     imagesEnabled: true,
 };
 
@@ -70,6 +76,7 @@ function resolveSlugs(input: Record<string, unknown>): string[] {
 export function normalizeConfig(raw: unknown): PluginConfig {
     const input = (raw && typeof raw === 'object') ? raw as Record<string, unknown> : {};
     const sort = String(input.default_sort ?? input.defaultSort ?? DEFAULT_CONFIG.defaultSort);
+    const pack = String(input.sticker_pack ?? input.stickerPack ?? DEFAULT_CONFIG.stickerPack);
     return {
         enabled: boolish(input.enabled, true),
         allowGuestLikes: boolish(input.allow_guest_likes ?? input.allowGuestLikes, false),
@@ -80,12 +87,28 @@ export function normalizeConfig(raw: unknown): PluginConfig {
         boardSlugs: resolveSlugs(input),
         styleEnabled: boolish(input.style_enabled ?? input.styleEnabled, true),
         stickersEnabled: boolish(input.stickers_enabled ?? input.stickersEnabled, true),
+        stickerPack: normalizeStickerPack(pack),
+        stickersAnimated: boolish(input.stickers_animated ?? input.stickersAnimated, true),
         imagesEnabled: boolish(input.images_enabled ?? input.imagesEnabled, true),
     };
 }
 
 export function readInlineConfig(win: G7Window = window): PluginConfig {
     return normalizeConfig(win.G7Config?.plugins?.[PLUGIN_ID]);
+}
+
+export function normalizeStickerPack(raw: unknown): StickerPack {
+    const text = String(raw ?? '').trim().toLowerCase();
+    if (text === 'simple') {
+        return '48';
+    }
+    if (text === 'all') {
+        return 'full';
+    }
+    if ((STICKER_PACKS as readonly string[]).includes(text)) {
+        return text as StickerPack;
+    }
+    return 'full';
 }
 
 function boolish(value: unknown, fallback: boolean): boolean {

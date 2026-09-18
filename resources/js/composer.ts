@@ -1,5 +1,7 @@
 import type { PluginConfig } from './config';
-import { STICKERS, stickerToken } from './stickers';
+import { stickerMotion, stickersForPack, stickerToken } from './stickers';
+
+export const STICKER_DISMISS_ARM_MS = 280;
 
 type Copy = {
     sticker: string;
@@ -108,7 +110,7 @@ function bindActionButtons(
         stickerBtn.onclick = (event) => {
             event.preventDefault();
             event.stopPropagation();
-            toggleStickerPanel(toolbar, section, copy);
+            toggleStickerPanel(toolbar, section, copy, config);
         };
     }
     if (imageBtn) {
@@ -121,7 +123,12 @@ function bindActionButtons(
     }
 }
 
-function toggleStickerPanel(toolbar: HTMLElement, section: Element | null, copy: Copy): void {
+function toggleStickerPanel(
+    toolbar: HTMLElement,
+    section: Element | null,
+    copy: Copy,
+    config: PluginConfig,
+): void {
     const existing = document.querySelector<HTMLElement>('[data-cbc-stickers]');
     if (existing) {
         closeStickerPanel(existing);
@@ -129,21 +136,21 @@ function toggleStickerPanel(toolbar: HTMLElement, section: Element | null, copy:
     }
     const panel = document.createElement('div');
     panel.setAttribute('data-cbc-stickers', '1');
-    panel.className = 'cbc-stickers';
+    panel.className = config.stickersAnimated ? 'cbc-stickers cbc-stickers--animated' : 'cbc-stickers';
     panel.tabIndex = -1;
     panel.style.position = 'fixed';
     panel.style.zIndex = '2147483001';
-    panel.innerHTML = STICKERS.map((sticker) => (
-        `<button type="button" class="cbc-sticker-pick" data-cbc-sticker-id="${sticker.id}" title="${sticker.label.ko}">`
-        + `<span class="cbc-sticker-emoji">${sticker.emoji}</span>`
+    panel.innerHTML = stickersForPack(config.stickerPack).map((sticker) => (
+        `<div role="button" tabindex="0" class="cbc-sticker-pick" data-cbc-sticker-id="${sticker.id}" data-cbc-motion="${stickerMotion(sticker.id)}" title="${sticker.label.ko}">`
+        + `<span class="cbc-sticker cbc-sticker-emoji" data-cbc-motion="${stickerMotion(sticker.id)}">${sticker.emoji}</span>`
         + `<span class="cbc-sticker-name">${sticker.label.ko}</span>`
-        + `</button>`
+        + `</div>`
     )).join('');
     document.body.appendChild(panel);
     placePanel(panel, toolbar);
-    bindStickerDismiss(panel, toolbar);
-    panel.querySelectorAll<HTMLButtonElement>('[data-cbc-sticker-id]').forEach((button) => {
-        button.onclick = () => {
+    bindStickerDismiss(panel);
+    panel.querySelectorAll<HTMLElement>('[data-cbc-sticker-id]').forEach((button) => {
+        const pick = (): void => {
             const id = button.getAttribute('data-cbc-sticker-id') ?? '';
             const composer = findComposer(section);
             if (!composer || !insertIntoComposer(composer, stickerToken(id))) {
@@ -152,24 +159,44 @@ function toggleStickerPanel(toolbar: HTMLElement, section: Element | null, copy:
             }
             closeStickerPanel(panel);
         };
+        button.onclick = pick;
+        button.onkeydown = (event) => {
+            if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault();
+                pick();
+            }
+        };
     });
-    panel.focus();
 }
 
-function bindStickerDismiss(panel: HTMLElement, toolbar: HTMLElement): void {
+function isStickerUi(target: EventTarget | null): boolean {
+    if (!(target instanceof Node)) {
+        return false;
+    }
+    const panel = document.querySelector('[data-cbc-stickers]');
+    if (panel instanceof Node && panel.contains(target)) {
+        return true;
+    }
+    return target instanceof Element && Boolean(target.closest('[data-cbc-sticker]'));
+}
+
+function bindStickerDismiss(panel: HTMLElement): void {
     const abort = new AbortController();
     const { signal } = abort;
-    const close = (): void => closeStickerPanel(panel);
-    panel.addEventListener('cbc-close', () => abort.abort(), { once: true });
+    let armed = false;
+    const armTimer = window.setTimeout(() => {
+        armed = true;
+    }, STICKER_DISMISS_ARM_MS);
+    const close = (): void => {
+        window.clearTimeout(armTimer);
+        closeStickerPanel(panel);
+    };
+    panel.addEventListener('cbc-close', () => {
+        window.clearTimeout(armTimer);
+        abort.abort();
+    }, { once: true });
     document.addEventListener('pointerdown', (event) => {
-        const target = event.target;
-        if (!(target instanceof Node)) {
-            return;
-        }
-        if (panel.contains(target)) {
-            return;
-        }
-        if (target instanceof Element && target.closest('[data-cbc-sticker]')) {
+        if (isStickerUi(event.target)) {
             return;
         }
         close();
@@ -180,11 +207,22 @@ function bindStickerDismiss(panel: HTMLElement, toolbar: HTMLElement): void {
         }
     }, { capture: true, signal });
     document.addEventListener('focusin', (event) => {
-        const target = event.target;
-        if (!(target instanceof Node)) {
+        if (!armed) {
             return;
         }
-        if (panel.contains(target) || toolbar.contains(target)) {
+        if (isStickerUi(event.target)) {
+            return;
+        }
+        close();
+    }, { capture: true, signal });
+    panel.addEventListener('focusout', (event) => {
+        if (!armed) {
+            return;
+        }
+        if (isStickerUi(event.relatedTarget)) {
+            return;
+        }
+        if (!(event.relatedTarget instanceof Node)) {
             return;
         }
         close();

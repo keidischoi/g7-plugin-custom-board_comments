@@ -29,7 +29,14 @@
     "options": {
       "latest": "Latest",
       "oldest": "Oldest",
-      "popular": "Most liked"
+      "popular": "Most liked",
+      "pack_12": "12 stickers",
+      "pack_24": "24 stickers",
+      "pack_48": "48 stickers",
+      "pack_96": "96 stickers",
+      "pack_192": "192 stickers",
+      "pack_384": "384 stickers",
+      "full": "All"
     },
     "fields": {
       "enabled": {
@@ -47,6 +54,14 @@
       "stickers_enabled": {
         "label": "Sticker insert",
         "hint": "Lets visitors insert stickers into the comment box."
+      },
+      "sticker_pack": {
+        "label": "Sticker pack",
+        "hint": "Choose 12, 24, 48, 96, and so on. Full is 700+ stickers."
+      },
+      "stickers_animated": {
+        "label": "Animated stickers",
+        "hint": "Stickers bounce and wiggle with CSS. Turn off for still emoji. No remote GIF files."
       },
       "images_enabled": {
         "label": "Image insert",

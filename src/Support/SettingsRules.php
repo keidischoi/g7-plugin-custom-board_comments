@@ -8,6 +8,8 @@ final class SettingsRules
 
     public const SORTS = ['latest', 'oldest', 'popular'];
 
+    public const STICKER_PACKS = ['12', '24', '48', '96', '192', '384', 'full'];
+
     /**
      * @return array<string, mixed>
      */
@@ -23,6 +25,8 @@ final class SettingsRules
             'board_slugs' => 'free',
             'style_enabled' => true,
             'stickers_enabled' => true,
+            'sticker_pack' => 'full',
+            'stickers_animated' => true,
             'images_enabled' => true,
         ];
     }
@@ -41,6 +45,8 @@ final class SettingsRules
             $sort = $defaults['default_sort'];
         }
 
+        $pack = self::normalizeStickerPack($input['sticker_pack'] ?? $defaults['sticker_pack']);
+
         return [
             'enabled' => self::boolish($input['enabled'] ?? $defaults['enabled']),
             'allow_guest_likes' => self::boolish($input['allow_guest_likes'] ?? $defaults['allow_guest_likes']),
@@ -53,8 +59,26 @@ final class SettingsRules
             ),
             'style_enabled' => self::boolish($input['style_enabled'] ?? $defaults['style_enabled']),
             'stickers_enabled' => self::boolish($input['stickers_enabled'] ?? $defaults['stickers_enabled']),
+            'sticker_pack' => $pack,
+            'stickers_animated' => self::boolish($input['stickers_animated'] ?? $defaults['stickers_animated']),
             'images_enabled' => self::boolish($input['images_enabled'] ?? $defaults['images_enabled']),
         ];
+    }
+
+    public static function normalizeStickerPack(mixed $raw): string
+    {
+        $text = strtolower(trim((string) $raw));
+        if ($text === 'simple') {
+            return '48';
+        }
+        if ($text === 'all') {
+            return 'full';
+        }
+        if (in_array($text, self::STICKER_PACKS, true)) {
+            return $text;
+        }
+
+        return 'full';
     }
 
     /**

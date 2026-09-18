@@ -107,7 +107,8 @@
     width: min(36rem, calc(100vw - 1.5rem));
     max-height: 26rem;
     overflow-y: auto;
-    padding: 0.55rem;
+    overflow-x: hidden;
+    padding: 0.75rem;
     background: rgb(255 255 255 / 0.98);
     border: 1px solid rgb(209 213 219);
     border-radius: 1rem;
@@ -122,7 +123,9 @@
     border: 1px solid transparent;
     background: rgb(249 250 251);
     border-radius: 0.55rem;
-    padding: 0.35rem 0.1rem 0.2rem;
+    padding: 0.55rem 0.1rem 0.35rem;
+    min-height: 3.5rem;
+    overflow: visible;
     cursor: pointer;
 }
 
@@ -132,8 +135,8 @@
 }
 
 .cbc-sticker-emoji {
-    font-size: 1.5rem;
-    line-height: 1;
+    font-size: 1.75rem;
+    line-height: 1.35;
 }
 
 .cbc-sticker-name {
@@ -148,6 +151,120 @@
 .cbc-sticker {
     font-size: 1.65rem;
     line-height: 1;
+}
+
+html.cbc-stickers-animated .cbc-sticker,
+.cbc-stickers--animated .cbc-sticker-emoji {
+    display: inline-block;
+    transform-origin: 50% 80%;
+    will-change: transform;
+    backface-visibility: hidden;
+}
+
+.cbc-stickers--animated .cbc-sticker-emoji {
+    animation: cbc-pulse 0.7s ease-in-out infinite;
+}
+
+html.cbc-stickers-animated .cbc-sticker[data-cbc-motion="bob"] {
+    animation: cbc-bob 0.9s ease-in-out infinite;
+}
+
+.cbc-stickers--animated [data-cbc-motion="bob"] .cbc-sticker-emoji {
+    animation: cbc-pulse 0.75s ease-in-out infinite;
+}
+
+html.cbc-stickers-animated .cbc-sticker[data-cbc-motion="pulse"] {
+    animation: cbc-pulse 0.85s ease-in-out infinite;
+}
+
+.cbc-stickers--animated [data-cbc-motion="pulse"] .cbc-sticker-emoji {
+    animation: cbc-pulse 0.65s ease-in-out infinite;
+}
+
+html.cbc-stickers-animated .cbc-sticker[data-cbc-motion="wiggle"] {
+    animation: cbc-wiggle 0.7s ease-in-out infinite;
+}
+
+.cbc-stickers--animated [data-cbc-motion="wiggle"] .cbc-sticker-emoji {
+    animation: cbc-wiggle 0.7s ease-in-out infinite;
+}
+
+html.cbc-stickers-animated .cbc-sticker[data-cbc-motion="shake"] {
+    animation: cbc-shake 0.55s ease-in-out infinite;
+}
+
+.cbc-stickers--animated [data-cbc-motion="shake"] .cbc-sticker-emoji {
+    animation: cbc-shake 0.55s ease-in-out infinite;
+}
+
+html.cbc-stickers-animated .cbc-sticker[data-cbc-motion="pop"] {
+    animation: cbc-pop 0.95s ease-in-out infinite;
+}
+
+.cbc-stickers--animated [data-cbc-motion="pop"] .cbc-sticker-emoji {
+    animation: cbc-pop 0.8s ease-in-out infinite;
+}
+
+.cbc-stickers--animated .cbc-sticker-pick {
+    transform-origin: 50% 50%;
+    animation: cbc-pick 0.8s ease-in-out infinite;
+}
+
+.cbc-stickers--animated .cbc-sticker-pick:nth-child(2n) {
+    animation-delay: 0.12s;
+}
+
+.cbc-stickers--animated .cbc-sticker-pick:nth-child(3n) {
+    animation-delay: 0.24s;
+}
+
+.cbc-stickers--animated .cbc-sticker-pick:hover {
+    animation: none;
+    transform: scale(1.08);
+}
+
+@keyframes cbc-bob {
+    0%, 100% { transform: translateY(0) rotate(0deg); }
+    50% { transform: translateY(-0.42em) rotate(-6deg); }
+}
+
+@keyframes cbc-pulse {
+    0%, 100% { transform: scale(1); }
+    40% { transform: scale(1.34); }
+    70% { transform: scale(0.9); }
+}
+
+@keyframes cbc-wiggle {
+    0%, 100% { transform: rotate(-18deg) translateY(0); }
+    50% { transform: rotate(18deg) translateY(-0.16em); }
+}
+
+@keyframes cbc-shake {
+    0%, 100% { transform: translate(0, 0) rotate(0deg); }
+    20% { transform: translate(-0.18em, 0.05em) rotate(-8deg); }
+    40% { transform: translate(0.18em, -0.05em) rotate(8deg); }
+    60% { transform: translate(-0.12em, 0) rotate(-4deg); }
+    80% { transform: translate(0.12em, 0) rotate(4deg); }
+}
+
+@keyframes cbc-pop {
+    0%, 100% { transform: scale(1) translateY(0); }
+    30% { transform: scale(1.4) translateY(-0.22em); }
+    55% { transform: scale(0.86) translateY(0.06em); }
+    75% { transform: scale(1.16) translateY(-0.1em); }
+}
+
+@keyframes cbc-pick {
+    0%, 100% { transform: scale(1) rotate(0deg); filter: brightness(1); }
+    50% { transform: scale(1.12) rotate(-7deg); filter: brightness(1.2); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    html.cbc-stickers-animated .cbc-sticker,
+    .cbc-stickers--animated .cbc-sticker-emoji,
+    .cbc-stickers--animated .cbc-sticker-pick {
+        animation: none !important;
+    }
 }
 
 .cbc-image {

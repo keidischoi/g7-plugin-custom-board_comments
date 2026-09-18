@@ -29,7 +29,14 @@
     "options": {
       "latest": "최신순",
       "oldest": "등록순",
-      "popular": "추천순"
+      "popular": "추천순",
+      "pack_12": "12개",
+      "pack_24": "24개",
+      "pack_48": "48개",
+      "pack_96": "96개",
+      "pack_192": "192개",
+      "pack_384": "384개",
+      "full": "전체"
     },
     "fields": {
       "enabled": {
@@ -47,6 +54,14 @@
       "stickers_enabled": {
         "label": "스티커 삽입",
         "hint": "댓글 입력창에 스티커를 넣을 수 있습니다."
+      },
+      "sticker_pack": {
+        "label": "스티커 세트",
+        "hint": "12, 24, 48, 96처럼 배수로 고릅니다. 전체는 700개 넘습니다."
+      },
+      "stickers_animated": {
+        "label": "움직이는 스티커",
+        "hint": "스티커가 위아래로 뛰거나 흔들립니다. GIF를 받지 않고 CSS로만 움직입니다. 끄면 가만히 있는 이모지입니다."
       },
       "images_enabled": {
         "label": "이미지 삽입",

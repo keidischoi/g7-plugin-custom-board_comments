@@ -104,6 +104,27 @@ class Plugin extends AbstractPlugin
                 ],
                 'required' => false,
             ],
+            'sticker_pack' => [
+                'type' => 'enum',
+                'options' => ['12', '24', '48', '96', '192', '384', 'full'],
+                'default' => 'full',
+                'label' => ['ko' => '스티커 세트', 'en' => 'Sticker pack'],
+                'hint' => [
+                    'ko' => '12, 24, 48, 96처럼 배수로 고릅니다. 전체는 700개 넘습니다.',
+                    'en' => 'Choose 12, 24, 48, 96, and so on. Full is 700+ stickers.',
+                ],
+                'required' => true,
+            ],
+            'stickers_animated' => [
+                'type' => 'boolean',
+                'default' => true,
+                'label' => ['ko' => '움직이는 스티커', 'en' => 'Animated stickers'],
+                'hint' => [
+                    'ko' => '스티커가 위아래로 뛰거나 흔들립니다. GIF를 받지 않고 CSS로만 움직입니다. 끄면 가만히 있는 이모지입니다.',
+                    'en' => 'Stickers bounce and wiggle with CSS. Turn off for still emoji. No remote GIF files.',
+                ],
+                'required' => false,
+            ],
             'images_enabled' => [
                 'type' => 'boolean',
                 'default' => true,
@@ -132,6 +153,8 @@ class Plugin extends AbstractPlugin
             'board_slugs' => 'free',
             'style_enabled' => true,
             'stickers_enabled' => true,
+            'sticker_pack' => 'full',
+            'stickers_animated' => true,
             'images_enabled' => true,
         ];
     }

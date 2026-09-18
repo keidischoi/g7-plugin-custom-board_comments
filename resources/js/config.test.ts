@@ -8,6 +8,8 @@ describe('normalizeConfig', () => {
             allowGuestLikes: false,
             defaultSort: 'latest',
             boardSlugs: ['free'],
+            stickerPack: 'full',
+            stickersAnimated: true,
         });
     });
 
@@ -17,12 +19,18 @@ describe('normalizeConfig', () => {
             best_threshold: 5000,
             default_sort: 'popular',
             board_slugs: 'Free, qna',
+            sticker_pack: 'simple',
+            stickers_animated: '0',
         })).toMatchObject({
             enabled: false,
             bestThreshold: 999,
             defaultSort: 'popular',
             boardSlugs: ['free', 'qna'],
+            stickerPack: '48',
+            stickersAnimated: false,
         });
+        expect(normalizeConfig({ sticker_pack: '96' }).stickerPack).toBe('96');
+        expect(normalizeConfig({ sticker_pack: 'all' }).stickerPack).toBe('full');
     });
 
     it('rejects invalid slugs', () => {
@@ -30,5 +38,6 @@ describe('normalizeConfig', () => {
         expect(normalizeConfig({ board_slugs: '' }).boardSlugs).toEqual([]);
         expect(appliesToBoard('qna', [])).toBe(true);
         expect(appliesToBoard('qna', ['free'])).toBe(false);
+        expect(normalizeConfig({ sticker_pack: 'nope' }).stickerPack).toBe('full');
     });
 });
