@@ -48,7 +48,9 @@ describe('composer', () => {
         document.body.innerHTML = '<div class="border-b" data-cbc-comment-id="11">안녕 [[s:love]] [[i:9]]</div>';
         paintTokens(document.body);
         expect(document.querySelector('[data-cbc-media="sticker"]')?.textContent).toBe('😍');
+        expect(document.querySelector('[data-cbc-media="sticker"] .cbc-sticker-face')?.textContent).toBe('😍');
         expect(document.querySelector('[data-cbc-media="sticker"]')?.getAttribute('data-cbc-motion')).toBeTruthy();
+        expect(document.querySelector('[data-cbc-media="sticker"]')?.childElementCount).toBe(1);
         expect(document.querySelector('[data-cbc-media="image"]')?.getAttribute('src')).toContain('/media/9');
         expect(document.body.textContent).not.toContain('[[s:love]]');
         expect(imageToken(9)).toBe('[[i:9]]');
@@ -74,6 +76,8 @@ describe('composer', () => {
         expect(document.querySelector('[data-cbc-sticker-id]')?.tagName).toBe('DIV');
         expect(document.querySelector('[data-cbc-sticker-id]')?.getAttribute('role')).toBe('button');
         expect(document.querySelector('.cbc-sticker-icon')?.getAttribute('data-cbc-motion')).toBeTruthy();
+        expect(document.querySelector('.cbc-sticker-icon .cbc-sticker-face')?.textContent).toBeTruthy();
+        expect(document.querySelector('.cbc-sticker-icon')?.childElementCount).toBe(1);
         expect(document.querySelector('.cbc-sticker-pick')?.getAttribute('data-cbc-motion')).toBeNull();
         expect(document.querySelector('.cbc-sticker-name')?.getAttribute('data-cbc-motion')).toBeNull();
     });

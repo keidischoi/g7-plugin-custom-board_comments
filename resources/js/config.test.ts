@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { appliesToBoard, normalizeConfig, parseSlugs } from './config';
+import { applyPluginClasses, applyStickerMotionClass, appliesToBoard, normalizeConfig, parseSlugs } from './config';
 
 describe('normalizeConfig', () => {
     it('uses safe defaults', () => {
@@ -39,5 +39,20 @@ describe('normalizeConfig', () => {
         expect(appliesToBoard('qna', [])).toBe(true);
         expect(appliesToBoard('qna', ['free'])).toBe(false);
         expect(normalizeConfig({ sticker_pack: 'nope' }).stickerPack).toBe('full');
+    });
+
+    it('toggles the animated sticker class on the document root', () => {
+        const root = document.createElement('html');
+        applyStickerMotionClass(true, root);
+        expect(root.classList.contains('cbc-stickers-animated')).toBe(true);
+        applyStickerMotionClass(false, root);
+        expect(root.classList.contains('cbc-stickers-animated')).toBe(false);
+        applyPluginClasses({
+            ...normalizeConfig(undefined),
+            styleEnabled: true,
+            stickersAnimated: true,
+        }, root);
+        expect(root.classList.contains('cbc-styled')).toBe(true);
+        expect(root.classList.contains('cbc-stickers-animated')).toBe(true);
     });
 });

@@ -97,6 +97,15 @@ export function readInlineConfig(win: G7Window = window): PluginConfig {
     return normalizeConfig(win.G7Config?.plugins?.[PLUGIN_ID]);
 }
 
+export function applyStickerMotionClass(on: boolean, root: HTMLElement = document.documentElement): void {
+    root.classList.toggle('cbc-stickers-animated', on);
+}
+
+export function applyPluginClasses(config: PluginConfig, root: HTMLElement = document.documentElement): void {
+    root.classList.toggle('cbc-styled', config.styleEnabled);
+    applyStickerMotionClass(config.stickersAnimated, root);
+}
+
 export function normalizeStickerPack(raw: unknown): StickerPack {
     const text = String(raw ?? '').trim().toLowerCase();
     if (text === 'simple') {

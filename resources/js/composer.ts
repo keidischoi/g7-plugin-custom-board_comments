@@ -1,5 +1,6 @@
 import type { PluginConfig } from './config';
 import { stickerMotion, stickersForPack, stickerToken } from './stickers';
+import { stickerFaceHtml } from './tokens';
 
 export const STICKER_DISMISS_ARM_MS = 280;
 
@@ -142,7 +143,7 @@ function toggleStickerPanel(
     panel.style.zIndex = '2147483001';
     panel.innerHTML = stickersForPack(config.stickerPack).map((sticker) => (
         `<div role="button" tabindex="0" class="cbc-sticker-pick" data-cbc-sticker-id="${sticker.id}" title="${sticker.label.ko}">`
-        + `<span class="cbc-sticker-icon" data-cbc-motion="${stickerMotion(sticker.id)}">${sticker.emoji}</span>`
+        + `<span class="cbc-sticker-icon" data-cbc-motion="${stickerMotion(sticker.id)}">${stickerFaceHtml(sticker.emoji)}</span>`
         + `<span class="cbc-sticker-name">${sticker.label.ko}</span>`
         + `</div>`
     )).join('');

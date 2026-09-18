@@ -1,5 +1,6 @@
 import '../css/plugin.css';
 import {
+    applyPluginClasses,
     appliesToBoard,
     normalizeConfig,
     PLUGIN_ID,
@@ -124,6 +125,8 @@ function boot(): void {
     let boardId = 0;
     let summary = emptySummary();
     let config = readInlineConfig();
+    let settingsReady = false;
+    applyPluginClasses(config);
     let sort: SortKind = config.defaultSort;
     let observer: MutationObserver | null = null;
     let fetchPatched = false;
@@ -160,8 +163,7 @@ function boot(): void {
         syncing = true;
         try {
         const ref = page();
-        document.documentElement.classList.toggle('cbc-styled', config.styleEnabled);
-        document.documentElement.classList.toggle('cbc-stickers-animated', config.stickersAnimated);
+        applyPluginClasses(config);
         if (!ref || !config.enabled || !appliesToBoard(ref.slug, config.boardSlugs)) {
             hideToolbar();
             return;
@@ -362,7 +364,10 @@ function boot(): void {
         summary = emptySummary();
         postFetched = false;
         likesLoaded = false;
-        config = readInlineConfig();
+        if (!settingsReady) {
+            config = readInlineConfig();
+            applyPluginClasses(config);
+        }
         sort = config.defaultSort;
         retryUntilVisible();
     };
@@ -395,14 +400,17 @@ function boot(): void {
         }
     });
     observer.observe(document.documentElement, { childList: true, subtree: true });
-    document.documentElement.setAttribute('data-cbc-boot', '0.1.15');
+    document.documentElement.setAttribute('data-cbc-boot', '0.1.16');
 
     void (async () => {
         try {
             config = normalizeConfig(unwrapData(await fetchJson(`${API_PREFIX}/settings`)));
+            settingsReady = true;
+            applyPluginClasses(config);
             sort = config.defaultSort;
         } catch {
             config = readInlineConfig();
+            applyPluginClasses(config);
         }
         retryUntilVisible();
     })();
