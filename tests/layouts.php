@@ -52,7 +52,9 @@ expectTrue('css option overrides reduced motion', ! str_contains($css, 'prefers-
 $layout = json_decode((string) file_get_contents($root.'/resources/layouts/admin/plugin_settings.json'), true);
 expect('layout name', $layout['layout_name'] ?? null, 'plugin_settings');
 expectTrue('has enabled toggle', str_contains((string) file_get_contents($root.'/resources/layouts/admin/plugin_settings.json'), '"name": "enabled"'));
-expectTrue('has sticker pack', str_contains((string) file_get_contents($root.'/resources/layouts/admin/plugin_settings.json'), '"name": "sticker_pack"'));
+$settingsLayout = (string) file_get_contents($root.'/resources/layouts/admin/plugin_settings.json');
+expectTrue('has sticker pack', str_contains($settingsLayout, '"name": "sticker_pack"'));
+expectTrue('sticker pack uses options binding', str_contains($settingsLayout, '"value": "12"') && str_contains($settingsLayout, '"value": "96"') && ! str_contains($settingsLayout, '"name": "Option"'));
 expectTrue('has animated toggle', str_contains((string) file_get_contents($root.'/resources/layouts/admin/plugin_settings.json'), '"name": "stickers_animated"'));
 
 $defaults = json_decode((string) file_get_contents($root.'/config/settings/defaults.json'), true);
