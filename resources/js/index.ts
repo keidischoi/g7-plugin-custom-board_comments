@@ -1,0 +1,291 @@
+import '../css/plugin.css';
+import {
+    appliesToBoard,
+    normalizeConfig,
+    PLUGIN_ID,
+    readInlineConfig,
+    type PluginConfig,
+    type SortKind,
+} from './config';
+import {
+    applySort,
+    bindCommentRows,
+    ensureToolbar,
+    localeCopy,
+    paintLikes,
+    type LikeSummary,
+} from './enhance';
+import { parseBoardShowPath, isBoardPostApi, unwrapApiData } from './url';
+import type { BoardComment } from './sort';
+
+type Runtime = {
+    stop: () => void;
+};
+
+declare global {
+    interface Window {
+        __g7CustomBoardComments?: Runtime;
+        G7Core?: { dispatch?: (detail: unknown) => void };
+    }
+}
+
+const API_PREFIX = `/api/plugins/${PLUGIN_ID}`;
+
+function asComments(raw: unknown): BoardComment[] {
+    if (!Array.isArray(raw)) {
+        return [];
+    }
+    return raw.map((item) => {
+        const row = item && typeof item === 'object' ? item as Record<string, unknown> : {};
+        return {
+            id: Number(row.id) || 0,
+            parent_id: row.parent_id == null ? null : Number(row.parent_id),
+            depth: Number(row.depth) || 0,
+            created_at: String(row.created_at ?? ''),
+            content: row.content == null ? undefined : String(row.content),
+            author: row.author && typeof row.author === 'object'
+                ? { name: String((row.author as { name?: unknown }).name ?? '') }
+                : null,
+        };
+    }).filter((comment) => comment.id > 0);
+}
+
+function findCommentSection(root: ParentNode = document): Element | null {
+    const existing = root.querySelector('[data-cbc-section]');
+    if (existing) {
+        return existing;
+    }
+    const headings = [...root.querySelectorAll('h3')];
+    const heading = headings.find((node) => /댓글|comment/i.test(node.textContent ?? ''));
+    const section = heading?.closest('.bg-white, .rounded-lg') ?? heading?.parentElement;
+    if (section instanceof HTMLElement) {
+        section.setAttribute('data-cbc-section', '1');
+        return section;
+    }
+    return null;
+}
+
+async function fetchJson(url: string, init?: RequestInit): Promise<unknown> {
+    const response = await fetch(url, {
+        credentials: 'same-origin',
+        headers: {
+            Accept: 'application/json',
+            'X-Requested-With': 'XMLHttpRequest',
+            ...(init?.headers ?? {}),
+        },
+        ...init,
+    });
+    const payload = await response.json().catch(() => null);
+    if (!response.ok) {
+        const message = payload && typeof payload === 'object' && 'message' in payload
+            ? String((payload as { message: unknown }).message)
+            : `HTTP ${response.status}`;
+        throw new Error(message);
+    }
+    return payload;
+}
+
+function unwrapData(payload: unknown): Record<string, unknown> {
+    if (payload && typeof payload === 'object' && 'data' in payload) {
+        const data = (payload as { data: unknown }).data;
+        if (data && typeof data === 'object') {
+            return data as Record<string, unknown>;
+        }
+    }
+    return (payload && typeof payload === 'object') ? payload as Record<string, unknown> : {};
+}
+
+function emptySummary(): LikeSummary {
+    return { counts: {}, liked: [], best: [] };
+}
+
+function parseSummary(payload: unknown): LikeSummary {
+    const data = unwrapData(payload);
+    const countsRaw = data.counts && typeof data.counts === 'object' ? data.counts as Record<string, unknown> : {};
+    const counts: Record<string, number> = {};
+    for (const [id, value] of Object.entries(countsRaw)) {
+        counts[id] = Number(value) || 0;
+    }
+    return {
+        counts,
+        liked: Array.isArray(data.liked) ? data.liked.map(Number) : [],
+        best: Array.isArray(data.best) ? data.best.map(Number) : [],
+    };
+}
+
+function boot(): void {
+    window.__g7CustomBoardComments?.stop();
+
+    let comments: BoardComment[] = [];
+    let boardId = 0;
+    let summary = emptySummary();
+    let config = readInlineConfig();
+    let sort: SortKind = config.defaultSort;
+    let observer: MutationObserver | null = null;
+    let fetchPatched = false;
+    const originalFetch = window.fetch.bind(window);
+    let stopped = false;
+
+    const page = () => parseBoardShowPath(window.location.pathname);
+    const copy = () => localeCopy(document.documentElement.lang || 'ko');
+
+    const sync = async (): Promise<void> => {
+        if (stopped) {
+            return;
+        }
+        const ref = page();
+        document.documentElement.classList.toggle('cbc-styled', config.styleEnabled);
+        if (!ref || !config.enabled || !appliesToBoard(ref.slug, config.boardSlugs)) {
+            return;
+        }
+
+        const section = findCommentSection();
+        if (!section || comments.length === 0) {
+            return;
+        }
+
+        bindCommentRows(section, comments);
+        const toolbar = ensureToolbar(section, sort, copy());
+        toolbar.querySelectorAll<HTMLButtonElement>('[data-cbc-sort]').forEach((button) => {
+            button.onclick = () => {
+                sort = (button.getAttribute('data-cbc-sort') as SortKind) || 'latest';
+                void sync();
+            };
+        });
+
+        try {
+            summary = parseSummary(await fetchJson(`${API_PREFIX}/posts/${ref.postId}/likes?slug=${encodeURIComponent(ref.slug)}`));
+        } catch {
+            summary = emptySummary();
+        }
+        applySort(section, comments, sort, summary, config);
+        paintLikes(section, summary, config, copy());
+
+        section.querySelectorAll<HTMLButtonElement>('[data-cbc-like]').forEach((button) => {
+            button.onclick = async () => {
+                const row = button.closest('[data-cbc-comment-id]');
+                const commentId = Number(row?.getAttribute('data-cbc-comment-id'));
+                if (!commentId) {
+                    return;
+                }
+                try {
+                    const result = unwrapData(await fetchJson(`${API_PREFIX}/comments/${commentId}/like`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            post_id: ref.postId,
+                            board_id: boardId,
+                        }),
+                    }));
+                    summary.counts[String(commentId)] = Number(result.count) || 0;
+                    const liked = new Set(summary.liked);
+                    if (result.liked) {
+                        liked.add(commentId);
+                    } else {
+                        liked.delete(commentId);
+                    }
+                    summary.liked = [...liked];
+                    await sync();
+                } catch (error) {
+                    window.alert(error instanceof Error ? error.message : copy().login);
+                }
+            };
+        });
+    };
+
+    const ingestPost = (payload: unknown): void => {
+        const data = unwrapApiData(payload);
+        if (!data) {
+            return;
+        }
+        comments = asComments(data.comments);
+        boardId = Number(data.board_id ?? (data.board && typeof data.board === 'object' ? (data.board as { id?: unknown }).id : 0)) || 0;
+        void sync();
+    };
+
+    window.fetch = async (input: RequestInfo | URL, init?: RequestInit): Promise<Response> => {
+        const response = await originalFetch(input, init);
+        try {
+            const url = typeof input === 'string' ? input : input instanceof URL ? input.toString() : input.url;
+            if (isBoardPostApi(url)) {
+                void response.clone().json().then(ingestPost).catch(() => undefined);
+            }
+        } catch {
+            // ignore parse errors
+        }
+        return response;
+    };
+    fetchPatched = true;
+
+    let syncTimer: number | null = null;
+    const scheduleSync = (): void => {
+        if (syncTimer !== null) {
+            return;
+        }
+        syncTimer = window.setTimeout(() => {
+            syncTimer = null;
+            void sync().catch(() => undefined);
+        }, 50);
+    };
+
+    observer = new MutationObserver((mutations) => {
+        const relevant = mutations.some((mutation) => [...mutation.addedNodes].some((node) => {
+            if (!(node instanceof Element)) {
+                return false;
+            }
+            if (node.closest('[data-cbc-like], [data-cbc-toolbar], [data-cbc-best], [data-cbc-section]')) {
+                return node.querySelector('.space-y-4, [data-cbc-comment-id]') !== null
+                    && node.querySelector('[data-cbc-like]') === null;
+            }
+            return Boolean(node.querySelector?.('h3, .space-y-4'));
+        }));
+        if (relevant) {
+            scheduleSync();
+        }
+    });
+    observer.observe(document.documentElement, { childList: true, subtree: true });
+
+    const onRoute = (): void => {
+        comments = [];
+        boardId = 0;
+        summary = emptySummary();
+        config = readInlineConfig();
+        sort = config.defaultSort;
+        void sync();
+    };
+    window.addEventListener('popstate', onRoute);
+
+    void (async () => {
+        try {
+            config = normalizeConfig(unwrapData(await fetchJson(`${API_PREFIX}/settings`)));
+            sort = config.defaultSort;
+        } catch {
+            config = readInlineConfig();
+        }
+        void sync();
+    })();
+
+    window.__g7CustomBoardComments = {
+        stop: () => {
+            stopped = true;
+            observer?.disconnect();
+            window.removeEventListener('popstate', onRoute);
+            if (syncTimer !== null) {
+                window.clearTimeout(syncTimer);
+                syncTimer = null;
+            }
+            if (fetchPatched) {
+                window.fetch = originalFetch;
+                fetchPatched = false;
+            }
+        },
+    };
+}
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', boot);
+} else {
+    boot();
+}
+
+window.G7Core?.dispatch?.({ handler: `${PLUGIN_ID}.refresh` });

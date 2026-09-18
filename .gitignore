@@ -1,0 +1,4 @@
+/node_modules/
+/dist/**/*.map
+/.phpunit.result.cache
+/.DS_Store

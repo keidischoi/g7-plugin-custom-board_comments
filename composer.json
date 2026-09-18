@@ -1,0 +1,15 @@
+{
+    "name": "plugins/g7-plugin-custom-board_comments",
+    "description": "Custom board comment likes, best comments, and sorting for Gnuboard7",
+    "type": "library",
+    "version": "0.1.0",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Plugins\\G7\\Plugin\\Custom\\BoardComments\\": ["src/", "./"]
+        }
+    },
+    "require": {
+        "php": "^8.2"
+    }
+}
