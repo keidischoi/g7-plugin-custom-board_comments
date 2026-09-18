@@ -11,6 +11,7 @@ import {
     applySort,
     bindCommentRows,
     bindToolbarSort,
+    commentRows,
     ensureToolbar,
     findCommentSection,
     hideToolbar,
@@ -136,6 +137,8 @@ function boot(): void {
     let stopped = false;
     let loadingPost = false;
     let postFetched = false;
+    let likesLoaded = false;
+    let syncing = false;
 
     const page = () => parseBoardShowPath(window.location.pathname);
     const copy = () => localeCopy(document.documentElement.lang || 'ko');
@@ -151,9 +154,11 @@ function boot(): void {
     };
 
     const sync = async (): Promise<void> => {
-        if (stopped) {
+        if (stopped || syncing) {
             return;
         }
+        syncing = true;
+        try {
         const ref = page();
         document.documentElement.classList.toggle('cbc-styled', config.styleEnabled);
         document.documentElement.classList.toggle('cbc-stickers-animated', config.stickersAnimated);
@@ -218,11 +223,13 @@ function boot(): void {
         }
 
         bindCommentRows(section, comments);
-        applySort(section, comments, sort, summary, config);
-        try {
-            summary = parseSummary(await fetchJson(`${API_PREFIX}/posts/${ref.postId}/likes?slug=${encodeURIComponent(ref.slug)}`));
-        } catch {
-            summary = emptySummary();
+        if (!likesLoaded) {
+            try {
+                summary = parseSummary(await fetchJson(`${API_PREFIX}/posts/${ref.postId}/likes?slug=${encodeURIComponent(ref.slug)}`));
+            } catch {
+                summary = emptySummary();
+            }
+            likesLoaded = true;
         }
         applySort(section, comments, sort, summary, config);
         paintLikes(section, summary, config, copy());
@@ -258,6 +265,9 @@ function boot(): void {
                 }
             };
         });
+        } finally {
+            syncing = false;
+        }
     };
 
     let syncTimer: number | null = null;
@@ -275,6 +285,17 @@ function boot(): void {
             void sync().catch(() => undefined);
         }, 50);
     };
+    const commentsReady = (): boolean => {
+        const toolbar = document.querySelector('[data-cbc-toolbar]');
+        const section = findCommentSection();
+        if (!toolbar || !section) {
+            return false;
+        }
+        if (comments.length === 0) {
+            return true;
+        }
+        return commentRows(section).some((row) => row.hasAttribute('data-cbc-comment-id'));
+    };
     const retryUntilVisible = (): void => {
         retries = 0;
         if (retryTimer !== null) {
@@ -286,7 +307,7 @@ function boot(): void {
             }
             scheduleSync();
             retries += 1;
-            if (retries >= 48) {
+            if (commentsReady() || retries >= 48) {
                 if (retryTimer !== null) {
                     window.clearInterval(retryTimer);
                     retryTimer = null;
@@ -340,6 +361,7 @@ function boot(): void {
         boardId = 0;
         summary = emptySummary();
         postFetched = false;
+        likesLoaded = false;
         config = readInlineConfig();
         sort = config.defaultSort;
         retryUntilVisible();
@@ -373,7 +395,7 @@ function boot(): void {
         }
     });
     observer.observe(document.documentElement, { childList: true, subtree: true });
-    document.documentElement.setAttribute('data-cbc-boot', '0.1.13');
+    document.documentElement.setAttribute('data-cbc-boot', '0.1.14');
 
     void (async () => {
         try {

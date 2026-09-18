@@ -304,12 +304,6 @@ export function reorderRows(section: Element, ordered: BoardComment[]): void {
     if (parent && rows.every((row) => row.parentElement === parent)) {
         flexStack(parent);
         applyRank(rows, rank, (row) => row.getAttribute('data-cbc-comment-id'));
-        for (const comment of ordered) {
-            const row = parent.querySelector(`[data-cbc-comment-id="${comment.id}"]`);
-            if (row) {
-                parent.appendChild(row);
-            }
-        }
         return;
     }
     const wrappers = rows
@@ -321,13 +315,6 @@ export function reorderRows(section: Element, ordered: BoardComment[]): void {
     }
     flexStack(host);
     applyRank(wrappers, rank, (wrap) => wrap.querySelector('[data-cbc-comment-id]')?.getAttribute('data-cbc-comment-id') ?? null);
-    for (const comment of ordered) {
-        const row = section.querySelector(`[data-cbc-comment-id="${comment.id}"]`);
-        const wrap = row?.parentElement;
-        if (wrap && wrap.parentElement === host) {
-            host.appendChild(wrap);
-        }
-    }
 }
 
 export function applySort(

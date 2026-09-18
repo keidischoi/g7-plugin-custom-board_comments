@@ -146,13 +146,15 @@ describe('enhance', () => {
         expect(commentRows(section).map((row) => row.getAttribute('data-cbc-comment-id'))).toEqual(['2', '3', '4', '5']);
 
         applySort(section, liveComments, 'latest', summary, DEFAULT_CONFIG);
-        expect(commentRows(section).map((row) => row.getAttribute('data-cbc-comment-id'))).toEqual(['5', '4', '3', '2']);
+        expect(commentRows(section).map((row) => row.getAttribute('data-cbc-comment-id'))).toEqual(['2', '3', '4', '5']);
         expect(section.querySelector('.space-y-4')?.classList.contains('cbc-comment-stack')).toBe(true);
-        expect(section.querySelector('[data-cbc-comment-id="5"]')?.style.order).toBe('1');
+        expect(['2', '3', '4', '5'].map((id) => (
+            section.querySelector<HTMLElement>(`[data-cbc-comment-id="${id}"]`)?.style.order
+        ))).toEqual(['4', '3', '2', '1']);
 
         bindCommentRows(section, liveComments);
         applySort(section, liveComments, 'latest', summary, DEFAULT_CONFIG);
-        expect(commentRows(section).map((row) => row.getAttribute('data-cbc-comment-id'))).toEqual(['5', '4', '3', '2']);
+        expect(commentRows(section).map((row) => row.getAttribute('data-cbc-comment-id'))).toEqual(['2', '3', '4', '5']);
 
         const list = section.querySelector('.space-y-4') as HTMLElement;
         ['2', '3', '4', '5'].forEach((id) => {

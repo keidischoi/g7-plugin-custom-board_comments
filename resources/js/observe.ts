@@ -28,9 +28,23 @@ export function looksLikeCommentTree(node: Node): boolean {
     );
 }
 
+function isCommentStackShuffle(mutation: MutationRecord): boolean {
+    const target = mutation.target;
+    if (!(target instanceof Element) || !target.classList.contains('cbc-comment-stack')) {
+        return false;
+    }
+    const nodes = [...mutation.addedNodes, ...mutation.removedNodes];
+    return nodes.length > 0 && nodes.every((node) => (
+        node instanceof Element && (node.hasAttribute('data-cbc-comment-id') || Boolean(node.querySelector('[data-cbc-comment-id]')))
+    ));
+}
+
 export function mutationNeedsCommentSync(mutations: MutationRecord[]): boolean {
     for (const mutation of mutations) {
         if (mutation.type !== 'childList') {
+            continue;
+        }
+        if (isCommentStackShuffle(mutation)) {
             continue;
         }
         for (const node of mutation.removedNodes) {
