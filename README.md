@@ -11,7 +11,7 @@
 - 댓글 추천 토글 (기본: 로그인 회원만, 설정에서 비회원 IP 1회 허용)
 - 추천 수가 기준 이상이면 **베스트** 배지와 상단 고정
 - 최신순 / 등록순 / 추천순
-- 댓글 스티커 삽입 (설정에서 간단버전 / 수가 많은 버전, 움직이는 스티커)
+- 댓글 스티커 삽입 (설정에서 12·24·48·96개 배수 / 전체, 움직이는 스티커)
 - 스티커 창은 바깥을 누르거나 포커스를 잃으면 닫힘
 - 댓글 이미지 삽입 (로그인 회원, 2MB, jpg/png/gif/webp)
 - 적용할 게시판 슬러그 (기본 `free`, 비우면 전체)
@@ -71,6 +71,8 @@ Prefix: `/api/plugins/g7-plugin-custom-board_comments`
 | `board_slugs` | `free` | 적용 게시판. 비우면 전체 |
 | `style_enabled` | true | 추천 버튼·배지 CSS |
 | `stickers_enabled` | true | 스티커 삽입 |
+| `sticker_pack` | `full` | 12 / 24 / 48 / 96 / 192 / 384 / full |
+| `stickers_animated` | true | 스티커가 뛰고 흔들림 |
 | `images_enabled` | true | 이미지 삽입 |
 
 ## 테스트

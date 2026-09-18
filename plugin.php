@@ -106,12 +106,12 @@ class Plugin extends AbstractPlugin
             ],
             'sticker_pack' => [
                 'type' => 'enum',
-                'options' => ['simple', 'full'],
+                'options' => ['12', '24', '48', '96', '192', '384', 'full'],
                 'default' => 'full',
                 'label' => ['ko' => '스티커 세트', 'en' => 'Sticker pack'],
                 'hint' => [
-                    'ko' => '간단버전은 자주 쓰는 스티커만, 수가 많은 버전은 700개 넘는 전체 세트입니다.',
-                    'en' => 'Simple is a short set. The large set has 700+ stickers.',
+                    'ko' => '12, 24, 48, 96처럼 배수로 고릅니다. 전체는 700개 넘습니다.',
+                    'en' => 'Choose 12, 24, 48, 96, and so on. Full is 700+ stickers.',
                 ],
                 'required' => true,
             ],

@@ -30,8 +30,13 @@
       "latest": "Latest",
       "oldest": "Oldest",
       "popular": "Most liked",
-      "simple": "Simple version",
-      "full": "Large set"
+      "pack_12": "12 stickers",
+      "pack_24": "24 stickers",
+      "pack_48": "48 stickers",
+      "pack_96": "96 stickers",
+      "pack_192": "192 stickers",
+      "pack_384": "384 stickers",
+      "full": "All"
     },
     "fields": {
       "enabled": {
@@ -52,7 +57,7 @@
       },
       "sticker_pack": {
         "label": "Sticker pack",
-        "hint": "Simple is a short set. The large set has 700+ stickers."
+        "hint": "Choose 12, 24, 48, 96, and so on. Full is 700+ stickers."
       },
       "stickers_animated": {
         "label": "Animated stickers",

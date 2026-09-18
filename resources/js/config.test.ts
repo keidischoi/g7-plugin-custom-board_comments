@@ -26,9 +26,11 @@ describe('normalizeConfig', () => {
             bestThreshold: 999,
             defaultSort: 'popular',
             boardSlugs: ['free', 'qna'],
-            stickerPack: 'simple',
+            stickerPack: '48',
             stickersAnimated: false,
         });
+        expect(normalizeConfig({ sticker_pack: '96' }).stickerPack).toBe('96');
+        expect(normalizeConfig({ sticker_pack: 'all' }).stickerPack).toBe('full');
     });
 
     it('rejects invalid slugs', () => {

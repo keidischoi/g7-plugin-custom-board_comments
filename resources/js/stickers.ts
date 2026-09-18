@@ -737,13 +737,40 @@ export function stickerById(id: string): Sticker | undefined {
     return STICKERS.find((item) => item.id === id);
 }
 
-export function stickersForPack(pack: string): Sticker[] {
-    if (pack === 'simple') {
-        return SIMPLE_STICKER_IDS
-            .map((id) => stickerById(id))
-            .filter((item): item is Sticker => Boolean(item));
+export const STICKER_PACK_SIZES = [12, 24, 48, 96, 192, 384] as const;
+
+export function orderedStickers(): Sticker[] {
+    const seen = new Set<string>();
+    const ordered: Sticker[] = [];
+    for (const id of SIMPLE_STICKER_IDS) {
+        const sticker = stickerById(id);
+        if (!sticker || seen.has(sticker.id)) {
+            continue;
+        }
+        seen.add(sticker.id);
+        ordered.push(sticker);
     }
-    return STICKERS;
+    for (const sticker of STICKERS) {
+        if (seen.has(sticker.id)) {
+            continue;
+        }
+        seen.add(sticker.id);
+        ordered.push(sticker);
+    }
+    return ordered;
+}
+
+export function stickersForPack(pack: string | number): Sticker[] {
+    const ordered = orderedStickers();
+    const key = String(pack).trim().toLowerCase();
+    if (key === 'full' || key === 'all') {
+        return ordered;
+    }
+    const size = key === 'simple' ? 48 : Number(key);
+    if (!Number.isFinite(size) || size <= 0) {
+        return ordered;
+    }
+    return ordered.slice(0, Math.min(size, ordered.length));
 }
 
 export function stickerMotion(id: string): StickerMotion {

@@ -67,8 +67,8 @@ describe('composer', () => {
         expect(document.querySelector('[data-cbc-stickers]')).toBeNull();
     });
 
-    it('uses the simple sticker pack when configured', () => {
-        openStickerPanel({ ...DEFAULT_CONFIG, stickerPack: 'simple' });
+    it('uses the 48 sticker pack when configured', () => {
+        openStickerPanel({ ...DEFAULT_CONFIG, stickerPack: '48' });
         expect(document.querySelectorAll('[data-cbc-sticker-id]').length).toBe(SIMPLE_STICKER_IDS.length);
         expect(document.querySelector('[data-cbc-stickers]')?.className).toContain('cbc-stickers--animated');
         expect(document.querySelector('[data-cbc-sticker-id]')?.tagName).toBe('DIV');
@@ -77,7 +77,7 @@ describe('composer', () => {
     });
 
     it('keeps stickers still when animation is off', () => {
-        openStickerPanel({ ...DEFAULT_CONFIG, stickerPack: 'simple', stickersAnimated: false });
+        openStickerPanel({ ...DEFAULT_CONFIG, stickerPack: '48', stickersAnimated: false });
         expect(document.querySelector('[data-cbc-stickers]')?.className).toBe('cbc-stickers');
         expect(document.querySelector('[data-cbc-stickers]')?.className).not.toContain('cbc-stickers--animated');
     });

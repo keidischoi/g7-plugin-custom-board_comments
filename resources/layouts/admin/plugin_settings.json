@@ -32,7 +32,7 @@
     "board_slugs": { "type": "string", "default": "free" },
     "style_enabled": { "type": "boolean", "default": true },
     "stickers_enabled": { "type": "boolean", "default": true },
-    "sticker_pack": { "type": "enum", "options": ["simple", "full"], "default": "full" },
+    "sticker_pack": { "type": "enum", "options": ["12", "24", "48", "96", "192", "384", "full"], "default": "full" },
     "stickers_animated": { "type": "boolean", "default": true },
     "images_enabled": { "type": "boolean", "default": true }
   },
@@ -216,7 +216,12 @@
                         "name": "Select",
                         "props": { "id": "sticker_pack", "name": "sticker_pack", "className": "lg:col-span-1" },
                         "children": [
-                          { "type": "basic", "name": "Option", "props": { "value": "simple" }, "text": "$t:g7-plugin-custom-board_comments.settings.options.simple" },
+                          { "type": "basic", "name": "Option", "props": { "value": "12" }, "text": "$t:g7-plugin-custom-board_comments.settings.options.pack_12" },
+                          { "type": "basic", "name": "Option", "props": { "value": "24" }, "text": "$t:g7-plugin-custom-board_comments.settings.options.pack_24" },
+                          { "type": "basic", "name": "Option", "props": { "value": "48" }, "text": "$t:g7-plugin-custom-board_comments.settings.options.pack_48" },
+                          { "type": "basic", "name": "Option", "props": { "value": "96" }, "text": "$t:g7-plugin-custom-board_comments.settings.options.pack_96" },
+                          { "type": "basic", "name": "Option", "props": { "value": "192" }, "text": "$t:g7-plugin-custom-board_comments.settings.options.pack_192" },
+                          { "type": "basic", "name": "Option", "props": { "value": "384" }, "text": "$t:g7-plugin-custom-board_comments.settings.options.pack_384" },
                           { "type": "basic", "name": "Option", "props": { "value": "full" }, "text": "$t:g7-plugin-custom-board_comments.settings.options.full" }
                         ]
                       }

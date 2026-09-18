@@ -12,13 +12,19 @@ describe('stickers', () => {
         expect(stickerToken('love')).toBe('[[s:love]]');
     });
 
-    it('keeps a smaller simple pack inside the full set', () => {
-        const simple = stickersForPack('simple');
-        expect(simple.length).toBe(SIMPLE_STICKER_IDS.length);
-        expect(simple.length).toBeGreaterThanOrEqual(40);
-        expect(simple.length).toBeLessThanOrEqual(80);
-        expect(simple.length).toBeLessThan(STICKERS.length / 5);
+    it('slices packs by 12, 24, 48, 96 and so on', () => {
+        const twelve = stickersForPack('12');
+        const fortyEight = stickersForPack('48');
+        expect(twelve.length).toBe(12);
+        expect(stickersForPack(24).length).toBe(24);
+        expect(fortyEight.length).toBe(48);
+        expect(stickersForPack('simple').length).toBe(48);
+        expect(stickersForPack('96').length).toBe(96);
+        expect(stickersForPack('192').length).toBe(192);
+        expect(stickersForPack('384').length).toBe(384);
         expect(stickersForPack('full').length).toBe(STICKERS.length);
-        expect(simple.every((item) => STICKERS.some((full) => full.id === item.id))).toBe(true);
+        expect(SIMPLE_STICKER_IDS.length).toBe(48);
+        expect(twelve.map((item) => item.id)).toEqual(SIMPLE_STICKER_IDS.slice(0, 12));
+        expect(fortyEight.every((item) => STICKERS.some((full) => full.id === item.id))).toBe(true);
     });
 });

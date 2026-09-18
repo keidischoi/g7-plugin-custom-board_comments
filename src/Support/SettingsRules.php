@@ -8,7 +8,7 @@ final class SettingsRules
 
     public const SORTS = ['latest', 'oldest', 'popular'];
 
-    public const STICKER_PACKS = ['simple', 'full'];
+    public const STICKER_PACKS = ['12', '24', '48', '96', '192', '384', 'full'];
 
     /**
      * @return array<string, mixed>
@@ -45,10 +45,7 @@ final class SettingsRules
             $sort = $defaults['default_sort'];
         }
 
-        $pack = (string) ($input['sticker_pack'] ?? $defaults['sticker_pack']);
-        if (! in_array($pack, self::STICKER_PACKS, true)) {
-            $pack = $defaults['sticker_pack'];
-        }
+        $pack = self::normalizeStickerPack($input['sticker_pack'] ?? $defaults['sticker_pack']);
 
         return [
             'enabled' => self::boolish($input['enabled'] ?? $defaults['enabled']),
@@ -66,6 +63,22 @@ final class SettingsRules
             'stickers_animated' => self::boolish($input['stickers_animated'] ?? $defaults['stickers_animated']),
             'images_enabled' => self::boolish($input['images_enabled'] ?? $defaults['images_enabled']),
         ];
+    }
+
+    public static function normalizeStickerPack(mixed $raw): string
+    {
+        $text = strtolower(trim((string) $raw));
+        if ($text === 'simple') {
+            return '48';
+        }
+        if ($text === 'all') {
+            return 'full';
+        }
+        if (in_array($text, self::STICKER_PACKS, true)) {
+            return $text;
+        }
+
+        return 'full';
     }
 
     /**

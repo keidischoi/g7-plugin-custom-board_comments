@@ -1,6 +1,6 @@
 export const PLUGIN_ID = 'g7-plugin-custom-board_comments';
 export const SORTS = ['latest', 'oldest', 'popular'] as const;
-export const STICKER_PACKS = ['simple', 'full'] as const;
+export const STICKER_PACKS = ['12', '24', '48', '96', '192', '384', 'full'] as const;
 
 export type SortKind = (typeof SORTS)[number];
 export type StickerPack = (typeof STICKER_PACKS)[number];
@@ -87,7 +87,7 @@ export function normalizeConfig(raw: unknown): PluginConfig {
         boardSlugs: resolveSlugs(input),
         styleEnabled: boolish(input.style_enabled ?? input.styleEnabled, true),
         stickersEnabled: boolish(input.stickers_enabled ?? input.stickersEnabled, true),
-        stickerPack: (STICKER_PACKS as readonly string[]).includes(pack) ? pack as StickerPack : 'full',
+        stickerPack: normalizeStickerPack(pack),
         stickersAnimated: boolish(input.stickers_animated ?? input.stickersAnimated, true),
         imagesEnabled: boolish(input.images_enabled ?? input.imagesEnabled, true),
     };
@@ -95,6 +95,20 @@ export function normalizeConfig(raw: unknown): PluginConfig {
 
 export function readInlineConfig(win: G7Window = window): PluginConfig {
     return normalizeConfig(win.G7Config?.plugins?.[PLUGIN_ID]);
+}
+
+export function normalizeStickerPack(raw: unknown): StickerPack {
+    const text = String(raw ?? '').trim().toLowerCase();
+    if (text === 'simple') {
+        return '48';
+    }
+    if (text === 'all') {
+        return 'full';
+    }
+    if ((STICKER_PACKS as readonly string[]).includes(text)) {
+        return text as StickerPack;
+    }
+    return 'full';
 }
 
 function boolish(value: unknown, fallback: boolean): boolean {
