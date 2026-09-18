@@ -15,6 +15,8 @@ expectTrue('summary route', str_contains($routes, "Route::get('/posts/{postId}/l
 expectTrue('like route', str_contains($routes, "Route::post('/comments/{commentId}/like'"));
 expectTrue('media upload route', str_contains($routes, "Route::post('/media'"));
 expectTrue('media show route', str_contains($routes, "Route::get('/media/{id}'"));
+expectTrue('media uses optional sanctum', str_contains($routes, "optional.sanctum"));
+expectTrue('like uses optional sanctum', substr_count($routes, 'optional.sanctum') >= 3);
 expectTrue('dynamic table', str_contains($pluginPhp, 'custom_board_comment_likes'));
 expectTrue('media dynamic table', str_contains($pluginPhp, 'custom_board_comment_media'));
 expectFalse('no hook listeners', str_contains($pluginPhp, 'CommentDeletedCleanupListener'));

@@ -5,7 +5,6 @@ namespace Plugins\G7\Plugin\Custom\BoardComments\Http\Controllers;
 use App\Helpers\ResponseHelper;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Plugins\G7\Plugin\Custom\BoardComments\Services\CommentMediaService;
 use Plugins\G7\Plugin\Custom\BoardComments\Support\ActorRules;
 use RuntimeException;
@@ -19,7 +18,7 @@ class CommentMediaController
 
     public function store(Request $request): JsonResponse
     {
-        $userId = ActorRules::id(Auth::id(), $request->user());
+        $userId = ActorRules::fromRequest($request);
         if ($userId === '') {
             return $this->fail('이미지를 올리려면 로그인하세요.', 401);
         }

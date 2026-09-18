@@ -19,14 +19,17 @@ Route::get('/settings', [CommentLikeController::class, 'settings'])
     ->name('settings');
 
 Route::get('/posts/{postId}/likes', [CommentLikeController::class, 'summary'])
+    ->middleware('optional.sanctum')
     ->whereNumber('postId')
     ->name('posts.likes');
 
 Route::post('/comments/{commentId}/like', [CommentLikeController::class, 'toggle'])
+    ->middleware('optional.sanctum')
     ->whereNumber('commentId')
     ->name('comments.like');
 
 Route::post('/media', [CommentMediaController::class, 'store'])
+    ->middleware('optional.sanctum')
     ->name('media.store');
 
 Route::get('/media/{id}', [CommentMediaController::class, 'show'])
