@@ -147,10 +147,24 @@ describe('enhance', () => {
 
         applySort(section, liveComments, 'latest', summary, DEFAULT_CONFIG);
         expect(commentRows(section).map((row) => row.getAttribute('data-cbc-comment-id'))).toEqual(['5', '4', '3', '2']);
+        expect(section.querySelector('.space-y-4')?.classList.contains('cbc-comment-stack')).toBe(true);
+        expect(section.querySelector('[data-cbc-comment-id="5"]')?.style.order).toBe('1');
 
         bindCommentRows(section, liveComments);
         applySort(section, liveComments, 'latest', summary, DEFAULT_CONFIG);
         expect(commentRows(section).map((row) => row.getAttribute('data-cbc-comment-id'))).toEqual(['5', '4', '3', '2']);
+
+        const list = section.querySelector('.space-y-4') as HTMLElement;
+        ['2', '3', '4', '5'].forEach((id) => {
+            const row = list.querySelector(`[data-cbc-comment-id="${id}"]`);
+            if (row) {
+                list.appendChild(row);
+            }
+        });
+        expect(commentRows(section).map((row) => row.getAttribute('data-cbc-comment-id'))).toEqual(['2', '3', '4', '5']);
+        expect(['2', '3', '4', '5'].map((id) => (
+            list.querySelector<HTMLElement>(`[data-cbc-comment-id="${id}"]`)?.style.order
+        ))).toEqual(['4', '3', '2', '1']);
 
         const toolbar = ensureToolbar(section, 'latest', copy);
         bindToolbarSort(toolbar, (next) => {
@@ -158,5 +172,6 @@ describe('enhance', () => {
         });
         toolbar.querySelector<HTMLButtonElement>('[data-cbc-sort="oldest"]')?.click();
         expect(commentRows(section).map((row) => row.getAttribute('data-cbc-comment-id'))).toEqual(['2', '3', '4', '5']);
+        expect(section.querySelector<HTMLElement>('[data-cbc-comment-id="2"]')?.style.order).toBe('1');
     });
 });

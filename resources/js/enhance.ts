@@ -283,13 +283,27 @@ export function paintLikes(
     }
 }
 
+function flexStack(el: HTMLElement): void {
+    el.classList.add('cbc-comment-stack');
+}
+
+function applyRank(nodes: HTMLElement[], rank: Map<string, number>, idOf: (node: HTMLElement) => string | null): void {
+    for (const node of nodes) {
+        const n = rank.get(idOf(node) ?? '');
+        node.style.order = n ? String(n) : '';
+    }
+}
+
 export function reorderRows(section: Element, ordered: BoardComment[]): void {
     const rows = commentRows(section);
     if (rows.length === 0) {
         return;
     }
+    const rank = new Map(ordered.map((comment, index) => [String(comment.id), index + 1]));
     const parent = rows[0]?.parentElement;
     if (parent && rows.every((row) => row.parentElement === parent)) {
+        flexStack(parent);
+        applyRank(rows, rank, (row) => row.getAttribute('data-cbc-comment-id'));
         for (const comment of ordered) {
             const row = parent.querySelector(`[data-cbc-comment-id="${comment.id}"]`);
             if (row) {
@@ -305,6 +319,8 @@ export function reorderRows(section: Element, ordered: BoardComment[]): void {
     if (!host || wrappers.some((wrap) => wrap.parentElement !== host)) {
         return;
     }
+    flexStack(host);
+    applyRank(wrappers, rank, (wrap) => wrap.querySelector('[data-cbc-comment-id]')?.getAttribute('data-cbc-comment-id') ?? null);
     for (const comment of ordered) {
         const row = section.querySelector(`[data-cbc-comment-id="${comment.id}"]`);
         const wrap = row?.parentElement;

@@ -185,10 +185,15 @@ function boot(): void {
             sort = next;
             syncSortButtons(toolbar, sort);
             const liveSection = findCommentSection();
-            if (liveSection && comments.length > 0) {
+            const paint = (): void => {
+                if (!liveSection || comments.length === 0) {
+                    return;
+                }
                 bindCommentRows(liveSection, comments);
                 applySort(liveSection, comments, sort, summary, config);
-            }
+            };
+            paint();
+            window.requestAnimationFrame(paint);
             void sync();
         });
         ensureComposerControls(toolbar, section, config, copy(), async (file) => {
@@ -375,7 +380,7 @@ function boot(): void {
         }
     });
     observer.observe(document.documentElement, { childList: true, subtree: true });
-    document.documentElement.setAttribute('data-cbc-boot', '0.1.10');
+    document.documentElement.setAttribute('data-cbc-boot', '0.1.11');
 
     void (async () => {
         try {
