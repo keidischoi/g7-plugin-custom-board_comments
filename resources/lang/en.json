@@ -30,8 +30,8 @@
       "latest": "Latest",
       "oldest": "Oldest",
       "popular": "Most liked",
-      "simple": "Simple (common stickers)",
-      "full": "Full (complete set)"
+      "simple": "Simple version",
+      "full": "Large set"
     },
     "fields": {
       "enabled": {
@@ -52,7 +52,7 @@
       },
       "sticker_pack": {
         "label": "Sticker pack",
-        "hint": "Simple is a short set. Full is the 300+ sticker pack."
+        "hint": "Simple is a short set. The large set has 700+ stickers."
       },
       "stickers_animated": {
         "label": "Animated stickers",

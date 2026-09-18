@@ -36,7 +36,7 @@ $iife = (string) file_get_contents($root.'/dist/js/plugin.iife.js');
 expectTrue('iife exists', $iife !== '');
 expectTrue('iife mounts overlay toolbar', str_contains($iife, 'cbc-toolbar--overlay') && str_contains($iife, 'data-cbc-boot'));
 expectTrue('iife has sticker button', str_contains($iife, 'data-cbc-sticker') && str_contains($iife, '[[s:'));
-expectTrue('iife has expanded sticker set', str_contains($iife, 'pleading') && str_contains($iife, 'bubbletea'));
+expectTrue('iife has expanded sticker set', str_contains($iife, 'pleading') && str_contains($iife, 'bubbletea') && str_contains($iife, 'hearthands'));
 expectTrue('iife sends bearer token', str_contains($iife, 'Authorization') && str_contains($iife, 'auth_token'));
 expectTrue('iife keeps sort ids', str_contains($iife, 'data-cbc-comment-id'));
 expectTrue('iife uses css sort order', str_contains($iife, 'cbc-comment-stack'));

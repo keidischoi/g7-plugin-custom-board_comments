@@ -110,8 +110,8 @@ class Plugin extends AbstractPlugin
                 'default' => 'full',
                 'label' => ['ko' => '스티커 세트', 'en' => 'Sticker pack'],
                 'hint' => [
-                    'ko' => '간단은 자주 쓰는 스티커만, 많음은 300개 넘는 전체 세트입니다.',
-                    'en' => 'Simple is a short set. Full is the 300+ sticker pack.',
+                    'ko' => '간단버전은 자주 쓰는 스티커만, 수가 많은 버전은 700개 넘는 전체 세트입니다.',
+                    'en' => 'Simple is a short set. The large set has 700+ stickers.',
                 ],
                 'required' => true,
             ],
