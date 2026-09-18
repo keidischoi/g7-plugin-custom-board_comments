@@ -1,12 +1,10 @@
-.cbc-styled [data-cbc-section] {
-    overflow: hidden;
-}
-
 .cbc-toolbar {
-    display: inline-flex;
+    display: flex;
+    justify-content: flex-end;
+    flex-wrap: wrap;
     align-items: center;
     gap: 0.35rem;
-    margin-left: auto;
+    padding: 0 1.5rem 0.75rem;
 }
 
 .cbc-sort {
