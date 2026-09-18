@@ -10,20 +10,17 @@ describe('observe', () => {
         expect(looksLikeCommentTree(fragment)).toBe(true);
     });
 
-    it('resyncs when the toolbar is removed from the live comment card', () => {
-        document.body.innerHTML = `
-            <div class="bg-white rounded-lg shadow" data-cbc-section="1">
-                <h3><span>댓글</span></h3>
-                <div data-cbc-toolbar="1" class="cbc-toolbar"></div>
-            </div>
-        `;
-        const toolbar = document.querySelector('[data-cbc-toolbar]') as HTMLElement;
-        const section = document.querySelector('[data-cbc-section]') as HTMLElement;
+    it('resyncs when the overlay toolbar is removed from document.body', () => {
+        document.body.innerHTML = '<div id="app"><div class="bg-white rounded-lg shadow" data-cbc-section="1"><h3><span>댓글</span></h3></div></div>';
+        const toolbar = document.createElement('div');
+        toolbar.setAttribute('data-cbc-toolbar', '1');
+        toolbar.className = 'cbc-toolbar cbc-toolbar--overlay';
+        document.body.appendChild(toolbar);
         const record = {
             type: 'childList',
             addedNodes: [] as unknown as NodeList,
             removedNodes: [toolbar] as unknown as NodeList,
-            target: section,
+            target: document.body,
         } as MutationRecord;
         expect(mutationNeedsCommentSync([record])).toBe(true);
     });

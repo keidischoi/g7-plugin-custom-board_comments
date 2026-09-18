@@ -12,8 +12,10 @@ import {
     bindCommentRows,
     ensureToolbar,
     findCommentSection,
+    hideToolbar,
     localeCopy,
     paintLikes,
+    placeToolbar,
     type LikeSummary,
 } from './enhance';
 import { boardPostApiUrl, parseBoardShowPath, isBoardPostApi, unwrapApiData } from './url';
@@ -155,6 +157,7 @@ function boot(): void {
         const ref = page();
         document.documentElement.classList.toggle('cbc-styled', config.styleEnabled);
         if (!ref || !config.enabled || !appliesToBoard(ref.slug, config.boardSlugs)) {
+            hideToolbar();
             return;
         }
 
@@ -171,10 +174,6 @@ function boot(): void {
         }
 
         const section = findCommentSection();
-        if (!section) {
-            return;
-        }
-
         const toolbar = ensureToolbar(section, sort, copy());
         toolbar.querySelectorAll<HTMLButtonElement>('[data-cbc-sort]').forEach((button) => {
             button.onclick = () => {
@@ -183,7 +182,7 @@ function boot(): void {
             };
         });
 
-        if (comments.length === 0) {
+        if (!section || comments.length === 0) {
             return;
         }
 
@@ -254,13 +253,13 @@ function boot(): void {
             }
             scheduleSync();
             retries += 1;
-            if (retries >= 20) {
+            if (retries >= 48) {
                 if (retryTimer !== null) {
                     window.clearInterval(retryTimer);
                     retryTimer = null;
                 }
             }
-        }, 200);
+        }, 250);
         scheduleSync();
     };
 
@@ -325,12 +324,23 @@ function boot(): void {
     };
     historyPatched = true;
 
+    const reposition = (): void => {
+        const toolbar = document.querySelector<HTMLElement>('[data-cbc-toolbar]');
+        if (!toolbar) {
+            return;
+        }
+        placeToolbar(toolbar, findCommentSection());
+    };
+    window.addEventListener('scroll', reposition, true);
+    window.addEventListener('resize', reposition);
+
     observer = new MutationObserver((mutations) => {
         if (mutationNeedsCommentSync(mutations)) {
             scheduleSync();
         }
     });
     observer.observe(document.documentElement, { childList: true, subtree: true });
+    document.documentElement.setAttribute('data-cbc-boot', '0.1.6');
 
     void (async () => {
         try {
@@ -369,6 +379,10 @@ function boot(): void {
                 history.replaceState = originalReplace;
                 historyPatched = false;
             }
+            window.removeEventListener('scroll', reposition, true);
+            window.removeEventListener('resize', reposition);
+            hideToolbar();
+            document.documentElement.removeAttribute('data-cbc-boot');
         },
     };
 }
