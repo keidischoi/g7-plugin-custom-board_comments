@@ -72,6 +72,12 @@ describe('composer', () => {
         expect(document.querySelectorAll('[data-cbc-sticker-id]').length).toBe(SIMPLE_STICKER_IDS.length);
         expect(document.querySelector('[data-cbc-stickers]')?.className).toContain('cbc-stickers--animated');
     });
+
+    it('keeps stickers still when animation is off', () => {
+        openStickerPanel({ ...DEFAULT_CONFIG, stickerPack: 'simple', stickersAnimated: false });
+        expect(document.querySelector('[data-cbc-stickers]')?.className).toBe('cbc-stickers');
+        expect(document.querySelector('[data-cbc-stickers]')?.className).not.toContain('cbc-stickers--animated');
+    });
 });
 
 describe('sticker panel blur', () => {

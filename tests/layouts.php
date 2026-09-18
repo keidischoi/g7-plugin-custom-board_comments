@@ -42,7 +42,8 @@ expectTrue('iife keeps sort ids', str_contains($iife, 'data-cbc-comment-id'));
 expectTrue('iife uses css sort order', str_contains($iife, 'cbc-comment-stack'));
 expectTrue('iife closes stickers', str_contains($iife, 'cbc-close') && str_contains($iife, 'focusin'));
 expectTrue('iife has simple pack', str_contains($iife, 'simple') && str_contains($iife, 'cbc-stickers--animated'));
-expectTrue('css has sticker motion', str_contains((string) file_get_contents($root.'/dist/css/plugin.css'), 'cbc-stickers-animated'));
+$css = (string) file_get_contents($root.'/dist/css/plugin.css');
+expectTrue('css has sticker motion', str_contains($css, 'cbc-stickers-animated') && str_contains($css, 'cbc-bob'));
 
 $layout = json_decode((string) file_get_contents($root.'/resources/layouts/admin/plugin_settings.json'), true);
 expect('layout name', $layout['layout_name'] ?? null, 'plugin_settings');

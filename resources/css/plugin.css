@@ -153,60 +153,73 @@
 html.cbc-stickers-animated .cbc-sticker,
 .cbc-stickers--animated .cbc-sticker-emoji {
     display: inline-block;
-    transform-origin: 50% 70%;
+    transform-origin: 50% 80%;
     will-change: transform;
+    backface-visibility: hidden;
 }
 
 html.cbc-stickers-animated .cbc-sticker[data-cbc-motion="bob"],
 .cbc-stickers--animated [data-cbc-motion="bob"] .cbc-sticker-emoji {
-    animation: cbc-bob 1.15s ease-in-out infinite;
+    animation: cbc-bob 0.9s ease-in-out infinite;
 }
 
 html.cbc-stickers-animated .cbc-sticker[data-cbc-motion="pulse"],
 .cbc-stickers--animated [data-cbc-motion="pulse"] .cbc-sticker-emoji {
-    animation: cbc-pulse 1.05s ease-in-out infinite;
+    animation: cbc-pulse 0.85s ease-in-out infinite;
 }
 
 html.cbc-stickers-animated .cbc-sticker[data-cbc-motion="wiggle"],
 .cbc-stickers--animated [data-cbc-motion="wiggle"] .cbc-sticker-emoji {
-    animation: cbc-wiggle 0.85s ease-in-out infinite;
+    animation: cbc-wiggle 0.7s ease-in-out infinite;
 }
 
 html.cbc-stickers-animated .cbc-sticker[data-cbc-motion="shake"],
 .cbc-stickers--animated [data-cbc-motion="shake"] .cbc-sticker-emoji {
-    animation: cbc-shake 0.7s ease-in-out infinite;
+    animation: cbc-shake 0.55s ease-in-out infinite;
 }
 
 html.cbc-stickers-animated .cbc-sticker[data-cbc-motion="pop"],
 .cbc-stickers--animated [data-cbc-motion="pop"] .cbc-sticker-emoji {
-    animation: cbc-pop 1.25s ease-in-out infinite;
+    animation: cbc-pop 0.95s ease-in-out infinite;
+}
+
+.cbc-stickers--animated .cbc-sticker-pick:nth-child(2n) .cbc-sticker-emoji {
+    animation-delay: 0.12s;
+}
+
+.cbc-stickers--animated .cbc-sticker-pick:nth-child(3n) .cbc-sticker-emoji {
+    animation-delay: 0.24s;
 }
 
 @keyframes cbc-bob {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-0.18em); }
+    0%, 100% { transform: translateY(0) rotate(0deg); }
+    50% { transform: translateY(-0.42em) rotate(-6deg); }
 }
 
 @keyframes cbc-pulse {
     0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.18); }
+    40% { transform: scale(1.34); }
+    70% { transform: scale(0.9); }
 }
 
 @keyframes cbc-wiggle {
-    0%, 100% { transform: rotate(-11deg); }
-    50% { transform: rotate(11deg); }
+    0%, 100% { transform: rotate(-18deg) translateY(0); }
+    50% { transform: rotate(18deg) translateY(-0.16em); }
 }
 
 @keyframes cbc-shake {
-    0%, 100% { transform: translateX(0); }
-    25% { transform: translateX(-0.12em); }
-    75% { transform: translateX(0.12em); }
+    0%, 100% { transform: translate(0, 0) rotate(0deg); }
+    20% { transform: translate(-0.18em, 0.05em) rotate(-8deg); }
+    40% { transform: translate(0.18em, -0.05em) rotate(8deg); }
+    60% { transform: translate(-0.12em, 0) rotate(-4deg); }
+    80% { transform: translate(0.12em, 0) rotate(4deg); }
 }
 
 @keyframes cbc-pop {
     0%, 100% { transform: scale(1) translateY(0); }
-    40% { transform: scale(1.22) translateY(-0.08em); }
-    70% { transform: scale(0.94); }
+    30% { transform: scale(1.4) translateY(-0.22em); }
+    55% { transform: scale(0.86) translateY(0.06em); }
+    75% { transform: scale(1.16) translateY(-0.1em); }
 }
 
 @media (prefers-reduced-motion: reduce) {
