@@ -2,9 +2,9 @@
 
 그누보드7 공식 게시판(`sirsoft-board`) 댓글에 **추천**, **베스트 댓글**, **정렬**을 붙이는 플러그인입니다. 테마와 게시판 모듈 파일은 수정하지 않습니다.
 
-버전 **0.1.3**. 처음 연결 대상은 [자유게시판](https://3ds.liveon.synology.me/board/free) 입니다. 목록이 아니라 **글 제목을 연 화면**의 댓글 칸에 추천/정렬이 붙습니다.
+버전 **0.1.4**. 처음 연결 대상은 [자유게시판](https://3ds.liveon.synology.me/board/free) 입니다. 목록이 아니라 **글 제목을 연 화면**의 댓글 칸에 추천/정렬이 붙습니다.
 
-0.1.2까지는 플러그인이 켜지면 사이트 부팅이 깨져 Laravel **Server Error**가 날 수 있습니다. 그 경우 플러그인을 제거한 뒤 **0.1.3**을 다시 설치하세요.
+이전 버전은 설치·활성화 때 사이트 전체가 Laravel **Server Error**가 날 수 있습니다. 그 경우 플러그인을 완전히 제거한 뒤 **0.1.4**만 다시 설치하세요.
 
 ## 기능
 
@@ -13,15 +13,16 @@
 - 최신순 / 등록순 / 추천순
 - 적용할 게시판 슬러그 (기본 `free`, 비우면 전체)
 - 다크 테마에 맞춘 추천 버튼·베스트 배지
-- 댓글 삭제 훅에서 추천 행 정리
 
 이 기능은 자체 게시판을 소유하지 않고 기존 댓글 화면을 확장하므로 모듈이 아니라 플러그인입니다.
 
 ## 요구 사항
 
 - 그누보드7 `>=7.0.0`
+- 공식 `sirsoft-board` 댓글이 있는 게시글 상세 (없으면 정렬 바만 표시)
 - PHP `^8.2`
-- 모듈 `sirsoft-board` 활성화
+
+설치는 게시판 모듈이 꺼져 있어도 실패하지 않습니다. 댓글 칸에 기능을 붙이려면 `sirsoft-board`를 켜 두세요.
 
 ## 설치
 
@@ -39,7 +40,7 @@ php artisan cache:clear
 
 설치 후 **게시판 댓글 확장** 설정에서 추천·베스트를 조절하세요. 기본 적용 게시판은 `free`(자유게시판)입니다. 게시글 상세는 하드 리프레시가 필요합니다.
 
-테이블: `custom_board_comment_likes` (플러그인 제거 시 dynamic tables로 정리).
+테이블: `custom_board_comment_likes` (첫 추천/조회 때 생성, 플러그인 제거 시 dynamic tables로 정리).
 
 ## 공개 API
 
@@ -95,7 +96,7 @@ npm run build
 | vendor | `g7` |
 | namespace | `Plugins\\G7\\Plugin\\Custom\\BoardComments` |
 | github_url | `https://github.com/keidischoi/g7-plugin-custom-board_comments` |
-| version | `0.1.3` |
+| version | `0.1.4` |
 
 ## 라이선스
 

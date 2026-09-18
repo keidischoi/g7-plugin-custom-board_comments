@@ -29,7 +29,7 @@ foreach ($jsonFiles as $path) {
 
 $plugin = json_decode((string) file_get_contents($root.'/plugin.json'), true);
 expect('identifier', $plugin['identifier'] ?? null, 'g7-plugin-custom-board_comments');
-expectTrue('depends on board', isset($plugin['dependencies']['modules']['sirsoft-board']));
+expect('g7 version', $plugin['g7_version'] ?? null, '>=7.0.0');
 expectTrue('js asset', ($plugin['assets']['js']['output'] ?? '') === 'dist/js/plugin.iife.js');
 
 $layout = json_decode((string) file_get_contents($root.'/resources/layouts/admin/plugin_settings.json'), true);

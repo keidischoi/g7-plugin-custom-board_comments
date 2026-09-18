@@ -3,8 +3,6 @@
 namespace Plugins\G7\Plugin\Custom\BoardComments;
 
 use App\Extension\AbstractPlugin;
-use Plugins\G7\Plugin\Custom\BoardComments\Listeners\CommentDeletedCleanupListener;
-use Plugins\G7\Plugin\Custom\BoardComments\Support\SettingsRules;
 
 /**
  * 공식 게시판 댓글에 추천·베스트·정렬을 더하는 플러그인입니다.
@@ -104,15 +102,6 @@ class Plugin extends AbstractPlugin
      */
     public function getConfigValues(): array
     {
-        $file = __DIR__.'/src/Support/SettingsRules.php';
-        if (is_file($file)) {
-            require_once $file;
-        }
-
-        if (class_exists(SettingsRules::class, false)) {
-            return SettingsRules::defaults();
-        }
-
         return [
             'enabled' => true,
             'allow_guest_likes' => false,
@@ -126,13 +115,13 @@ class Plugin extends AbstractPlugin
     }
 
     /**
-     * @return array<class-string>
+     * 설치 때 artisan migrate를 돌리지 않습니다. 추천 테이블은 처음 쓸 때 만듭니다.
+     *
+     * @return array<int, string>
      */
-    public function getHookListeners(): array
+    public function getMigrations(): array
     {
-        return [
-            CommentDeletedCleanupListener::class,
-        ];
+        return [];
     }
 
     /**
