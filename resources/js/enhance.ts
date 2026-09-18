@@ -16,6 +16,7 @@ const COPY = {
         latest: '최신순',
         oldest: '등록순',
         popular: '추천순',
+        sortLabel: '댓글 정렬',
         login: '추천하려면 로그인하세요.',
     },
     en: {
@@ -25,6 +26,7 @@ const COPY = {
         latest: 'Latest',
         oldest: 'Oldest',
         popular: 'Most liked',
+        sortLabel: 'Comment sort',
         login: 'Sign in to like a comment.',
     },
 };
@@ -90,26 +92,55 @@ export function bindCommentRows(section: Element, comments: BoardComment[]): voi
     });
 }
 
-export function ensureToolbar(section: Element, sort: SortKind, copy: typeof COPY.ko): HTMLElement {
-    let toolbar = section.querySelector<HTMLElement>('[data-cbc-toolbar]');
+const OVERLAY_Z = '2147483000';
+
+export function ensureToolbar(section: Element | null, sort: SortKind, copy: typeof COPY.ko): HTMLElement {
+    let toolbar = document.querySelector<HTMLElement>('[data-cbc-toolbar]');
     if (!toolbar) {
         toolbar = document.createElement('div');
         toolbar.setAttribute('data-cbc-toolbar', '1');
-        toolbar.className = 'cbc-toolbar';
+        toolbar.setAttribute('role', 'toolbar');
+        toolbar.setAttribute('aria-label', copy.sortLabel);
+        toolbar.className = 'cbc-toolbar cbc-toolbar--overlay';
+        toolbar.style.position = 'fixed';
+        toolbar.style.zIndex = OVERLAY_Z;
+        toolbar.style.display = 'flex';
+        document.body.appendChild(toolbar);
         toolbar.innerHTML = SORTS_HTML(copy, sort);
     } else {
         syncSortButtons(toolbar, sort);
-    }
-
-    const heading = section.querySelector('h3, h2, h4');
-    if (heading) {
-        if (toolbar.previousElementSibling !== heading) {
-            heading.insertAdjacentElement('afterend', toolbar);
+        if (toolbar.parentElement !== document.body) {
+            document.body.appendChild(toolbar);
         }
-    } else if (toolbar.parentElement !== section) {
-        section.prepend(toolbar);
     }
+    placeToolbar(toolbar, section);
     return toolbar;
+}
+
+export function hideToolbar(): void {
+    document.querySelector('[data-cbc-toolbar]')?.remove();
+}
+
+export function placeToolbar(toolbar: HTMLElement, section: Element | null): void {
+    const heading = section?.querySelector('h3, h2, h4');
+    toolbar.style.position = 'fixed';
+    toolbar.style.zIndex = OVERLAY_Z;
+    toolbar.style.display = 'flex';
+    if (heading instanceof HTMLElement) {
+        const rect = heading.getBoundingClientRect();
+        const width = toolbar.offsetWidth || 240;
+        toolbar.style.top = `${Math.max(8, rect.bottom + 6)}px`;
+        toolbar.style.left = `${Math.max(8, rect.right - width)}px`;
+        toolbar.style.right = 'auto';
+        toolbar.style.bottom = 'auto';
+        toolbar.dataset.cbcAnchored = '1';
+        return;
+    }
+    toolbar.style.top = 'auto';
+    toolbar.style.left = 'auto';
+    toolbar.style.right = '1.25rem';
+    toolbar.style.bottom = '1.25rem';
+    toolbar.dataset.cbcAnchored = '0';
 }
 
 export function paintLikes(
@@ -191,9 +222,10 @@ function SORTS_HTML(copy: typeof COPY.ko, current: SortKind): string {
         ['oldest', copy.oldest],
         ['popular', copy.popular],
     ];
-    return options.map(([value, label]) => (
+    const buttons = options.map(([value, label]) => (
         `<button type="button" class="cbc-sort${value === current ? ' is-active' : ''}" data-cbc-sort="${value}">${label}</button>`
     )).join('');
+    return `<span class="cbc-toolbar-label">${copy.sortLabel}</span>${buttons}`;
 }
 
 function syncSortButtons(toolbar: HTMLElement, sort: SortKind): void {

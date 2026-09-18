@@ -28,6 +28,7 @@ const copy = {
     latest: '최신순',
     oldest: '등록순',
     popular: '추천순',
+    sortLabel: '댓글 정렬',
     login: '로그인',
 };
 
@@ -48,13 +49,15 @@ describe('enhance', () => {
         expect(section.querySelector('[data-cbc-comment-id="11"] [data-cbc-best]')?.textContent).toBe('베스트');
     });
 
-    it('inserts a sort toolbar on the comments heading', () => {
+    it('inserts a sort toolbar on document.body, not inside the comment card', () => {
         const section = commentSection();
         const toolbar = ensureToolbar(section, 'popular', copy);
         expect(toolbar.querySelector('[data-cbc-sort="popular"]')?.classList.contains('is-active')).toBe(true);
-        expect(section.querySelectorAll('[data-cbc-toolbar]').length).toBe(1);
+        expect(toolbar.parentElement).toBe(document.body);
+        expect(section.querySelectorAll('[data-cbc-toolbar]').length).toBe(0);
+        expect(document.querySelectorAll('[data-cbc-toolbar]').length).toBe(1);
         ensureToolbar(section, 'latest', copy);
-        expect(section.querySelectorAll('[data-cbc-toolbar]').length).toBe(1);
+        expect(document.querySelectorAll('[data-cbc-toolbar]').length).toBe(1);
     });
 
     it('finds the official comment heading even when there are no comments', () => {
@@ -68,26 +71,40 @@ describe('enhance', () => {
         expect(section).not.toBeNull();
         const toolbar = ensureToolbar(section as Element, 'latest', copy);
         expect(toolbar.querySelector('[data-cbc-sort="latest"]')?.textContent).toBe('최신순');
-        expect(section?.querySelector('h3')?.nextElementSibling).toBe(toolbar);
+        expect(toolbar.parentElement).toBe(document.body);
+        expect(toolbar.classList.contains('cbc-toolbar--overlay')).toBe(true);
     });
 
-    it('finds the live 3D Store comment card and places the toolbar beside the heading', () => {
+    it('finds the live 3D Store comment card and mounts the toolbar outside React', () => {
         document.body.innerHTML = `
-            <div class="mt-6">
-                <div class="bg-white dark:bg-gray-800 rounded-lg shadow">
-                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white flex items-center justify-between px-6 pt-6 pb-4">
-                        <div class="flex items-center gap-2"><span>댓글</span><span>0</span></div>
-                    </h3>
-                    <div class="border-b border-gray-200 dark:border-gray-700"></div>
-                    <div class="px-6 py-8 text-center">댓글 작성 권한이 없습니다</div>
+            <div id="app">
+                <div class="mt-6">
+                    <div class="bg-white dark:bg-gray-800 rounded-lg shadow">
+                        <h3 class="text-lg font-semibold text-gray-900 dark:text-white flex items-center justify-between px-6 pt-6 pb-4">
+                            <div class="flex items-center gap-2"><span>댓글</span><span>0</span></div>
+                        </h3>
+                        <div class="border-b border-gray-200 dark:border-gray-700"></div>
+                        <div class="px-6 py-8 text-center">댓글 작성 권한이 없습니다</div>
+                    </div>
                 </div>
             </div>
         `;
         const section = findCommentSection();
         expect(section).not.toBeNull();
         const toolbar = ensureToolbar(section as Element, 'latest', copy);
-        expect(toolbar.parentElement).toBe(section);
-        expect(section?.querySelector('h3')?.nextElementSibling).toBe(toolbar);
+        expect(toolbar.parentElement).toBe(document.body);
+        expect(document.getElementById('app')?.contains(toolbar)).toBe(false);
         expect(toolbar.textContent).toContain('최신순');
+        expect(toolbar.textContent).toContain('댓글 정렬');
+        document.getElementById('app')!.innerHTML = '<div>replaced</div>';
+        expect(document.querySelector('[data-cbc-toolbar]')).toBe(toolbar);
+    });
+
+    it('shows the overlay even before the comment card exists', () => {
+        document.body.innerHTML = '<div id="app"></div>';
+        const toolbar = ensureToolbar(null, 'oldest', copy);
+        expect(toolbar.parentElement).toBe(document.body);
+        expect(toolbar.dataset.cbcAnchored).toBe('0');
+        expect(toolbar.querySelector('[data-cbc-sort="oldest"]')?.classList.contains('is-active')).toBe(true);
     });
 });

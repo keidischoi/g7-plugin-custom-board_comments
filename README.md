@@ -2,9 +2,9 @@
 
 그누보드7 공식 게시판(`sirsoft-board`) 댓글에 **추천**, **베스트 댓글**, **정렬**을 붙이는 플러그인입니다. 테마와 게시판 모듈 파일은 수정하지 않습니다.
 
-버전 **0.1.5**. 처음 연결 대상은 [자유게시판](https://3ds.liveon.synology.me/board/free) 입니다. 목록이 아니라 **글 제목을 연 화면**의 댓글 칸에 추천/정렬이 붙습니다.
+버전 **0.1.6**. 처음 연결 대상은 [자유게시판](https://3ds.liveon.synology.me/board/free) 입니다. 목록이 아니라 **글 제목을 연 화면**(`/board/free/{번호}`)에 댓글 정렬 바가 보입니다.
 
-이전 버전은 설치·활성화 때 사이트 전체가 Laravel **Server Error**가 나거나, 글 상세에 정렬 바가 안 보일 수 있습니다. 그 경우 플러그인을 완전히 제거한 뒤 **0.1.5**만 다시 설치하세요.
+이전 버전은 설치·활성화 때 사이트 전체가 Laravel **Server Error**가 나거나, 글 상세에 정렬 바가 안 보일 수 있습니다. 그 경우 플러그인을 완전히 제거한 뒤 **0.1.6**만 다시 설치하세요.
 
 ## 기능
 
@@ -96,7 +96,7 @@ npm run build
 | vendor | `g7` |
 | namespace | `Plugins\\G7\\Plugin\\Custom\\BoardComments` |
 | github_url | `https://github.com/keidischoi/g7-plugin-custom-board_comments` |
-| version | `0.1.5` |
+| version | `0.1.6` |
 
 ## 라이선스
 
