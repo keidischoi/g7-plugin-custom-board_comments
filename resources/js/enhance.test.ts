@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { bindCommentRows, commentRows, ensureToolbar, paintLikes } from './enhance';
+import { bindCommentRows, commentRows, ensureToolbar, findCommentSection, paintLikes } from './enhance';
 import { DEFAULT_CONFIG } from './config';
 import type { BoardComment } from './sort';
 
@@ -21,6 +21,16 @@ const comments: BoardComment[] = [
     { id: 12, parent_id: null, depth: 0, created_at: '2026-01-01 00:00:00' },
 ];
 
+const copy = {
+    like: '추천',
+    liked: '추천함',
+    best: '베스트',
+    latest: '최신순',
+    oldest: '등록순',
+    popular: '추천순',
+    login: '로그인',
+};
+
 describe('enhance', () => {
     it('binds comment ids and paints like buttons', () => {
         const section = commentSection();
@@ -31,15 +41,7 @@ describe('enhance', () => {
             counts: { 11: 5, 12: 1 },
             liked: [11],
             best: [11],
-        }, DEFAULT_CONFIG, {
-            like: '추천',
-            liked: '추천함',
-            best: '베스트',
-            latest: '최신순',
-            oldest: '등록순',
-            popular: '추천순',
-            login: '로그인',
-        });
+        }, DEFAULT_CONFIG, copy);
 
         const liked = section.querySelector('[data-cbc-comment-id="11"] [data-cbc-like]');
         expect(liked?.textContent).toContain('추천함 5');
@@ -48,20 +50,23 @@ describe('enhance', () => {
 
     it('inserts a sort toolbar on the comments heading', () => {
         const section = commentSection();
-        const toolbar = ensureToolbar(section, 'popular', {
-            like: '추천',
-            liked: '추천함',
-            best: '베스트',
-            latest: '최신순',
-            oldest: '등록순',
-            popular: '추천순',
-            login: '로그인',
-        });
+        const toolbar = ensureToolbar(section, 'popular', copy);
         expect(toolbar.querySelector('[data-cbc-sort="popular"]')?.classList.contains('is-active')).toBe(true);
         expect(section.querySelectorAll('[data-cbc-toolbar]').length).toBe(1);
-        ensureToolbar(section, 'latest', {
-            like: '추천', liked: '추천함', best: '베스트', latest: '최신순', oldest: '등록순', popular: '추천순', login: '로그인',
-        });
+        ensureToolbar(section, 'latest', copy);
         expect(section.querySelectorAll('[data-cbc-toolbar]').length).toBe(1);
+    });
+
+    it('finds the official comment heading even when there are no comments', () => {
+        document.body.innerHTML = `
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow">
+                <h3 class="text-lg font-semibold">댓글 0</h3>
+                <div class="px-6 py-8 text-center">아직 댓글이 없습니다.</div>
+            </div>
+        `;
+        const section = findCommentSection();
+        expect(section).not.toBeNull();
+        const toolbar = ensureToolbar(section as Element, 'latest', copy);
+        expect(toolbar.querySelector('[data-cbc-sort="latest"]')?.textContent).toBe('최신순');
     });
 });

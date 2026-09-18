@@ -33,6 +33,23 @@ export function localeCopy(lang = 'ko'): typeof COPY.ko {
     return lang.toLowerCase().startsWith('en') ? COPY.en : COPY.ko;
 }
 
+export function findCommentSection(root: ParentNode = document): Element | null {
+    const existing = root.querySelector('[data-cbc-section]');
+    if (existing) {
+        return existing;
+    }
+
+    const headings = [...root.querySelectorAll('h2, h3, h4')];
+    const heading = headings.find((node) => /댓글|comments?/i.test(node.textContent ?? ''));
+    const section = heading?.closest('.bg-white, .rounded-lg, .shadow, [class*="comment"]')
+        ?? heading?.parentElement;
+    if (section instanceof HTMLElement) {
+        section.setAttribute('data-cbc-section', '1');
+        return section;
+    }
+    return null;
+}
+
 export function commentRows(section: Element): HTMLElement[] {
     const list = section.querySelector('.space-y-4') ?? section;
     return [...list.children].filter((node): node is HTMLElement => (
