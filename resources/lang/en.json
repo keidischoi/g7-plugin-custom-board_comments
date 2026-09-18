@@ -14,7 +14,9 @@
     "latest": "Latest",
     "oldest": "Oldest",
     "popular": "Most liked",
-    "login_to_like": "Sign in to like a comment."
+    "login_to_like": "Sign in to like a comment.",
+    "sticker": "Sticker",
+    "image": "Image"
   },
   "settings": {
     "title": "Board comment extras",
@@ -41,6 +43,14 @@
       "style_enabled": {
         "label": "Comment card styling",
         "hint": "Applies like-button and best-badge styles."
+      },
+      "stickers_enabled": {
+        "label": "Sticker insert",
+        "hint": "Lets visitors insert stickers into the comment box."
+      },
+      "images_enabled": {
+        "label": "Image insert",
+        "hint": "Signed-in members can attach images to comments. 2MB max."
       },
       "default_sort": {
         "label": "Default sort",

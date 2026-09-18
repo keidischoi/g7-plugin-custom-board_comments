@@ -32,6 +32,8 @@ expect('limit clamp', $normalized['best_limit'], 1);
 expect('sort fallback', $normalized['default_sort'], 'latest');
 expect('slug parse', $normalized['board_slugs'], 'free, qna, ok_board');
 expect('style off', $normalized['style_enabled'], false);
+expect('stickers default on', $defaults['stickers_enabled'], true);
+expect('images default on', $defaults['images_enabled'], true);
 
 expectTrue('all boards when empty', SettingsRules::appliesToBoard('free', ''));
 expect('blank slugs mean all boards', SettingsRules::normalize(['board_slugs' => ''])['board_slugs'], '');

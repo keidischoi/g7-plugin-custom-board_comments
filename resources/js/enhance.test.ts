@@ -29,6 +29,10 @@ const copy = {
     oldest: '등록순',
     popular: '추천순',
     sortLabel: '댓글 정렬',
+    sticker: '스티커',
+    image: '이미지',
+    needComposer: '댓글 입력창이 없습니다.',
+    uploadFail: '업로드 실패',
     login: '로그인',
 };
 
@@ -96,6 +100,8 @@ describe('enhance', () => {
         expect(document.getElementById('app')?.contains(toolbar)).toBe(false);
         expect(toolbar.textContent).toContain('최신순');
         expect(toolbar.textContent).toContain('댓글 정렬');
+        expect(toolbar.textContent).toContain('스티커');
+        expect(toolbar.textContent).toContain('이미지');
         document.getElementById('app')!.innerHTML = '<div>replaced</div>';
         expect(document.querySelector('[data-cbc-toolbar]')).toBe(toolbar);
     });

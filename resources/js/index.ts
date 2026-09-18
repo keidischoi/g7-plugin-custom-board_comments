@@ -20,6 +20,8 @@ import {
 } from './enhance';
 import { boardPostApiUrl, parseBoardShowPath, isBoardPostApi, unwrapApiData } from './url';
 import { mutationNeedsCommentSync } from './observe';
+import { ensureComposerControls } from './composer';
+import { paintTokens } from './tokens';
 import type { BoardComment } from './sort';
 
 type Runtime = {
@@ -59,14 +61,18 @@ function asComments(raw: unknown): BoardComment[] {
 }
 
 async function fetchJson(url: string, init?: RequestInit): Promise<unknown> {
+    const csrf = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+    const { headers: extraHeaders, ...rest } = init ?? {};
+    const headers: Record<string, string> = {
+        Accept: 'application/json',
+        'X-Requested-With': 'XMLHttpRequest',
+        ...(csrf ? { 'X-CSRF-TOKEN': csrf } : {}),
+        ...((extraHeaders ?? {}) as Record<string, string>),
+    };
     const response = await window.fetch(url, {
         credentials: 'same-origin',
-        headers: {
-            Accept: 'application/json',
-            'X-Requested-With': 'XMLHttpRequest',
-            ...(init?.headers ?? {}),
-        },
-        ...init,
+        headers,
+        ...rest,
     });
     const payload = await response.json().catch(() => null);
     if (!response.ok) {
@@ -181,6 +187,34 @@ function boot(): void {
                 void sync();
             };
         });
+        ensureComposerControls(toolbar, section, config, copy(), async (file) => {
+            const csrf = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+            const body = new FormData();
+            body.append('file', file);
+            body.append('post_id', String(ref.postId));
+            const response = await window.fetch(`${API_PREFIX}/media`, {
+                method: 'POST',
+                credentials: 'same-origin',
+                headers: {
+                    Accept: 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest',
+                    ...(csrf ? { 'X-CSRF-TOKEN': csrf } : {}),
+                },
+                body,
+            });
+            const payload = await response.json().catch(() => null);
+            if (!response.ok) {
+                const message = payload && typeof payload === 'object' && 'message' in payload
+                    ? String((payload as { message: unknown }).message)
+                    : copy().uploadFail;
+                throw new Error(message);
+            }
+            const data = unwrapData(payload);
+            return { token: String(data.token ?? '') };
+        });
+        if (section) {
+            paintTokens(section);
+        }
 
         if (!section || comments.length === 0) {
             return;
@@ -340,7 +374,7 @@ function boot(): void {
         }
     });
     observer.observe(document.documentElement, { childList: true, subtree: true });
-    document.documentElement.setAttribute('data-cbc-boot', '0.1.6');
+    document.documentElement.setAttribute('data-cbc-boot', '0.1.7');
 
     void (async () => {
         try {

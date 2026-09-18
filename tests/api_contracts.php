@@ -13,7 +13,10 @@ $pluginJson = json_decode((string) file_get_contents($root.'/plugin.json'), true
 expectTrue('settings route', str_contains($routes, "Route::get('/settings'"));
 expectTrue('summary route', str_contains($routes, "Route::get('/posts/{postId}/likes'"));
 expectTrue('like route', str_contains($routes, "Route::post('/comments/{commentId}/like'"));
+expectTrue('media upload route', str_contains($routes, "Route::post('/media'"));
+expectTrue('media show route', str_contains($routes, "Route::get('/media/{id}'"));
 expectTrue('dynamic table', str_contains($pluginPhp, 'custom_board_comment_likes'));
+expectTrue('media dynamic table', str_contains($pluginPhp, 'custom_board_comment_media'));
 expectFalse('no hook listeners', str_contains($pluginPhp, 'CommentDeletedCleanupListener'));
 expectFalse('no custom service provider', is_dir($root.'/src/Providers'));
 expectTrue('unique actor', str_contains($likeTable, 'cbc_likes_actor_unique'));

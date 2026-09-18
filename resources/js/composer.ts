@@ -1,0 +1,189 @@
+import type { PluginConfig } from './config';
+import { stickerToken } from './stickers';
+
+type Copy = {
+    sticker: string;
+    image: string;
+    needComposer: string;
+    uploadFail: string;
+    login: string;
+};
+
+export function findComposer(section: Element | null): HTMLElement | null {
+    const roots: ParentNode[] = [];
+    if (section) {
+        roots.push(section);
+        if (section.parentElement) {
+            roots.push(section.parentElement);
+        }
+    }
+    roots.push(document);
+
+    for (const root of roots) {
+        const nodes = [...root.querySelectorAll('textarea, [contenteditable="true"]')];
+        const match = nodes.find((node) => {
+            if (!(node instanceof HTMLElement)) {
+                return false;
+            }
+            if (node.closest('[data-cbc-toolbar], [data-cbc-stickers]')) {
+                return false;
+            }
+            const rect = node.getBoundingClientRect();
+            const visible = rect.width > 60 && rect.height > 24;
+            const inComments = Boolean(section && section.contains(node));
+            return inComments || visible;
+        });
+        if (match instanceof HTMLElement) {
+            return match;
+        }
+    }
+    return null;
+}
+
+export function insertIntoComposer(field: HTMLElement, text: string): boolean {
+    const padded = text.startsWith(' ') || text.startsWith('\n') ? text : ` ${text}`;
+    if (field instanceof HTMLTextAreaElement || field instanceof HTMLInputElement) {
+        const start = field.selectionStart ?? field.value.length;
+        const end = field.selectionEnd ?? start;
+        const next = `${field.value.slice(0, start)}${padded}${field.value.slice(end)}`;
+        const proto = Object.getOwnPropertyDescriptor(Object.getPrototypeOf(field), 'value');
+        proto?.set?.call(field, next);
+        field.dispatchEvent(new InputEvent('input', { bubbles: true, data: padded, inputType: 'insertText' }));
+        field.dispatchEvent(new Event('change', { bubbles: true }));
+        const pos = start + padded.length;
+        try {
+            field.setSelectionRange(pos, pos);
+        } catch {
+            // some inputs do not support selection
+        }
+        field.focus();
+        return true;
+    }
+    if (field.isContentEditable) {
+        field.focus();
+        const ok = document.execCommand('insertText', false, padded);
+        if (!ok) {
+            field.append(padded);
+            field.dispatchEvent(new InputEvent('input', { bubbles: true }));
+        }
+        return true;
+    }
+    return false;
+}
+
+export function hideComposerUi(): void {
+    document.querySelector('[data-cbc-stickers]')?.remove();
+    document.querySelector('[data-cbc-file]')?.remove();
+}
+
+export function ensureComposerControls(
+    toolbar: HTMLElement,
+    section: Element | null,
+    config: PluginConfig,
+    copy: Copy,
+    uploadImage: (file: File) => Promise<{ token: string }>,
+): void {
+    bindActionButtons(toolbar, section, config, copy, uploadImage);
+}
+
+function bindActionButtons(
+    toolbar: HTMLElement,
+    section: Element | null,
+    config: PluginConfig,
+    copy: Copy,
+    uploadImage: (file: File) => Promise<{ token: string }>,
+): void {
+    const stickerBtn = toolbar.querySelector<HTMLButtonElement>('[data-cbc-sticker]');
+    const imageBtn = toolbar.querySelector<HTMLButtonElement>('[data-cbc-image]');
+    if (stickerBtn) {
+        stickerBtn.hidden = !config.stickersEnabled;
+        stickerBtn.onclick = (event) => {
+            event.preventDefault();
+            event.stopPropagation();
+            toggleStickerPanel(toolbar, section, copy);
+        };
+    }
+    if (imageBtn) {
+        imageBtn.hidden = !config.imagesEnabled;
+        imageBtn.onclick = (event) => {
+            event.preventDefault();
+            event.stopPropagation();
+            pickImage(section, copy, uploadImage);
+        };
+    }
+}
+
+function toggleStickerPanel(toolbar: HTMLElement, section: Element | null, copy: Copy): void {
+    const existing = document.querySelector<HTMLElement>('[data-cbc-stickers]');
+    if (existing) {
+        existing.remove();
+        return;
+    }
+    const panel = document.createElement('div');
+    panel.setAttribute('data-cbc-stickers', '1');
+    panel.className = 'cbc-stickers';
+    panel.style.position = 'fixed';
+    panel.style.zIndex = '2147483001';
+    panel.innerHTML = STICKERS.map((sticker) => (
+        `<button type="button" class="cbc-sticker-pick" data-cbc-sticker-id="${sticker.id}" title="${sticker.label.ko}">`
+        + `<span class="cbc-sticker-emoji">${sticker.emoji}</span>`
+        + `<span class="cbc-sticker-name">${sticker.label.ko}</span>`
+        + `</button>`
+    )).join('');
+    document.body.appendChild(panel);
+    placePanel(panel, toolbar);
+    panel.querySelectorAll<HTMLButtonElement>('[data-cbc-sticker-id]').forEach((button) => {
+        button.onclick = () => {
+            const id = button.getAttribute('data-cbc-sticker-id') ?? '';
+            const composer = findComposer(section);
+            if (!composer || !insertIntoComposer(composer, stickerToken(id))) {
+                window.alert(copy.needComposer);
+                return;
+            }
+            panel.remove();
+        };
+    });
+}
+
+function placePanel(panel: HTMLElement, toolbar: HTMLElement): void {
+    const rect = toolbar.getBoundingClientRect();
+    panel.style.top = `${Math.max(8, rect.bottom + 8)}px`;
+    panel.style.left = `${Math.max(8, Math.min(window.innerWidth - 320, rect.left))}px`;
+}
+
+function pickImage(
+    section: Element | null,
+    copy: Copy,
+    uploadImage: (file: File) => Promise<{ token: string }>,
+): void {
+    const composer = findComposer(section);
+    if (!composer) {
+        window.alert(copy.needComposer);
+        return;
+    }
+    let input = document.querySelector<HTMLInputElement>('[data-cbc-file]');
+    if (!input) {
+        input = document.createElement('input');
+        input.type = 'file';
+        input.accept = 'image/jpeg,image/png,image/gif,image/webp';
+        input.setAttribute('data-cbc-file', '1');
+        input.hidden = true;
+        document.body.appendChild(input);
+    }
+    input.onchange = async () => {
+        const file = input?.files?.[0];
+        input.value = '';
+        if (!file) {
+            return;
+        }
+        try {
+            const result = await uploadImage(file);
+            if (!insertIntoComposer(composer, result.token)) {
+                window.alert(copy.needComposer);
+            }
+        } catch (error) {
+            window.alert(error instanceof Error ? error.message : copy.uploadFail);
+        }
+    };
+    input.click();
+}

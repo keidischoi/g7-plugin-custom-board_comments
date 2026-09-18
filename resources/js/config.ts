@@ -12,6 +12,8 @@ export type PluginConfig = {
     defaultSort: SortKind;
     boardSlugs: string[];
     styleEnabled: boolean;
+    stickersEnabled: boolean;
+    imagesEnabled: boolean;
 };
 
 export const DEFAULT_CONFIG: PluginConfig = {
@@ -23,6 +25,8 @@ export const DEFAULT_CONFIG: PluginConfig = {
     defaultSort: 'latest',
     boardSlugs: ['free'],
     styleEnabled: true,
+    stickersEnabled: true,
+    imagesEnabled: true,
 };
 
 type G7Window = Window & {
@@ -75,6 +79,8 @@ export function normalizeConfig(raw: unknown): PluginConfig {
         defaultSort: (SORTS as readonly string[]).includes(sort) ? sort as SortKind : 'latest',
         boardSlugs: resolveSlugs(input),
         styleEnabled: boolish(input.style_enabled ?? input.styleEnabled, true),
+        stickersEnabled: boolish(input.stickers_enabled ?? input.stickersEnabled, true),
+        imagesEnabled: boolish(input.images_enabled ?? input.imagesEnabled, true),
     };
 }
 

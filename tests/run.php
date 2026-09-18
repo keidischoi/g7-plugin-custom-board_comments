@@ -10,6 +10,7 @@ $files = [
     __DIR__.'/layouts.php',
     __DIR__.'/api_contracts.php',
     __DIR__.'/boot.php',
+    __DIR__.'/media.php',
 ];
 
 $failed = 0;
