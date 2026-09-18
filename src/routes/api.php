@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use Plugins\G7\Plugin\Custom\BoardComments\Http\Controllers\CommentLikeController;
+use Plugins\G7\Plugin\Custom\BoardComments\Http\Controllers\CommentMediaController;
 
 /*
 |--------------------------------------------------------------------------
@@ -24,3 +25,10 @@ Route::get('/posts/{postId}/likes', [CommentLikeController::class, 'summary'])
 Route::post('/comments/{commentId}/like', [CommentLikeController::class, 'toggle'])
     ->whereNumber('commentId')
     ->name('comments.like');
+
+Route::post('/media', [CommentMediaController::class, 'store'])
+    ->name('media.store');
+
+Route::get('/media/{id}', [CommentMediaController::class, 'show'])
+    ->whereNumber('id')
+    ->name('media.show');

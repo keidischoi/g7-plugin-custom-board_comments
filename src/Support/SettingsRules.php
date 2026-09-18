@@ -22,6 +22,8 @@ final class SettingsRules
             'default_sort' => 'latest',
             'board_slugs' => 'free',
             'style_enabled' => true,
+            'stickers_enabled' => true,
+            'images_enabled' => true,
         ];
     }
 
@@ -50,6 +52,8 @@ final class SettingsRules
                 array_key_exists('board_slugs', $input) ? $input['board_slugs'] : $defaults['board_slugs']
             ),
             'style_enabled' => self::boolish($input['style_enabled'] ?? $defaults['style_enabled']),
+            'stickers_enabled' => self::boolish($input['stickers_enabled'] ?? $defaults['stickers_enabled']),
+            'images_enabled' => self::boolish($input['images_enabled'] ?? $defaults['images_enabled']),
         ];
     }
 

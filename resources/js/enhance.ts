@@ -17,6 +17,10 @@ const COPY = {
         oldest: '등록순',
         popular: '추천순',
         sortLabel: '댓글 정렬',
+        sticker: '스티커',
+        image: '이미지',
+        needComposer: '댓글 입력창이 없습니다. 로그인해서 댓글을 쓸 수 있는 글에서 사용하세요.',
+        uploadFail: '이미지를 올리지 못했습니다.',
         login: '추천하려면 로그인하세요.',
     },
     en: {
@@ -27,6 +31,10 @@ const COPY = {
         oldest: 'Oldest',
         popular: 'Most liked',
         sortLabel: 'Comment sort',
+        sticker: 'Sticker',
+        image: 'Image',
+        needComposer: 'No comment box on this page. Sign in on a post where you can write a comment.',
+        uploadFail: 'Could not upload the image.',
         login: 'Sign in to like a comment.',
     },
 };
@@ -119,6 +127,8 @@ export function ensureToolbar(section: Element | null, sort: SortKind, copy: typ
 
 export function hideToolbar(): void {
     document.querySelector('[data-cbc-toolbar]')?.remove();
+    document.querySelector('[data-cbc-stickers]')?.remove();
+    document.querySelector('[data-cbc-file]')?.remove();
 }
 
 export function placeToolbar(toolbar: HTMLElement, section: Element | null): void {
@@ -225,7 +235,11 @@ function SORTS_HTML(copy: typeof COPY.ko, current: SortKind): string {
     const buttons = options.map(([value, label]) => (
         `<button type="button" class="cbc-sort${value === current ? ' is-active' : ''}" data-cbc-sort="${value}">${label}</button>`
     )).join('');
-    return `<span class="cbc-toolbar-label">${copy.sortLabel}</span>${buttons}`;
+    const extras = [
+        `<button type="button" class="cbc-sort cbc-composer-btn" data-cbc-sticker="1">${copy.sticker}</button>`,
+        `<button type="button" class="cbc-sort cbc-composer-btn" data-cbc-image="1">${copy.image}</button>`,
+    ].join('');
+    return `<span class="cbc-toolbar-label">${copy.sortLabel}</span>${buttons}<span class="cbc-toolbar-gap"></span>${extras}`;
 }
 
 function syncSortButtons(toolbar: HTMLElement, sort: SortKind): void {

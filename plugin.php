@@ -94,6 +94,26 @@ class Plugin extends AbstractPlugin
                 ],
                 'required' => false,
             ],
+            'stickers_enabled' => [
+                'type' => 'boolean',
+                'default' => true,
+                'label' => ['ko' => '스티커 삽입', 'en' => 'Sticker insert'],
+                'hint' => [
+                    'ko' => '댓글 입력창에 스티커를 넣을 수 있습니다.',
+                    'en' => 'Lets visitors insert stickers into the comment box.',
+                ],
+                'required' => false,
+            ],
+            'images_enabled' => [
+                'type' => 'boolean',
+                'default' => true,
+                'label' => ['ko' => '이미지 삽입', 'en' => 'Image insert'],
+                'hint' => [
+                    'ko' => '로그인한 회원이 댓글에 이미지를 올릴 수 있습니다. 최대 2MB.',
+                    'en' => 'Signed-in members can attach images to comments. 2MB max.',
+                ],
+                'required' => false,
+            ],
         ];
     }
 
@@ -111,6 +131,8 @@ class Plugin extends AbstractPlugin
             'default_sort' => 'latest',
             'board_slugs' => 'free',
             'style_enabled' => true,
+            'stickers_enabled' => true,
+            'images_enabled' => true,
         ];
     }
 
@@ -131,6 +153,7 @@ class Plugin extends AbstractPlugin
     {
         return [
             'custom_board_comment_likes',
+            'custom_board_comment_media',
         ];
     }
 
@@ -142,7 +165,7 @@ class Plugin extends AbstractPlugin
         return [
             'author' => 'keidischoi',
             'license' => 'MIT',
-            'keywords' => ['board', 'comments', 'likes', 'best'],
+            'keywords' => ['board', 'comments', 'likes', 'best', 'sticker', 'image'],
         ];
     }
 }

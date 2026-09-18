@@ -3,8 +3,8 @@ export function isOurWidget(node: Node): boolean {
         return false;
     }
     return Boolean(
-        node.matches('[data-cbc-toolbar], [data-cbc-like], [data-cbc-best]')
-        || node.closest('[data-cbc-toolbar], [data-cbc-like], [data-cbc-best]'),
+        node.matches('[data-cbc-toolbar], [data-cbc-like], [data-cbc-best], [data-cbc-stickers], [data-cbc-media]')
+        || node.closest('[data-cbc-toolbar], [data-cbc-like], [data-cbc-best], [data-cbc-stickers], [data-cbc-media]'),
     );
 }
 
