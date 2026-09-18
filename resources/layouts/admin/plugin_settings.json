@@ -1,5 +1,5 @@
 {
-  "version": "0.1.0",
+  "version": "0.1.1",
   "layout_name": "plugin_settings",
   "permissions": [
     "core.plugins.update"
@@ -29,7 +29,7 @@
     "best_threshold": { "type": "integer", "min": 1, "max": 999, "default": 5 },
     "best_limit": { "type": "integer", "min": 1, "max": 20, "default": 3 },
     "default_sort": { "type": "enum", "options": ["latest", "oldest", "popular"], "default": "latest" },
-    "board_slugs": { "type": "string", "default": "" },
+    "board_slugs": { "type": "string", "default": "free" },
     "style_enabled": { "type": "boolean", "default": true }
   },
   "slots": {
@@ -217,7 +217,7 @@
                           "name": "board_slugs",
                           "type": "text",
                           "className": "lg:col-span-1",
-                          "placeholder": "free, qna"
+                          "placeholder": "free"
                         }
                       }
                     ]

@@ -10,7 +10,7 @@ $defaults = SettingsRules::normalize(null);
 expect('enabled default', $defaults['enabled'], true);
 expect('guest likes off', $defaults['allow_guest_likes'], false);
 expect('sort default', $defaults['default_sort'], 'latest');
-expect('empty slugs', $defaults['board_slugs'], '');
+expect('free slug default', $defaults['board_slugs'], 'free');
 
 $normalized = SettingsRules::normalize([
     'enabled' => '0',
@@ -33,6 +33,7 @@ expect('slug parse', $normalized['board_slugs'], 'free, qna, ok_board');
 expect('style off', $normalized['style_enabled'], false);
 
 expectTrue('all boards when empty', SettingsRules::appliesToBoard('free', ''));
+expect('blank slugs mean all boards', SettingsRules::normalize(['board_slugs' => ''])['board_slugs'], '');
 expectTrue('listed board', SettingsRules::appliesToBoard('QNA', 'free, qna'));
 expectFalse('other board', SettingsRules::appliesToBoard('notice', 'free, qna'));
 

@@ -78,11 +78,11 @@ class Plugin extends AbstractPlugin
             ],
             'board_slugs' => [
                 'type' => 'string',
-                'default' => '',
+                'default' => 'free',
                 'label' => ['ko' => '적용 게시판 슬러그', 'en' => 'Board slugs'],
                 'hint' => [
-                    'ko' => '쉼표 또는 줄바꿈으로 구분합니다. 비우면 모든 게시판에 적용합니다.',
-                    'en' => 'Comma or newline separated. Leave empty to apply to every board.',
+                    'ko' => '기본은 자유게시판(free)입니다. 쉼표로 더 넣을 수 있고, 비우면 모든 게시판에 적용합니다.',
+                    'en' => 'Defaults to the free board. Comma-separated; leave empty to apply to every board.',
                 ],
                 'required' => false,
             ],

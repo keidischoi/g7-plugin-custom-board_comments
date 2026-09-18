@@ -48,7 +48,7 @@
       },
       "board_slugs": {
         "label": "Board slugs",
-        "hint": "Comma or newline separated. Leave empty to apply to every board."
+        "hint": "Defaults to the free board. Comma-separated; leave empty to apply to every board."
       },
       "best_enabled": {
         "label": "Enable best comments",

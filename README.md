@@ -2,14 +2,14 @@
 
 그누보드7 공식 게시판(`sirsoft-board`) 댓글에 **추천**, **베스트 댓글**, **정렬**을 붙이는 플러그인입니다. 테마와 게시판 모듈 파일은 수정하지 않습니다.
 
-버전 **0.1.0**.
+버전 **0.1.1**. 처음 연결 대상은 [자유게시판 `/board/free`](https://3ds.liveon.synology.me/board/free) 입니다.
 
 ## 기능
 
 - 댓글 추천 토글 (기본: 로그인 회원만, 설정에서 비회원 IP 1회 허용)
 - 추천 수가 기준 이상이면 **베스트** 배지와 상단 고정
 - 최신순 / 등록순 / 추천순
-- 적용할 게시판 슬러그 (비우면 전체)
+- 적용할 게시판 슬러그 (기본 `free`, 비우면 전체)
 - 다크 테마에 맞춘 추천 버튼·베스트 배지
 - 댓글 삭제 훅에서 추천 행 정리
 
@@ -35,7 +35,7 @@ php artisan plugin:activate g7-plugin-custom-board_comments
 php artisan cache:clear
 ```
 
-설치 후 **게시판 댓글 확장** 설정에서 추천·베스트·적용 게시판을 조절하세요. 게시글 상세는 하드 리프레시가 필요합니다.
+설치 후 **게시판 댓글 확장** 설정에서 추천·베스트를 조절하세요. 기본 적용 게시판은 `free`(자유게시판)입니다. 게시글 상세는 하드 리프레시가 필요합니다.
 
 테이블: `custom_board_comment_likes` (플러그인 제거 시 dynamic tables로 정리).
 
@@ -61,7 +61,7 @@ Prefix: `/api/plugins/g7-plugin-custom-board_comments`
 | `best_threshold` | 5 | 베스트가 되는 최소 추천 수 |
 | `best_limit` | 3 | 상단 고정 개수 |
 | `default_sort` | latest | latest / oldest / popular |
-| `board_slugs` | (빈 값) | 적용 게시판. 비우면 전체 |
+| `board_slugs` | `free` | 적용 게시판. 비우면 전체 |
 | `style_enabled` | true | 추천 버튼·배지 CSS |
 
 ## 테스트
@@ -93,7 +93,7 @@ npm run build
 | vendor | `g7` |
 | namespace | `Plugins\\G7\\Plugin\\Custom\\BoardComments` |
 | github_url | `https://github.com/keidischoi/g7-plugin-custom-board_comments` |
-| version | `0.1.0` |
+| version | `0.1.1` |
 
 ## 라이선스
 

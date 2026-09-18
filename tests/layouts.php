@@ -38,6 +38,7 @@ expectTrue('has enabled toggle', str_contains((string) file_get_contents($root.'
 
 $defaults = json_decode((string) file_get_contents($root.'/config/settings/defaults.json'), true);
 expect('defaults sort', $defaults['defaults']['default_sort'] ?? null, 'latest');
+expect('defaults free board', $defaults['defaults']['board_slugs'] ?? null, 'free');
 expectTrue('frontend expose likes', ($defaults['frontend_schema']['allow_guest_likes']['expose'] ?? false) === true);
 
 finish();

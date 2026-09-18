@@ -7,7 +7,7 @@ describe('normalizeConfig', () => {
             enabled: true,
             allowGuestLikes: false,
             defaultSort: 'latest',
-            boardSlugs: [],
+            boardSlugs: ['free'],
         });
     });
 
@@ -27,6 +27,7 @@ describe('normalizeConfig', () => {
 
     it('rejects invalid slugs', () => {
         expect(parseSlugs('ok, ../x, Hello!')).toEqual(['ok']);
+        expect(normalizeConfig({ board_slugs: '' }).boardSlugs).toEqual([]);
         expect(appliesToBoard('qna', [])).toBe(true);
         expect(appliesToBoard('qna', ['free'])).toBe(false);
     });
