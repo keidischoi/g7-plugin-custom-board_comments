@@ -205,12 +205,22 @@ html.cbc-stickers-animated .cbc-sticker[data-cbc-motion="pop"] {
     animation: cbc-pop 0.8s ease-in-out infinite;
 }
 
-.cbc-stickers--animated .cbc-sticker-pick:nth-child(2n) .cbc-sticker-emoji {
+.cbc-stickers--animated .cbc-sticker-pick {
+    transform-origin: 50% 50%;
+    animation: cbc-pick 0.8s ease-in-out infinite;
+}
+
+.cbc-stickers--animated .cbc-sticker-pick:nth-child(2n) {
     animation-delay: 0.12s;
 }
 
-.cbc-stickers--animated .cbc-sticker-pick:nth-child(3n) .cbc-sticker-emoji {
+.cbc-stickers--animated .cbc-sticker-pick:nth-child(3n) {
     animation-delay: 0.24s;
+}
+
+.cbc-stickers--animated .cbc-sticker-pick:hover {
+    animation: none;
+    transform: scale(1.08);
 }
 
 @keyframes cbc-bob {
@@ -244,9 +254,15 @@ html.cbc-stickers-animated .cbc-sticker[data-cbc-motion="pop"] {
     75% { transform: scale(1.16) translateY(-0.1em); }
 }
 
+@keyframes cbc-pick {
+    0%, 100% { transform: scale(1) rotate(0deg); }
+    50% { transform: scale(1.1) rotate(-6deg); }
+}
+
 @media (prefers-reduced-motion: reduce) {
     html.cbc-stickers-animated .cbc-sticker,
-    .cbc-stickers--animated .cbc-sticker-emoji {
+    .cbc-stickers--animated .cbc-sticker-emoji,
+    .cbc-stickers--animated .cbc-sticker-pick {
         animation: none !important;
     }
 }
