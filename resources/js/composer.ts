@@ -72,8 +72,16 @@ export function insertIntoComposer(field: HTMLElement, text: string): boolean {
 }
 
 export function hideComposerUi(): void {
-    document.querySelector('[data-cbc-stickers]')?.remove();
+    closeStickerPanel();
     document.querySelector('[data-cbc-file]')?.remove();
+}
+
+function closeStickerPanel(panel: Element | null = document.querySelector('[data-cbc-stickers]')): void {
+    if (!(panel instanceof HTMLElement)) {
+        return;
+    }
+    panel.dispatchEvent(new Event('cbc-close'));
+    panel.remove();
 }
 
 export function ensureComposerControls(
@@ -116,12 +124,13 @@ function bindActionButtons(
 function toggleStickerPanel(toolbar: HTMLElement, section: Element | null, copy: Copy): void {
     const existing = document.querySelector<HTMLElement>('[data-cbc-stickers]');
     if (existing) {
-        existing.remove();
+        closeStickerPanel(existing);
         return;
     }
     const panel = document.createElement('div');
     panel.setAttribute('data-cbc-stickers', '1');
     panel.className = 'cbc-stickers';
+    panel.tabIndex = -1;
     panel.style.position = 'fixed';
     panel.style.zIndex = '2147483001';
     panel.innerHTML = STICKERS.map((sticker) => (
@@ -132,6 +141,7 @@ function toggleStickerPanel(toolbar: HTMLElement, section: Element | null, copy:
     )).join('');
     document.body.appendChild(panel);
     placePanel(panel, toolbar);
+    bindStickerDismiss(panel, toolbar);
     panel.querySelectorAll<HTMLButtonElement>('[data-cbc-sticker-id]').forEach((button) => {
         button.onclick = () => {
             const id = button.getAttribute('data-cbc-sticker-id') ?? '';
@@ -140,9 +150,45 @@ function toggleStickerPanel(toolbar: HTMLElement, section: Element | null, copy:
                 window.alert(copy.needComposer);
                 return;
             }
-            panel.remove();
+            closeStickerPanel(panel);
         };
     });
+    panel.focus();
+}
+
+function bindStickerDismiss(panel: HTMLElement, toolbar: HTMLElement): void {
+    const abort = new AbortController();
+    const { signal } = abort;
+    const close = (): void => closeStickerPanel(panel);
+    panel.addEventListener('cbc-close', () => abort.abort(), { once: true });
+    document.addEventListener('pointerdown', (event) => {
+        const target = event.target;
+        if (!(target instanceof Node)) {
+            return;
+        }
+        if (panel.contains(target)) {
+            return;
+        }
+        if (target instanceof Element && target.closest('[data-cbc-sticker]')) {
+            return;
+        }
+        close();
+    }, { capture: true, signal });
+    document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape') {
+            close();
+        }
+    }, { capture: true, signal });
+    document.addEventListener('focusin', (event) => {
+        const target = event.target;
+        if (!(target instanceof Node)) {
+            return;
+        }
+        if (panel.contains(target) || toolbar.contains(target)) {
+            return;
+        }
+        close();
+    }, { signal });
 }
 
 function placePanel(panel: HTMLElement, toolbar: HTMLElement): void {
