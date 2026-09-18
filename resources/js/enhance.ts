@@ -1,6 +1,7 @@
 import type { PluginConfig, SortKind } from './config';
 import { PLUGIN_ID } from './config';
 import { bestIds, pinBest, sortTree, visibleComments, type BoardComment } from './sort';
+import { stickerById } from './stickers';
 
 export type LikeSummary = {
     counts: Record<string, number>;
@@ -60,21 +61,63 @@ export function findCommentSection(root: ParentNode = document): Element | null 
     return null;
 }
 
+function classText(node: Element): string {
+    return typeof node.className === 'string' ? node.className : '';
+}
+
+function isCommentRow(node: Element): node is HTMLElement {
+    if (!(node instanceof HTMLElement)) {
+        return false;
+    }
+    if (node.matches('h2, h3, h4, textarea, form, [data-cbc-toolbar], [data-cbc-stickers]')) {
+        return false;
+    }
+    return classText(node).includes('border-b')
+        || node.hasAttribute('data-cbc-comment-id')
+        || Boolean(node.querySelector('.flex-1'));
+}
+
+export function commentList(section: Element): HTMLElement | null {
+    const marked = section.querySelector<HTMLElement>('.space-y-4');
+    if (marked) {
+        return marked;
+    }
+    const row = section.querySelector<HTMLElement>('[data-cbc-comment-id]');
+    return row?.parentElement ?? null;
+}
+
 export function commentRows(section: Element): HTMLElement[] {
-    const list = section.querySelector('.space-y-4') ?? section;
-    return [...list.children].filter((node): node is HTMLElement => (
-        node instanceof HTMLElement
-        && (node.className.includes('border-b') || node.hasAttribute('data-cbc-comment-id'))
-    ));
+    const lists = [...section.querySelectorAll('.space-y-4')];
+    const hosts = lists.length > 0 ? lists : [commentList(section) ?? section];
+    const rows: HTMLElement[] = [];
+    for (const host of hosts) {
+        for (const node of host.children) {
+            if (isCommentRow(node)) {
+                rows.push(node);
+            }
+        }
+    }
+    return rows;
+}
+
+function rowHaystack(row: HTMLElement): string {
+    return (row.textContent ?? '').replace(/\s+/g, ' ').trim();
+}
+
+function commentNeedle(comment: BoardComment): string {
+    return String(comment.content ?? '')
+        .replace(/\[\[s:([a-z0-9-]+)\]\]/g, (_full, id: string) => stickerById(id)?.emoji ?? '')
+        .replace(/\[\[i:\d+\]\]/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim();
 }
 
 export function expandedRootIds(section: Element, comments: BoardComment[]): number[] {
     const expanded: number[] = [];
-    const rows = commentRows(section);
-    const roots = comments.filter((comment) => (comment.depth ?? 0) === 0);
-    for (const [index, root] of roots.entries()) {
-        const row = rows[index];
-        if (!row) {
+    for (const row of commentRows(section)) {
+        const id = Number(row.getAttribute('data-cbc-comment-id'));
+        const root = comments.find((comment) => comment.id === id && (comment.depth ?? 0) === 0);
+        if (!root) {
             continue;
         }
         const toggle = [...row.querySelectorAll('button')].find((button) => /hide|숨기|chevron-up/i.test(button.textContent ?? ''));
@@ -85,18 +128,64 @@ export function expandedRootIds(section: Element, comments: BoardComment[]): num
     return expanded;
 }
 
+function markRow(row: HTMLElement, comment: BoardComment): void {
+    row.setAttribute('data-cbc-comment-id', String(comment.id));
+    if ((comment.depth ?? 0) === 0) {
+        row.setAttribute('data-cbc-root', '1');
+    } else {
+        row.removeAttribute('data-cbc-root');
+    }
+}
+
 export function bindCommentRows(section: Element, comments: BoardComment[]): void {
     const visible = visibleComments(comments, expandedRootIds(section, comments));
     const rows = commentRows(section);
-    rows.forEach((row, index) => {
-        const comment = visible[index];
+    const used = new Set<number>();
+
+    for (const row of rows) {
+        const existing = Number(row.getAttribute('data-cbc-comment-id'));
+        const comment = visible.find((item) => item.id === existing);
+        if (!comment) {
+            continue;
+        }
+        used.add(comment.id);
+        markRow(row, comment);
+    }
+
+    const leftoverComments = visible.filter((item) => !used.has(item.id));
+    const leftoverRows = rows.filter((row) => {
+        const existing = Number(row.getAttribute('data-cbc-comment-id'));
+        return !existing || !used.has(existing);
+    });
+
+    const byContent = [...leftoverComments]
+        .map((comment) => ({ comment, needle: commentNeedle(comment) }))
+        .filter((item) => item.needle !== '')
+        .sort((left, right) => right.needle.length - left.needle.length);
+
+    for (const { comment, needle } of byContent) {
+        const row = leftoverRows.find((candidate) => (
+            !used.has(Number(candidate.getAttribute('data-cbc-comment-id')))
+            && rowHaystack(candidate).includes(needle)
+        ));
+        if (!row) {
+            continue;
+        }
+        used.add(comment.id);
+        markRow(row, comment);
+    }
+
+    const stillComments = leftoverComments.filter((item) => !used.has(item.id));
+    const stillRows = leftoverRows.filter((row) => {
+        const existing = Number(row.getAttribute('data-cbc-comment-id'));
+        return !existing || !used.has(existing);
+    });
+    stillRows.forEach((row, index) => {
+        const comment = stillComments[index];
         if (!comment) {
             return;
         }
-        row.setAttribute('data-cbc-comment-id', String(comment.id));
-        if ((comment.depth ?? 0) === 0) {
-            row.setAttribute('data-cbc-root', '1');
-        }
+        markRow(row, comment);
     });
 }
 
@@ -195,14 +284,32 @@ export function paintLikes(
 }
 
 export function reorderRows(section: Element, ordered: BoardComment[]): void {
-    const list = section.querySelector('.space-y-4');
-    if (!(list instanceof HTMLElement)) {
+    const rows = commentRows(section);
+    if (rows.length === 0) {
+        return;
+    }
+    const parent = rows[0]?.parentElement;
+    if (parent && rows.every((row) => row.parentElement === parent)) {
+        for (const comment of ordered) {
+            const row = parent.querySelector(`[data-cbc-comment-id="${comment.id}"]`);
+            if (row) {
+                parent.appendChild(row);
+            }
+        }
+        return;
+    }
+    const wrappers = rows
+        .map((row) => row.parentElement)
+        .filter((node): node is HTMLElement => node instanceof HTMLElement);
+    const host = wrappers[0]?.parentElement;
+    if (!host || wrappers.some((wrap) => wrap.parentElement !== host)) {
         return;
     }
     for (const comment of ordered) {
-        const row = list.querySelector(`[data-cbc-comment-id="${comment.id}"]`);
-        if (row) {
-            list.appendChild(row);
+        const row = section.querySelector(`[data-cbc-comment-id="${comment.id}"]`);
+        const wrap = row?.parentElement;
+        if (wrap && wrap.parentElement === host) {
+            host.appendChild(wrap);
         }
     }
 }
@@ -242,10 +349,26 @@ function SORTS_HTML(copy: typeof COPY.ko, current: SortKind): string {
     return `<span class="cbc-toolbar-label">${copy.sortLabel}</span>${buttons}<span class="cbc-toolbar-gap"></span>${extras}`;
 }
 
-function syncSortButtons(toolbar: HTMLElement, sort: SortKind): void {
+export function syncSortButtons(toolbar: HTMLElement, sort: SortKind): void {
     for (const button of toolbar.querySelectorAll<HTMLElement>('[data-cbc-sort]')) {
         button.classList.toggle('is-active', button.getAttribute('data-cbc-sort') === sort);
     }
+}
+
+export function bindToolbarSort(toolbar: HTMLElement, onSort: (sort: SortKind) => void): void {
+    if (toolbar.dataset.cbcSortBound === '1') {
+        return;
+    }
+    toolbar.dataset.cbcSortBound = '1';
+    toolbar.addEventListener('click', (event) => {
+        const button = (event.target as Element | null)?.closest?.('[data-cbc-sort]');
+        if (!(button instanceof HTMLElement) || !toolbar.contains(button)) {
+            return;
+        }
+        event.preventDefault();
+        event.stopPropagation();
+        onSort((button.getAttribute('data-cbc-sort') as SortKind) || 'latest');
+    }, true);
 }
 
 export function registerToggleAction(dispatch: (detail: unknown) => void): void {

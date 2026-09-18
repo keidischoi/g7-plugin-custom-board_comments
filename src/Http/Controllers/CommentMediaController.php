@@ -7,6 +7,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Plugins\G7\Plugin\Custom\BoardComments\Services\CommentMediaService;
+use Plugins\G7\Plugin\Custom\BoardComments\Support\ActorRules;
 use RuntimeException;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
@@ -18,8 +19,8 @@ class CommentMediaController
 
     public function store(Request $request): JsonResponse
     {
-        $userId = Auth::id();
-        if ($userId === null || $userId === '') {
+        $userId = ActorRules::id(Auth::id(), $request->user());
+        if ($userId === '') {
             return $this->fail('이미지를 올리려면 로그인하세요.', 401);
         }
 

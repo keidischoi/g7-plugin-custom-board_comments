@@ -10,18 +10,21 @@ import {
 import {
     applySort,
     bindCommentRows,
+    bindToolbarSort,
     ensureToolbar,
     findCommentSection,
     hideToolbar,
     localeCopy,
     paintLikes,
     placeToolbar,
+    syncSortButtons,
     type LikeSummary,
 } from './enhance';
 import { boardPostApiUrl, parseBoardShowPath, isBoardPostApi, unwrapApiData } from './url';
 import { mutationNeedsCommentSync } from './observe';
 import { ensureComposerControls } from './composer';
 import { paintTokens } from './tokens';
+import { pluginRequestHeaders } from './auth';
 import type { BoardComment } from './sort';
 
 type Runtime = {
@@ -31,7 +34,10 @@ type Runtime = {
 declare global {
     interface Window {
         __g7CustomBoardComments?: Runtime;
-        G7Core?: { dispatch?: (detail: unknown) => void };
+        G7Core?: {
+            dispatch?: (detail: unknown) => void;
+            api?: { getToken?: () => string | null };
+        };
     }
 }
 
@@ -61,14 +67,8 @@ function asComments(raw: unknown): BoardComment[] {
 }
 
 async function fetchJson(url: string, init?: RequestInit): Promise<unknown> {
-    const csrf = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
     const { headers: extraHeaders, ...rest } = init ?? {};
-    const headers: Record<string, string> = {
-        Accept: 'application/json',
-        'X-Requested-With': 'XMLHttpRequest',
-        ...(csrf ? { 'X-CSRF-TOKEN': csrf } : {}),
-        ...((extraHeaders ?? {}) as Record<string, string>),
-    };
+    const headers = pluginRequestHeaders((extraHeaders ?? {}) as Record<string, string>);
     const response = await window.fetch(url, {
         credentials: 'same-origin',
         headers,
@@ -181,25 +181,24 @@ function boot(): void {
 
         const section = findCommentSection();
         const toolbar = ensureToolbar(section, sort, copy());
-        toolbar.querySelectorAll<HTMLButtonElement>('[data-cbc-sort]').forEach((button) => {
-            button.onclick = () => {
-                sort = (button.getAttribute('data-cbc-sort') as SortKind) || 'latest';
-                void sync();
-            };
+        bindToolbarSort(toolbar, (next) => {
+            sort = next;
+            syncSortButtons(toolbar, sort);
+            const liveSection = findCommentSection();
+            if (liveSection && comments.length > 0) {
+                bindCommentRows(liveSection, comments);
+                applySort(liveSection, comments, sort, summary, config);
+            }
+            void sync();
         });
         ensureComposerControls(toolbar, section, config, copy(), async (file) => {
-            const csrf = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
             const body = new FormData();
             body.append('file', file);
             body.append('post_id', String(ref.postId));
             const response = await window.fetch(`${API_PREFIX}/media`, {
                 method: 'POST',
                 credentials: 'same-origin',
-                headers: {
-                    Accept: 'application/json',
-                    'X-Requested-With': 'XMLHttpRequest',
-                    ...(csrf ? { 'X-CSRF-TOKEN': csrf } : {}),
-                },
+                headers: pluginRequestHeaders(),
                 body,
             });
             const payload = await response.json().catch(() => null);
@@ -212,15 +211,16 @@ function boot(): void {
             const data = unwrapData(payload);
             return { token: String(data.token ?? '') };
         });
-        if (section) {
-            paintTokens(section);
-        }
 
         if (!section || comments.length === 0) {
+            if (section) {
+                paintTokens(section);
+            }
             return;
         }
 
         bindCommentRows(section, comments);
+        applySort(section, comments, sort, summary, config);
         try {
             summary = parseSummary(await fetchJson(`${API_PREFIX}/posts/${ref.postId}/likes?slug=${encodeURIComponent(ref.slug)}`));
         } catch {
@@ -228,6 +228,7 @@ function boot(): void {
         }
         applySort(section, comments, sort, summary, config);
         paintLikes(section, summary, config, copy());
+        paintTokens(section);
 
         section.querySelectorAll<HTMLButtonElement>('[data-cbc-like]').forEach((button) => {
             button.onclick = async () => {
@@ -374,7 +375,7 @@ function boot(): void {
         }
     });
     observer.observe(document.documentElement, { childList: true, subtree: true });
-    document.documentElement.setAttribute('data-cbc-boot', '0.1.7');
+    document.documentElement.setAttribute('data-cbc-boot', '0.1.8');
 
     void (async () => {
         try {
