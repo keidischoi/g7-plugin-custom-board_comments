@@ -23,6 +23,7 @@ describe('stickers', () => {
         expect(stickersForPack('192').length).toBe(192);
         expect(stickersForPack('384').length).toBe(384);
         expect(stickersForPack('full').length).toBe(STICKERS.length);
+        expect(stickersForPack('pack_12').length).toBe(12);
         expect(SIMPLE_STICKER_IDS.length).toBe(48);
         expect(twelve.map((item) => item.id)).toEqual(SIMPLE_STICKER_IDS.slice(0, 12));
         expect(fortyEight.every((item) => STICKERS.some((full) => full.id === item.id))).toBe(true);

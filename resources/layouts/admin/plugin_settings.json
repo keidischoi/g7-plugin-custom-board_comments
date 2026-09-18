@@ -1,5 +1,5 @@
 {
-  "version": "0.1.15",
+  "version": "0.1.16",
   "layout_name": "plugin_settings",
   "permissions": [
     "core.plugins.update"
@@ -214,16 +214,20 @@
                       {
                         "type": "basic",
                         "name": "Select",
-                        "props": { "id": "sticker_pack", "name": "sticker_pack", "className": "lg:col-span-1" },
-                        "children": [
-                          { "type": "basic", "name": "Option", "props": { "value": "12" }, "text": "$t:g7-plugin-custom-board_comments.settings.options.pack_12" },
-                          { "type": "basic", "name": "Option", "props": { "value": "24" }, "text": "$t:g7-plugin-custom-board_comments.settings.options.pack_24" },
-                          { "type": "basic", "name": "Option", "props": { "value": "48" }, "text": "$t:g7-plugin-custom-board_comments.settings.options.pack_48" },
-                          { "type": "basic", "name": "Option", "props": { "value": "96" }, "text": "$t:g7-plugin-custom-board_comments.settings.options.pack_96" },
-                          { "type": "basic", "name": "Option", "props": { "value": "192" }, "text": "$t:g7-plugin-custom-board_comments.settings.options.pack_192" },
-                          { "type": "basic", "name": "Option", "props": { "value": "384" }, "text": "$t:g7-plugin-custom-board_comments.settings.options.pack_384" },
-                          { "type": "basic", "name": "Option", "props": { "value": "full" }, "text": "$t:g7-plugin-custom-board_comments.settings.options.full" }
-                        ]
+                        "props": {
+                          "id": "sticker_pack",
+                          "name": "sticker_pack",
+                          "className": "lg:col-span-1",
+                          "options": [
+                            { "value": "12", "label": "$t:g7-plugin-custom-board_comments.settings.options.pack_12" },
+                            { "value": "24", "label": "$t:g7-plugin-custom-board_comments.settings.options.pack_24" },
+                            { "value": "48", "label": "$t:g7-plugin-custom-board_comments.settings.options.pack_48" },
+                            { "value": "96", "label": "$t:g7-plugin-custom-board_comments.settings.options.pack_96" },
+                            { "value": "192", "label": "$t:g7-plugin-custom-board_comments.settings.options.pack_192" },
+                            { "value": "384", "label": "$t:g7-plugin-custom-board_comments.settings.options.pack_384" },
+                            { "value": "full", "label": "$t:g7-plugin-custom-board_comments.settings.options.full" }
+                          ]
+                        }
                       }
                     ]
                   },
@@ -295,12 +299,16 @@
                       {
                         "type": "basic",
                         "name": "Select",
-                        "props": { "id": "default_sort", "name": "default_sort", "className": "lg:col-span-1" },
-                        "children": [
-                          { "type": "basic", "name": "Option", "props": { "value": "latest" }, "text": "$t:g7-plugin-custom-board_comments.settings.options.latest" },
-                          { "type": "basic", "name": "Option", "props": { "value": "oldest" }, "text": "$t:g7-plugin-custom-board_comments.settings.options.oldest" },
-                          { "type": "basic", "name": "Option", "props": { "value": "popular" }, "text": "$t:g7-plugin-custom-board_comments.settings.options.popular" }
-                        ]
+                        "props": {
+                          "id": "default_sort",
+                          "name": "default_sort",
+                          "className": "lg:col-span-1",
+                          "options": [
+                            { "value": "latest", "label": "$t:g7-plugin-custom-board_comments.settings.options.latest" },
+                            { "value": "oldest", "label": "$t:g7-plugin-custom-board_comments.settings.options.oldest" },
+                            { "value": "popular", "label": "$t:g7-plugin-custom-board_comments.settings.options.popular" }
+                          ]
+                        }
                       }
                     ]
                   },

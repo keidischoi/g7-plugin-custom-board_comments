@@ -38,7 +38,14 @@ expect('96 pack', $normalized['sticker_pack'], '96');
 expect('animated off', $normalized['stickers_animated'], false);
 expect('simple pack alias', SettingsRules::normalize(['sticker_pack' => 'simple'])['sticker_pack'], '48');
 expect('12 pack', SettingsRules::normalize(['sticker_pack' => '12'])['sticker_pack'], '12');
+expect('pack_12 alias', SettingsRules::normalize(['sticker_pack' => 'pack_12'])['sticker_pack'], '12');
+expect('numeric pack', SettingsRules::normalize(['sticker_pack' => 24])['sticker_pack'], '24');
 expect('pack fallback', SettingsRules::normalize(['sticker_pack' => 'nope'])['sticker_pack'], 'full');
+expect('nested settings pack', SettingsRules::normalize(SettingsRules::firstSettings([
+    [],
+    ['g7-plugin-custom-board_comments' => ['sticker_pack' => 'pack_48']],
+]))['sticker_pack'], '48');
+expect('empty active falls through', SettingsRules::firstSettings([[], ['sticker_pack' => '96']])['sticker_pack'] ?? null, '96');
 expect('stickers default on', $defaults['stickers_enabled'], true);
 expect('sticker pack default full', $defaults['sticker_pack'], 'full');
 expect('stickers animated default on', $defaults['stickers_animated'], true);

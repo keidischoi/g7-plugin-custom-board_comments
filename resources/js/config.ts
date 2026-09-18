@@ -97,8 +97,21 @@ export function readInlineConfig(win: G7Window = window): PluginConfig {
     return normalizeConfig(win.G7Config?.plugins?.[PLUGIN_ID]);
 }
 
+export function applyStickerMotionClass(on: boolean, root: HTMLElement = document.documentElement): void {
+    root.classList.toggle('cbc-stickers-animated', on);
+}
+
+export function applyPluginClasses(config: PluginConfig, root: HTMLElement = document.documentElement): void {
+    root.classList.toggle('cbc-styled', config.styleEnabled);
+    applyStickerMotionClass(config.stickersAnimated, root);
+}
+
 export function normalizeStickerPack(raw: unknown): StickerPack {
-    const text = String(raw ?? '').trim().toLowerCase();
+    let text = String(raw ?? '').trim().toLowerCase();
+    const prefixed = text.match(/^(?:pack_|p|size_)?(\d+)$/);
+    if (prefixed) {
+        text = prefixed[1] ?? text;
+    }
     if (text === 'simple') {
         return '48';
     }
@@ -109,6 +122,30 @@ export function normalizeStickerPack(raw: unknown): StickerPack {
         return text as StickerPack;
     }
     return 'full';
+}
+
+export function overlayConfig(base: PluginConfig, raw: unknown): PluginConfig {
+    const input = (raw && typeof raw === 'object') ? raw as Record<string, unknown> : {};
+    const overlay: Record<string, unknown> = {
+        enabled: base.enabled,
+        allow_guest_likes: base.allowGuestLikes,
+        best_enabled: base.bestEnabled,
+        best_threshold: base.bestThreshold,
+        best_limit: base.bestLimit,
+        default_sort: base.defaultSort,
+        board_slugs: base.boardSlugs,
+        style_enabled: base.styleEnabled,
+        stickers_enabled: base.stickersEnabled,
+        sticker_pack: base.stickerPack,
+        stickers_animated: base.stickersAnimated,
+        images_enabled: base.imagesEnabled,
+    };
+    for (const [key, value] of Object.entries(input)) {
+        if (value !== undefined && value !== null && value !== '') {
+            overlay[key] = value;
+        }
+    }
+    return normalizeConfig(overlay);
 }
 
 function boolish(value: unknown, fallback: boolean): boolean {

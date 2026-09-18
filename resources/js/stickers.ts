@@ -766,7 +766,8 @@ export function stickersForPack(pack: string | number): Sticker[] {
     if (key === 'full' || key === 'all') {
         return ordered;
     }
-    const size = key === 'simple' ? 48 : Number(key);
+    const prefixed = key.match(/^(?:pack_|p|size_)?(\d+)$/);
+    const size = key === 'simple' ? 48 : Number(prefixed?.[1] ?? key);
     if (!Number.isFinite(size) || size <= 0) {
         return ordered;
     }

@@ -120,8 +120,8 @@ class Plugin extends AbstractPlugin
                 'default' => true,
                 'label' => ['ko' => '움직이는 스티커', 'en' => 'Animated stickers'],
                 'hint' => [
-                    'ko' => '스티커가 위아래로 뛰거나 흔들립니다. GIF를 받지 않고 CSS로만 움직입니다. 끄면 가만히 있는 이모지입니다.',
-                    'en' => 'Stickers bounce and wiggle with CSS. Turn off for still emoji. No remote GIF files.',
+                    'ko' => '스티커 아이콘만 위아래로 뛰거나 흔들립니다. GIF를 받지 않고 CSS로만 움직입니다. 끄면 가만히 있는 이모지입니다.',
+                    'en' => 'Only sticker icons bounce and wiggle with CSS. Turn off for still emoji. No remote GIF files.',
                 ],
                 'required' => false,
             ],

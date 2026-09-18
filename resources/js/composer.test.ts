@@ -48,7 +48,9 @@ describe('composer', () => {
         document.body.innerHTML = '<div class="border-b" data-cbc-comment-id="11">안녕 [[s:love]] [[i:9]]</div>';
         paintTokens(document.body);
         expect(document.querySelector('[data-cbc-media="sticker"]')?.textContent).toBe('😍');
+        expect(document.querySelector('[data-cbc-media="sticker"] .cbc-sticker-face')?.textContent).toBe('😍');
         expect(document.querySelector('[data-cbc-media="sticker"]')?.getAttribute('data-cbc-motion')).toBeTruthy();
+        expect(document.querySelector('[data-cbc-media="sticker"]')?.childElementCount).toBe(1);
         expect(document.querySelector('[data-cbc-media="image"]')?.getAttribute('src')).toContain('/media/9');
         expect(document.body.textContent).not.toContain('[[s:love]]');
         expect(imageToken(9)).toBe('[[i:9]]');
@@ -70,12 +72,21 @@ describe('composer', () => {
     it('uses the 48 sticker pack when configured', () => {
         openStickerPanel({ ...DEFAULT_CONFIG, stickerPack: '48' });
         expect(document.querySelectorAll('[data-cbc-sticker-id]').length).toBe(SIMPLE_STICKER_IDS.length);
+        expect(document.querySelector('[data-cbc-stickers]')?.getAttribute('data-cbc-pack')).toBe('48');
         expect(document.querySelector('[data-cbc-stickers]')?.className).toContain('cbc-stickers--animated');
         expect(document.querySelector('[data-cbc-sticker-id]')?.tagName).toBe('DIV');
         expect(document.querySelector('[data-cbc-sticker-id]')?.getAttribute('role')).toBe('button');
         expect(document.querySelector('.cbc-sticker-icon')?.getAttribute('data-cbc-motion')).toBeTruthy();
+        expect(document.querySelector('.cbc-sticker-icon .cbc-sticker-face')?.textContent).toBeTruthy();
+        expect(document.querySelector('.cbc-sticker-icon')?.childElementCount).toBe(1);
         expect(document.querySelector('.cbc-sticker-pick')?.getAttribute('data-cbc-motion')).toBeNull();
         expect(document.querySelector('.cbc-sticker-name')?.getAttribute('data-cbc-motion')).toBeNull();
+    });
+
+    it('shows only 12 stickers for the smallest pack', () => {
+        openStickerPanel({ ...DEFAULT_CONFIG, stickerPack: '12' });
+        expect(document.querySelectorAll('[data-cbc-sticker-id]').length).toBe(12);
+        expect(document.querySelector('[data-cbc-stickers]')?.getAttribute('data-cbc-pack')).toBe('12');
     });
 
     it('keeps stickers still when animation is off', () => {

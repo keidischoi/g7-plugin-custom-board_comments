@@ -61,7 +61,7 @@
       },
       "stickers_animated": {
         "label": "Animated stickers",
-        "hint": "Stickers bounce and wiggle with CSS. Turn off for still emoji. No remote GIF files."
+        "hint": "Only sticker icons bounce and wiggle with CSS. Turn off for still emoji. No remote GIF files."
       },
       "images_enabled": {
         "label": "Image insert",

@@ -52,14 +52,26 @@ function replaceTextNode(node: Text): void {
     node.parentNode?.replaceChild(fragment, node);
 }
 
+export function stickerFaceHtml(emoji: string): string {
+    return `<span class="cbc-sticker-face" aria-hidden="true">${emoji}</span>`;
+}
+
+export function createStickerFace(emoji: string): HTMLSpanElement {
+    const face = document.createElement('span');
+    face.className = 'cbc-sticker-face';
+    face.setAttribute('aria-hidden', 'true');
+    face.textContent = emoji;
+    return face;
+}
+
 function stickerNode(id: string): HTMLElement {
     const sticker = stickerById(id);
     const span = document.createElement('span');
     span.setAttribute('data-cbc-media', 'sticker');
     span.className = 'cbc-sticker';
     span.setAttribute('data-cbc-motion', stickerMotion(id));
-    span.textContent = sticker?.emoji ?? STICKERS[0]?.emoji ?? '😊';
     span.title = sticker?.label.ko ?? id;
+    span.appendChild(createStickerFace(sticker?.emoji ?? STICKERS[0]?.emoji ?? '😊'));
     return span;
 }
 
