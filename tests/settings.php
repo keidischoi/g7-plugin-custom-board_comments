@@ -22,6 +22,8 @@ $normalized = SettingsRules::normalize([
     'default_sort' => 'nope',
     'board_slugs' => "Free, qna\nFree, ../x, ok_board",
     'style_enabled' => 'off',
+    'sticker_pack' => 'simple',
+    'stickers_animated' => '0',
 ]);
 
 expect('enabled false', $normalized['enabled'], false);
@@ -32,7 +34,12 @@ expect('limit clamp', $normalized['best_limit'], 1);
 expect('sort fallback', $normalized['default_sort'], 'latest');
 expect('slug parse', $normalized['board_slugs'], 'free, qna, ok_board');
 expect('style off', $normalized['style_enabled'], false);
+expect('simple pack', $normalized['sticker_pack'], 'simple');
+expect('animated off', $normalized['stickers_animated'], false);
+expect('pack fallback', SettingsRules::normalize(['sticker_pack' => 'nope'])['sticker_pack'], 'full');
 expect('stickers default on', $defaults['stickers_enabled'], true);
+expect('sticker pack default full', $defaults['sticker_pack'], 'full');
+expect('stickers animated default on', $defaults['stickers_animated'], true);
 expect('images default on', $defaults['images_enabled'], true);
 
 expectTrue('all boards when empty', SettingsRules::appliesToBoard('free', ''));

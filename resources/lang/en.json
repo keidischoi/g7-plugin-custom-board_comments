@@ -29,7 +29,9 @@
     "options": {
       "latest": "Latest",
       "oldest": "Oldest",
-      "popular": "Most liked"
+      "popular": "Most liked",
+      "simple": "Simple (common stickers)",
+      "full": "Full (complete set)"
     },
     "fields": {
       "enabled": {
@@ -47,6 +49,14 @@
       "stickers_enabled": {
         "label": "Sticker insert",
         "hint": "Lets visitors insert stickers into the comment box."
+      },
+      "sticker_pack": {
+        "label": "Sticker pack",
+        "hint": "Simple is a short set. Full is the 300+ sticker pack."
+      },
+      "stickers_animated": {
+        "label": "Animated stickers",
+        "hint": "Stickers bounce in place with CSS. No remote animated files."
       },
       "images_enabled": {
         "label": "Image insert",

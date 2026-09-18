@@ -320,8 +320,37 @@ export const STICKERS: Sticker[] = [
     { id: 'dotted', emoji: '🫥', label: { ko: '점선', en: 'Dotted' } },
 ];
 
+export const STICKER_MOTIONS = ['bob', 'pulse', 'wiggle', 'shake', 'pop'] as const;
+
+export type StickerMotion = (typeof STICKER_MOTIONS)[number];
+
+export const SIMPLE_STICKER_IDS: readonly string[] = [
+    'love', 'heart', 'like', 'dislike', 'ok', 'grin', 'lol', 'rofl', 'wink', 'cool',
+    'think', 'wow', 'scream', 'sad', 'cry', 'angry', 'sleepy', 'kiss', 'blush', 'thanks',
+    'clap', 'wave', 'party', 'fire', 'star', 'check', 'eyes', 'hug', 'pleading', 'partying',
+    'cat', 'dog', 'sun', 'moon', 'hundred', 'sparkle', 'idea', 'poop', 'ghost', 'flex',
+    'peace', 'okhand', 'explode', 'zany', 'rolling', 'sweat', 'best', 'gift',
+];
+
 export function stickerById(id: string): Sticker | undefined {
     return STICKERS.find((item) => item.id === id);
+}
+
+export function stickersForPack(pack: string): Sticker[] {
+    if (pack === 'simple') {
+        return SIMPLE_STICKER_IDS
+            .map((id) => stickerById(id))
+            .filter((item): item is Sticker => Boolean(item));
+    }
+    return STICKERS;
+}
+
+export function stickerMotion(id: string): StickerMotion {
+    let sum = 0;
+    for (let index = 0; index < id.length; index += 1) {
+        sum += id.charCodeAt(index);
+    }
+    return STICKER_MOTIONS[sum % STICKER_MOTIONS.length] ?? 'bob';
 }
 
 export function stickerToken(id: string): string {

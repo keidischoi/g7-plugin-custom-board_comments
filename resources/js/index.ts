@@ -162,6 +162,7 @@ function boot(): void {
         }
         const ref = page();
         document.documentElement.classList.toggle('cbc-styled', config.styleEnabled);
+        document.documentElement.classList.toggle('cbc-stickers-animated', config.stickersAnimated);
         if (!ref || !config.enabled || !appliesToBoard(ref.slug, config.boardSlugs)) {
             hideToolbar();
             return;
@@ -380,7 +381,7 @@ function boot(): void {
         }
     });
     observer.observe(document.documentElement, { childList: true, subtree: true });
-    document.documentElement.setAttribute('data-cbc-boot', '0.1.11');
+    document.documentElement.setAttribute('data-cbc-boot', '0.1.12');
 
     void (async () => {
         try {

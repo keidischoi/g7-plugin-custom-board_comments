@@ -150,6 +150,72 @@
     line-height: 1;
 }
 
+html.cbc-stickers-animated .cbc-sticker,
+.cbc-stickers--animated .cbc-sticker-emoji {
+    display: inline-block;
+    transform-origin: 50% 70%;
+    will-change: transform;
+}
+
+html.cbc-stickers-animated .cbc-sticker[data-cbc-motion="bob"],
+.cbc-stickers--animated [data-cbc-motion="bob"] .cbc-sticker-emoji {
+    animation: cbc-bob 1.15s ease-in-out infinite;
+}
+
+html.cbc-stickers-animated .cbc-sticker[data-cbc-motion="pulse"],
+.cbc-stickers--animated [data-cbc-motion="pulse"] .cbc-sticker-emoji {
+    animation: cbc-pulse 1.05s ease-in-out infinite;
+}
+
+html.cbc-stickers-animated .cbc-sticker[data-cbc-motion="wiggle"],
+.cbc-stickers--animated [data-cbc-motion="wiggle"] .cbc-sticker-emoji {
+    animation: cbc-wiggle 0.85s ease-in-out infinite;
+}
+
+html.cbc-stickers-animated .cbc-sticker[data-cbc-motion="shake"],
+.cbc-stickers--animated [data-cbc-motion="shake"] .cbc-sticker-emoji {
+    animation: cbc-shake 0.7s ease-in-out infinite;
+}
+
+html.cbc-stickers-animated .cbc-sticker[data-cbc-motion="pop"],
+.cbc-stickers--animated [data-cbc-motion="pop"] .cbc-sticker-emoji {
+    animation: cbc-pop 1.25s ease-in-out infinite;
+}
+
+@keyframes cbc-bob {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-0.18em); }
+}
+
+@keyframes cbc-pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.18); }
+}
+
+@keyframes cbc-wiggle {
+    0%, 100% { transform: rotate(-11deg); }
+    50% { transform: rotate(11deg); }
+}
+
+@keyframes cbc-shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-0.12em); }
+    75% { transform: translateX(0.12em); }
+}
+
+@keyframes cbc-pop {
+    0%, 100% { transform: scale(1) translateY(0); }
+    40% { transform: scale(1.22) translateY(-0.08em); }
+    70% { transform: scale(0.94); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    html.cbc-stickers-animated .cbc-sticker,
+    .cbc-stickers--animated .cbc-sticker-emoji {
+        animation: none !important;
+    }
+}
+
 .cbc-image {
     display: block;
     max-width: min(16rem, 100%);

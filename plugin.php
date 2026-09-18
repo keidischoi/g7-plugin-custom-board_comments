@@ -104,6 +104,27 @@ class Plugin extends AbstractPlugin
                 ],
                 'required' => false,
             ],
+            'sticker_pack' => [
+                'type' => 'enum',
+                'options' => ['simple', 'full'],
+                'default' => 'full',
+                'label' => ['ko' => '스티커 세트', 'en' => 'Sticker pack'],
+                'hint' => [
+                    'ko' => '간단은 자주 쓰는 스티커만, 많음은 300개 넘는 전체 세트입니다.',
+                    'en' => 'Simple is a short set. Full is the 300+ sticker pack.',
+                ],
+                'required' => true,
+            ],
+            'stickers_animated' => [
+                'type' => 'boolean',
+                'default' => true,
+                'label' => ['ko' => '움직이는 스티커', 'en' => 'Animated stickers'],
+                'hint' => [
+                    'ko' => '스티커가 살짝 움직입니다. 외부 이미지를 받지 않고 CSS로만 움직입니다.',
+                    'en' => 'Stickers bounce in place with CSS. No remote animated files.',
+                ],
+                'required' => false,
+            ],
             'images_enabled' => [
                 'type' => 'boolean',
                 'default' => true,
@@ -132,6 +153,8 @@ class Plugin extends AbstractPlugin
             'board_slugs' => 'free',
             'style_enabled' => true,
             'stickers_enabled' => true,
+            'sticker_pack' => 'full',
+            'stickers_animated' => true,
             'images_enabled' => true,
         ];
     }

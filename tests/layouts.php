@@ -31,7 +31,7 @@ $plugin = json_decode((string) file_get_contents($root.'/plugin.json'), true);
 expect('identifier', $plugin['identifier'] ?? null, 'g7-plugin-custom-board_comments');
 expect('g7 version', $plugin['g7_version'] ?? null, '>=7.0.0');
 expectTrue('js asset', ($plugin['assets']['js']['output'] ?? '') === 'dist/js/plugin.iife.js');
-expect('plugin version', $plugin['version'] ?? null, '0.1.11');
+expect('plugin version', $plugin['version'] ?? null, '0.1.12');
 $iife = (string) file_get_contents($root.'/dist/js/plugin.iife.js');
 expectTrue('iife exists', $iife !== '');
 expectTrue('iife mounts overlay toolbar', str_contains($iife, 'cbc-toolbar--overlay') && str_contains($iife, 'data-cbc-boot'));
@@ -40,14 +40,21 @@ expectTrue('iife has expanded sticker set', str_contains($iife, 'pleading') && s
 expectTrue('iife sends bearer token', str_contains($iife, 'Authorization') && str_contains($iife, 'auth_token'));
 expectTrue('iife keeps sort ids', str_contains($iife, 'data-cbc-comment-id'));
 expectTrue('iife uses css sort order', str_contains($iife, 'cbc-comment-stack'));
+expectTrue('iife closes stickers', str_contains($iife, 'cbc-close') && str_contains($iife, 'focusin'));
+expectTrue('iife has simple pack', str_contains($iife, 'simple') && str_contains($iife, 'cbc-stickers--animated'));
+expectTrue('css has sticker motion', str_contains((string) file_get_contents($root.'/dist/css/plugin.css'), 'cbc-stickers-animated'));
 
 $layout = json_decode((string) file_get_contents($root.'/resources/layouts/admin/plugin_settings.json'), true);
 expect('layout name', $layout['layout_name'] ?? null, 'plugin_settings');
 expectTrue('has enabled toggle', str_contains((string) file_get_contents($root.'/resources/layouts/admin/plugin_settings.json'), '"name": "enabled"'));
+expectTrue('has sticker pack', str_contains((string) file_get_contents($root.'/resources/layouts/admin/plugin_settings.json'), '"name": "sticker_pack"'));
+expectTrue('has animated toggle', str_contains((string) file_get_contents($root.'/resources/layouts/admin/plugin_settings.json'), '"name": "stickers_animated"'));
 
 $defaults = json_decode((string) file_get_contents($root.'/config/settings/defaults.json'), true);
 expect('defaults sort', $defaults['defaults']['default_sort'] ?? null, 'latest');
 expect('defaults free board', $defaults['defaults']['board_slugs'] ?? null, 'free');
 expectTrue('frontend expose likes', ($defaults['frontend_schema']['allow_guest_likes']['expose'] ?? false) === true);
+expect('defaults sticker pack', $defaults['defaults']['sticker_pack'] ?? null, 'full');
+expectTrue('frontend expose pack', ($defaults['frontend_schema']['sticker_pack']['expose'] ?? false) === true);
 
 finish();

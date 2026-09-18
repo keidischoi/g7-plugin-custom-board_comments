@@ -1,5 +1,5 @@
 import { PLUGIN_ID } from './config';
-import { STICKERS, stickerById } from './stickers';
+import { STICKERS, stickerById, stickerMotion } from './stickers';
 
 export const STICKER_TOKEN = /\[\[s:([a-z0-9-]+)\]\]/g;
 export const IMAGE_TOKEN = /\[\[i:(\d+)\]\]/g;
@@ -57,6 +57,7 @@ function stickerNode(id: string): HTMLElement {
     const span = document.createElement('span');
     span.setAttribute('data-cbc-media', 'sticker');
     span.className = 'cbc-sticker';
+    span.setAttribute('data-cbc-motion', stickerMotion(id));
     span.textContent = sticker?.emoji ?? STICKERS[0]?.emoji ?? '😊';
     span.title = sticker?.label.ko ?? id;
     return span;

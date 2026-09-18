@@ -29,7 +29,9 @@
     "options": {
       "latest": "최신순",
       "oldest": "등록순",
-      "popular": "추천순"
+      "popular": "추천순",
+      "simple": "간단 (자주 쓰는 스티커)",
+      "full": "많음 (전체 세트)"
     },
     "fields": {
       "enabled": {
@@ -47,6 +49,14 @@
       "stickers_enabled": {
         "label": "스티커 삽입",
         "hint": "댓글 입력창에 스티커를 넣을 수 있습니다."
+      },
+      "sticker_pack": {
+        "label": "스티커 세트",
+        "hint": "간단은 자주 쓰는 스티커만, 많음은 300개 넘는 전체 세트입니다."
+      },
+      "stickers_animated": {
+        "label": "움직이는 스티커",
+        "hint": "스티커가 살짝 움직입니다. 외부 이미지를 받지 않고 CSS로만 움직입니다."
       },
       "images_enabled": {
         "label": "이미지 삽입",
