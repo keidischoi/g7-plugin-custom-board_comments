@@ -4,6 +4,8 @@ namespace Plugins\G7\Plugin\Custom\BoardComments\Support;
 
 final class SettingsRules
 {
+    public const PLUGIN_ID = 'g7-plugin-custom-board_comments';
+
     public const SORTS = ['latest', 'oldest', 'popular'];
 
     /**

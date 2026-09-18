@@ -6,7 +6,6 @@ use App\Services\PluginSettingsService;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Schema;
 use Plugins\G7\Plugin\Custom\BoardComments\Models\CommentLike;
-use Plugins\G7\Plugin\Custom\BoardComments\Plugin;
 use Plugins\G7\Plugin\Custom\BoardComments\Support\CommentEnhanceRules;
 use Plugins\G7\Plugin\Custom\BoardComments\Support\LikeRules;
 use Plugins\G7\Plugin\Custom\BoardComments\Support\SettingsRules;
@@ -172,12 +171,12 @@ class CommentLikeService
 
         if (method_exists($this->pluginSettings, 'getAllActiveSettings')) {
             $active = $this->pluginSettings->getAllActiveSettings();
-            $loaded = is_array($active[Plugin::IDENTIFIER] ?? null) ? $active[Plugin::IDENTIFIER] : [];
+            $loaded = is_array($active[SettingsRules::PLUGIN_ID] ?? null) ? $active[SettingsRules::PLUGIN_ID] : [];
 
             return is_array($loaded) ? $loaded : null;
         }
 
-        $loaded = $this->pluginSettings->get(Plugin::IDENTIFIER);
+        $loaded = $this->pluginSettings->get(SettingsRules::PLUGIN_ID);
 
         return is_array($loaded) ? $loaded : null;
     }

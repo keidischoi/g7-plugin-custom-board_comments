@@ -14,6 +14,7 @@ expectTrue('summary route', str_contains($routes, "Route::get('/posts/{postId}/l
 expectTrue('like route', str_contains($routes, "Route::post('/comments/{commentId}/like'"));
 expectTrue('dynamic table', str_contains($pluginPhp, 'custom_board_comment_likes'));
 expectTrue('delete hook listener', str_contains($pluginPhp, 'CommentDeletedCleanupListener'));
+expectFalse('no custom service provider', is_dir($root.'/src/Providers'));
 expectTrue('unique actor', str_contains($migration, 'cbc_likes_actor_unique'));
 expectTrue('composer namespace', str_contains((string) file_get_contents($root.'/composer.json'), 'Plugins\\\\G7\\\\Plugin\\\\Custom\\\\BoardComments\\\\'));
 

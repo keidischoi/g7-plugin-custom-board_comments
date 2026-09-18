@@ -7,6 +7,7 @@ require __DIR__.'/bootstrap.php';
 use Plugins\G7\Plugin\Custom\BoardComments\Support\SettingsRules;
 
 $defaults = SettingsRules::normalize(null);
+expect('plugin id', SettingsRules::PLUGIN_ID, 'g7-plugin-custom-board_comments');
 expect('enabled default', $defaults['enabled'], true);
 expect('guest likes off', $defaults['allow_guest_likes'], false);
 expect('sort default', $defaults['default_sort'], 'latest');
