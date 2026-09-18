@@ -240,12 +240,7 @@ html.cbc-stickers-animated .cbc-sticker[data-cbc-motion="pop"],
     75% { transform: scale(1.16) translate3d(0, -0.1em, 0); }
 }
 
-@media (prefers-reduced-motion: reduce) {
-    html.cbc-stickers-animated .cbc-sticker,
-    .cbc-stickers--animated .cbc-sticker-icon {
-        animation: none !important;
-    }
-}
+/* 움직이는 스티커 설정이 켜진 칸만 움직인다. OS 움직임 줄이기보다 이 옵션을 따른다. */
 
 .cbc-image {
     display: block;

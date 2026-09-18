@@ -46,6 +46,7 @@ expectTrue('iife wraps sticker faces', str_contains($iife, 'cbc-sticker-face') &
 $css = (string) file_get_contents($root.'/dist/css/plugin.css');
 expectTrue('css has sticker motion', str_contains($css, 'cbc-stickers-animated') && str_contains($css, 'cbc-bob') && str_contains($css, 'cbc-sticker-icon') && str_contains($css, 'cbc-sticker-face'));
 expectTrue('css does not shake picker tiles', ! str_contains($css, 'cbc-pick'));
+expectTrue('css option overrides reduced motion', ! str_contains($css, 'prefers-reduced-motion'));
 
 $layout = json_decode((string) file_get_contents($root.'/resources/layouts/admin/plugin_settings.json'), true);
 expect('layout name', $layout['layout_name'] ?? null, 'plugin_settings');
