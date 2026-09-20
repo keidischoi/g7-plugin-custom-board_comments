@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { applyPluginClasses, applyStickerMotionClass, appliesToBoard, DEFAULT_CONFIG, normalizeConfig, overlayConfig, parseSlugs } from './config';
+import { applyPluginClasses, applyStickerMotionClass, appliesToBoard, DEFAULT_CONFIG, normalizeConfig, overlayConfig, parseSlugs, readInlineConfig } from './config';
 
 describe('normalizeConfig', () => {
     it('uses safe defaults', () => {
@@ -64,5 +64,31 @@ describe('normalizeConfig', () => {
         });
         expect(merged.stickerPack).toBe('12');
         expect(merged.stickersAnimated).toBe(true);
+    });
+
+    it('reads config from the GitHub folder id when the install folder still uses it', () => {
+        const win = {
+            G7Config: {
+                plugins: {
+                    'g7-plugin-custom-board_comments': { sticker_pack: '24', stickers_animated: false },
+                },
+            },
+        };
+        expect(readInlineConfig(win)).toMatchObject({
+            stickerPack: '24',
+            stickersAnimated: false,
+        });
+    });
+
+    it('prefers custom-board_comments over the GitHub folder id', () => {
+        const win = {
+            G7Config: {
+                plugins: {
+                    'g7-plugin-custom-board_comments': { sticker_pack: '24' },
+                    'custom-board_comments': { sticker_pack: '96' },
+                },
+            },
+        };
+        expect(readInlineConfig(win).stickerPack).toBe('96');
     });
 });

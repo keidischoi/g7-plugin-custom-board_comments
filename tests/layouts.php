@@ -29,9 +29,11 @@ foreach ($jsonFiles as $path) {
 
 $plugin = json_decode((string) file_get_contents($root.'/plugin.json'), true);
 expect('identifier', $plugin['identifier'] ?? null, 'custom-board_comments');
+expect('display name ko', $plugin['name']['ko'] ?? null, '게시판 댓글');
+expect('github url', $plugin['github_url'] ?? null, 'https://github.com/keidischoi/g7-plugin-custom-board_comments');
 expect('g7 version', $plugin['g7_version'] ?? null, '>=7.0.0');
 expectTrue('js asset', ($plugin['assets']['js']['output'] ?? '') === 'dist/js/plugin.iife.js');
-expect('plugin version', $plugin['version'] ?? null, '0.1.16');
+expect('plugin version', $plugin['version'] ?? null, '0.1.22');
 $iife = (string) file_get_contents($root.'/dist/js/plugin.iife.js');
 expectTrue('iife exists', $iife !== '');
 expectTrue('iife mounts overlay toolbar', str_contains($iife, 'cbc-toolbar--overlay') && str_contains($iife, 'data-cbc-boot'));
@@ -42,7 +44,7 @@ expectTrue('iife keeps sort ids', str_contains($iife, 'data-cbc-comment-id'));
 expectTrue('iife uses css sort order', str_contains($iife, 'cbc-comment-stack'));
 expectTrue('iife closes stickers', str_contains($iife, 'cbc-close') && str_contains($iife, 'focusin'));
 expectTrue('iife has pack sizes', str_contains($iife, '"12"') && str_contains($iife, '"96"') && str_contains($iife, '"384"') && str_contains($iife, 'cbc-stickers--animated'));
-expectTrue('iife wraps sticker faces', str_contains($iife, 'cbc-sticker-face') && str_contains($iife, '0.1.16'));
+expectTrue('iife wraps sticker faces', str_contains($iife, 'cbc-sticker-face') && str_contains($iife, '0.1.22'));
 expectTrue('iife accepts pack_12', str_contains($iife, 'pack_') && str_contains($iife, 'data-cbc-pack'));
 $css = (string) file_get_contents($root.'/dist/css/plugin.css');
 expectTrue('css has sticker motion', str_contains($css, 'cbc-stickers-animated') && str_contains($css, 'cbc-bob') && str_contains($css, 'cbc-sticker-icon') && str_contains($css, 'cbc-sticker-face'));

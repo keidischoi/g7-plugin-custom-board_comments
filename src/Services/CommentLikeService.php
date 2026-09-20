@@ -175,7 +175,7 @@ class CommentLikeService
         }
 
         $chunks = [];
-        $ids = [SettingsRules::PLUGIN_ID, 'custom-board_comments', 'custom-board_comments'];
+        $ids = [SettingsRules::PLUGIN_ID, SettingsRules::LEGACY_PLUGIN_ID, 'custom-board_comments'];
         if (method_exists($this->pluginSettings, 'get')) {
             foreach ($ids as $id) {
                 try { $chunks[] = $this->pluginSettings->get($id); } catch (\Throwable $e) {}
@@ -190,8 +190,8 @@ class CommentLikeService
             $chunks[] = $this->pluginSettings->getAllActiveSettings();
         }
         foreach ([
-            storage_path('app/plugins/custom-board_comments/settings.json'),
-            storage_path('app/plugins/custom-board_comments/settings.json'),
+            storage_path('app/plugins/'.SettingsRules::PLUGIN_ID.'/settings.json'),
+            storage_path('app/plugins/'.SettingsRules::LEGACY_PLUGIN_ID.'/settings.json'),
         ] as $path) {
             if (is_file($path)) {
                 try { $chunks[] = json_decode((string) file_get_contents($path), true); } catch (\Throwable $e) {}

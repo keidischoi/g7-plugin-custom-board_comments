@@ -406,7 +406,7 @@ function boot(): void {
         }
     });
     observer.observe(document.documentElement, { childList: true, subtree: true });
-    document.documentElement.setAttribute('data-cbc-boot', '0.1.16');
+    document.documentElement.setAttribute('data-cbc-boot', '0.1.22');
 
     void (async () => {
         try {

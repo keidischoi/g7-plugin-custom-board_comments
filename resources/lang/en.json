@@ -1,7 +1,7 @@
 {
   "editor": {
     "data_source": {
-      "settings": "Board comment extras"
+      "settings": "Board comments"
     }
   },
   "name": "Custom Board Comments",
@@ -19,7 +19,7 @@
     "image": "Image"
   },
   "settings": {
-    "title": "Board comment extras",
+    "title": "Board comments",
     "description": "Show likes, best comments, and sorting on post pages without editing the theme.",
     "notice": "Refresh a post page after saving. The sirsoft-board module must be active.",
     "sections": {

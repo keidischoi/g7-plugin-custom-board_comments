@@ -52,7 +52,8 @@ final class MediaTable
         if (function_exists('storage_path')) {
             $dirs[] = storage_path('app/custom-board_comments/media');
             $dirs[] = storage_path('app/plugins/custom-board_comments/media');
-            $dirs[] = storage_path('app/custom-board_comments/media');
+            $dirs[] = storage_path('app/plugins/g7-plugin-custom-board_comments/media');
+            $dirs[] = storage_path('app/g7-plugin-custom-board_comments/media');
         } else {
             $dirs[] = sys_get_temp_dir().'/custom-board_comments/media';
         }
