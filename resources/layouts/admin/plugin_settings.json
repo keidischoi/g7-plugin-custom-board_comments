@@ -1,0 +1,545 @@
+{
+  "version": "0.1.16",
+  "layout_name": "plugin_settings",
+  "permissions": [
+    "core.plugins.update"
+  ],
+  "extends": "_admin_base",
+  "meta": {
+    "title": "$t:custom-board_comments.settings.title",
+    "description": "$t:custom-board_comments.settings.description"
+  },
+  "data_sources": [
+    {
+      "id": "settings",
+      "label_key": "$t:custom-board_comments.editor.data_source.settings",
+      "type": "api",
+      "endpoint": "/api/plugins/custom-board_comments/admin/settings",
+      "method": "GET",
+      "auto_fetch": true,
+      "auth_required": true,
+      "initLocal": "form",
+      "refetchOnMount": true
+    }
+  ],
+  "schema": {
+    "enabled": { "type": "boolean", "default": true },
+    "allow_guest_likes": { "type": "boolean", "default": false },
+    "best_enabled": { "type": "boolean", "default": true },
+    "best_threshold": { "type": "integer", "min": 1, "max": 999, "default": 5 },
+    "best_limit": { "type": "integer", "min": 1, "max": 20, "default": 3 },
+    "default_sort": { "type": "enum", "options": ["latest", "oldest", "popular"], "default": "latest" },
+    "board_slugs": { "type": "string", "default": "free" },
+    "style_enabled": { "type": "boolean", "default": true },
+    "stickers_enabled": { "type": "boolean", "default": true },
+    "sticker_pack": { "type": "enum", "options": ["12", "24", "48", "96", "192", "384", "full"], "default": "full" },
+    "stickers_animated": { "type": "boolean", "default": true },
+    "images_enabled": { "type": "boolean", "default": true }
+  },
+  "slots": {
+    "content": [
+      {
+        "id": "plugin_settings_content",
+        "type": "basic",
+        "name": "Div",
+        "dataKey": "form",
+        "trackChanges": true,
+        "props": {
+          "className": "admin-page-content-responsive"
+        },
+        "children": [
+          {
+            "id": "page_header",
+            "type": "composite",
+            "name": "PageHeader",
+            "props": {
+              "title": "$t:custom-board_comments.settings.title",
+              "description": "$t:custom-board_comments.settings.description",
+              "backPath": "/admin/plugins",
+              "backLabel": "$t:admin.plugins.back_to_list"
+            }
+          },
+          {
+            "id": "settings_notice",
+            "type": "basic",
+            "name": "Div",
+            "props": {
+              "className": "mt-6 rounded-lg border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-800 dark:border-blue-800 dark:bg-blue-950 dark:text-blue-200"
+            },
+            "text": "$t:custom-board_comments.settings.notice"
+          },
+          {
+            "id": "general_card",
+            "type": "basic",
+            "name": "Div",
+            "props": {
+              "className": "mt-6 bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700"
+            },
+            "children": [
+              {
+                "id": "general_header",
+                "type": "basic",
+                "name": "Div",
+                "props": { "className": "panel-header-row" },
+                "children": [
+                  {
+                    "type": "basic",
+                    "name": "H3",
+                    "props": { "className": "text-body font-semibold" },
+                    "text": "$t:custom-board_comments.settings.sections.general"
+                  }
+                ]
+              },
+              {
+                "id": "general_fields",
+                "type": "basic",
+                "name": "Div",
+                "props": { "className": "divide-y divide-gray-100 dark:divide-gray-700" },
+                "children": [
+                  {
+                    "id": "field_enabled",
+                    "type": "basic",
+                    "name": "Div",
+                    "props": { "className": "grid-2col lg:grid-cols-3 items-center px-6 py-4" },
+                    "children": [
+                      {
+                        "type": "basic",
+                        "name": "Div",
+                        "props": { "className": "lg:col-span-2" },
+                        "children": [
+                          { "type": "basic", "name": "Label", "props": { "className": "form-label" }, "text": "$t:custom-board_comments.settings.fields.enabled.label" },
+                          { "type": "basic", "name": "P", "props": { "className": "form-hint" }, "text": "$t:custom-board_comments.settings.fields.enabled.hint" }
+                        ]
+                      },
+                      {
+                        "type": "basic",
+                        "name": "Div",
+                        "props": { "className": "lg:col-span-1 flex justify-end" },
+                        "children": [
+                          { "type": "composite", "name": "Toggle", "props": { "name": "enabled" } }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "id": "field_allow_guest_likes",
+                    "type": "basic",
+                    "name": "Div",
+                    "props": { "className": "grid-2col lg:grid-cols-3 items-center px-6 py-4" },
+                    "children": [
+                      {
+                        "type": "basic",
+                        "name": "Div",
+                        "props": { "className": "lg:col-span-2" },
+                        "children": [
+                          { "type": "basic", "name": "Label", "props": { "className": "form-label" }, "text": "$t:custom-board_comments.settings.fields.allow_guest_likes.label" },
+                          { "type": "basic", "name": "P", "props": { "className": "form-hint" }, "text": "$t:custom-board_comments.settings.fields.allow_guest_likes.hint" }
+                        ]
+                      },
+                      {
+                        "type": "basic",
+                        "name": "Div",
+                        "props": { "className": "lg:col-span-1 flex justify-end" },
+                        "children": [
+                          { "type": "composite", "name": "Toggle", "props": { "name": "allow_guest_likes" } }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "id": "field_style_enabled",
+                    "type": "basic",
+                    "name": "Div",
+                    "props": { "className": "grid-2col lg:grid-cols-3 items-center px-6 py-4" },
+                    "children": [
+                      {
+                        "type": "basic",
+                        "name": "Div",
+                        "props": { "className": "lg:col-span-2" },
+                        "children": [
+                          { "type": "basic", "name": "Label", "props": { "className": "form-label" }, "text": "$t:custom-board_comments.settings.fields.style_enabled.label" },
+                          { "type": "basic", "name": "P", "props": { "className": "form-hint" }, "text": "$t:custom-board_comments.settings.fields.style_enabled.hint" }
+                        ]
+                      },
+                      {
+                        "type": "basic",
+                        "name": "Div",
+                        "props": { "className": "lg:col-span-1 flex justify-end" },
+                        "children": [
+                          { "type": "composite", "name": "Toggle", "props": { "name": "style_enabled" } }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "id": "field_stickers_enabled",
+                    "type": "basic",
+                    "name": "Div",
+                    "props": { "className": "grid-2col lg:grid-cols-3 items-center px-6 py-4" },
+                    "children": [
+                      {
+                        "type": "basic",
+                        "name": "Div",
+                        "props": { "className": "lg:col-span-2" },
+                        "children": [
+                          { "type": "basic", "name": "Label", "props": { "className": "form-label" }, "text": "$t:custom-board_comments.settings.fields.stickers_enabled.label" },
+                          { "type": "basic", "name": "P", "props": { "className": "form-hint" }, "text": "$t:custom-board_comments.settings.fields.stickers_enabled.hint" }
+                        ]
+                      },
+                      {
+                        "type": "basic",
+                        "name": "Div",
+                        "props": { "className": "lg:col-span-1 flex justify-end" },
+                        "children": [
+                          { "type": "composite", "name": "Toggle", "props": { "name": "stickers_enabled" } }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "id": "field_sticker_pack",
+                    "type": "basic",
+                    "name": "Div",
+                    "props": { "className": "grid-2col lg:grid-cols-3 items-center px-6 py-4" },
+                    "children": [
+                      {
+                        "type": "basic",
+                        "name": "Div",
+                        "props": { "className": "lg:col-span-2" },
+                        "children": [
+                          { "type": "basic", "name": "Label", "props": { "className": "form-label", "htmlFor": "sticker_pack" }, "text": "$t:custom-board_comments.settings.fields.sticker_pack.label" },
+                          { "type": "basic", "name": "P", "props": { "className": "form-hint" }, "text": "$t:custom-board_comments.settings.fields.sticker_pack.hint" }
+                        ]
+                      },
+                      {
+                        "type": "basic",
+                        "name": "Select",
+                        "props": {
+                          "id": "sticker_pack",
+                          "name": "sticker_pack",
+                          "className": "lg:col-span-1",
+                          "options": [
+                            { "value": "12", "label": "$t:custom-board_comments.settings.options.pack_12" },
+                            { "value": "24", "label": "$t:custom-board_comments.settings.options.pack_24" },
+                            { "value": "48", "label": "$t:custom-board_comments.settings.options.pack_48" },
+                            { "value": "96", "label": "$t:custom-board_comments.settings.options.pack_96" },
+                            { "value": "192", "label": "$t:custom-board_comments.settings.options.pack_192" },
+                            { "value": "384", "label": "$t:custom-board_comments.settings.options.pack_384" },
+                            { "value": "full", "label": "$t:custom-board_comments.settings.options.full" }
+                          ]
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "id": "field_stickers_animated",
+                    "type": "basic",
+                    "name": "Div",
+                    "props": { "className": "grid-2col lg:grid-cols-3 items-center px-6 py-4" },
+                    "children": [
+                      {
+                        "type": "basic",
+                        "name": "Div",
+                        "props": { "className": "lg:col-span-2" },
+                        "children": [
+                          { "type": "basic", "name": "Label", "props": { "className": "form-label" }, "text": "$t:custom-board_comments.settings.fields.stickers_animated.label" },
+                          { "type": "basic", "name": "P", "props": { "className": "form-hint" }, "text": "$t:custom-board_comments.settings.fields.stickers_animated.hint" }
+                        ]
+                      },
+                      {
+                        "type": "basic",
+                        "name": "Div",
+                        "props": { "className": "lg:col-span-1 flex justify-end" },
+                        "children": [
+                          { "type": "composite", "name": "Toggle", "props": { "name": "stickers_animated" } }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "id": "field_images_enabled",
+                    "type": "basic",
+                    "name": "Div",
+                    "props": { "className": "grid-2col lg:grid-cols-3 items-center px-6 py-4" },
+                    "children": [
+                      {
+                        "type": "basic",
+                        "name": "Div",
+                        "props": { "className": "lg:col-span-2" },
+                        "children": [
+                          { "type": "basic", "name": "Label", "props": { "className": "form-label" }, "text": "$t:custom-board_comments.settings.fields.images_enabled.label" },
+                          { "type": "basic", "name": "P", "props": { "className": "form-hint" }, "text": "$t:custom-board_comments.settings.fields.images_enabled.hint" }
+                        ]
+                      },
+                      {
+                        "type": "basic",
+                        "name": "Div",
+                        "props": { "className": "lg:col-span-1 flex justify-end" },
+                        "children": [
+                          { "type": "composite", "name": "Toggle", "props": { "name": "images_enabled" } }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "id": "field_default_sort",
+                    "type": "basic",
+                    "name": "Div",
+                    "props": { "className": "grid-2col lg:grid-cols-3 items-center px-6 py-4" },
+                    "children": [
+                      {
+                        "type": "basic",
+                        "name": "Div",
+                        "props": { "className": "lg:col-span-2" },
+                        "children": [
+                          { "type": "basic", "name": "Label", "props": { "className": "form-label", "htmlFor": "default_sort" }, "text": "$t:custom-board_comments.settings.fields.default_sort.label" },
+                          { "type": "basic", "name": "P", "props": { "className": "form-hint" }, "text": "$t:custom-board_comments.settings.fields.default_sort.hint" }
+                        ]
+                      },
+                      {
+                        "type": "basic",
+                        "name": "Select",
+                        "props": {
+                          "id": "default_sort",
+                          "name": "default_sort",
+                          "className": "lg:col-span-1",
+                          "options": [
+                            { "value": "latest", "label": "$t:custom-board_comments.settings.options.latest" },
+                            { "value": "oldest", "label": "$t:custom-board_comments.settings.options.oldest" },
+                            { "value": "popular", "label": "$t:custom-board_comments.settings.options.popular" }
+                          ]
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "id": "field_board_slugs",
+                    "type": "basic",
+                    "name": "Div",
+                    "props": { "className": "grid-2col lg:grid-cols-3 items-start px-6 py-4" },
+                    "children": [
+                      {
+                        "type": "basic",
+                        "name": "Div",
+                        "props": { "className": "lg:col-span-2" },
+                        "children": [
+                          { "type": "basic", "name": "Label", "props": { "className": "form-label", "htmlFor": "board_slugs" }, "text": "$t:custom-board_comments.settings.fields.board_slugs.label" },
+                          { "type": "basic", "name": "P", "props": { "className": "form-hint" }, "text": "$t:custom-board_comments.settings.fields.board_slugs.hint" }
+                        ]
+                      },
+                      {
+                        "type": "basic",
+                        "name": "Input",
+                        "props": {
+                          "id": "board_slugs",
+                          "name": "board_slugs",
+                          "type": "text",
+                          "className": "lg:col-span-1",
+                          "placeholder": "free"
+                        }
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "id": "best_card",
+            "type": "basic",
+            "name": "Div",
+            "props": {
+              "className": "mt-6 bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700"
+            },
+            "children": [
+              {
+                "id": "best_header",
+                "type": "basic",
+                "name": "Div",
+                "props": { "className": "panel-header-row" },
+                "children": [
+                  {
+                    "type": "basic",
+                    "name": "H3",
+                    "props": { "className": "text-body font-semibold" },
+                    "text": "$t:custom-board_comments.settings.sections.best"
+                  }
+                ]
+              },
+              {
+                "id": "best_fields",
+                "type": "basic",
+                "name": "Div",
+                "props": { "className": "divide-y divide-gray-100 dark:divide-gray-700" },
+                "children": [
+                  {
+                    "id": "field_best_enabled",
+                    "type": "basic",
+                    "name": "Div",
+                    "props": { "className": "grid-2col lg:grid-cols-3 items-center px-6 py-4" },
+                    "children": [
+                      {
+                        "type": "basic",
+                        "name": "Div",
+                        "props": { "className": "lg:col-span-2" },
+                        "children": [
+                          { "type": "basic", "name": "Label", "props": { "className": "form-label" }, "text": "$t:custom-board_comments.settings.fields.best_enabled.label" },
+                          { "type": "basic", "name": "P", "props": { "className": "form-hint" }, "text": "$t:custom-board_comments.settings.fields.best_enabled.hint" }
+                        ]
+                      },
+                      {
+                        "type": "basic",
+                        "name": "Div",
+                        "props": { "className": "lg:col-span-1 flex justify-end" },
+                        "children": [
+                          { "type": "composite", "name": "Toggle", "props": { "name": "best_enabled" } }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "id": "field_best_threshold",
+                    "type": "basic",
+                    "name": "Div",
+                    "props": { "className": "grid-2col lg:grid-cols-3 items-center px-6 py-4" },
+                    "children": [
+                      {
+                        "type": "basic",
+                        "name": "Div",
+                        "props": { "className": "lg:col-span-2" },
+                        "children": [
+                          { "type": "basic", "name": "Label", "props": { "className": "form-label", "htmlFor": "best_threshold" }, "text": "$t:custom-board_comments.settings.fields.best_threshold.label" },
+                          { "type": "basic", "name": "P", "props": { "className": "form-hint" }, "text": "$t:custom-board_comments.settings.fields.best_threshold.hint" }
+                        ]
+                      },
+                      {
+                        "type": "basic",
+                        "name": "Input",
+                        "props": {
+                          "id": "best_threshold",
+                          "name": "best_threshold",
+                          "type": "number",
+                          "min": 1,
+                          "max": 999,
+                          "className": "lg:col-span-1"
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "id": "field_best_limit",
+                    "type": "basic",
+                    "name": "Div",
+                    "props": { "className": "grid-2col lg:grid-cols-3 items-center px-6 py-4" },
+                    "children": [
+                      {
+                        "type": "basic",
+                        "name": "Div",
+                        "props": { "className": "lg:col-span-2" },
+                        "children": [
+                          { "type": "basic", "name": "Label", "props": { "className": "form-label", "htmlFor": "best_limit" }, "text": "$t:custom-board_comments.settings.fields.best_limit.label" },
+                          { "type": "basic", "name": "P", "props": { "className": "form-hint" }, "text": "$t:custom-board_comments.settings.fields.best_limit.hint" }
+                        ]
+                      },
+                      {
+                        "type": "basic",
+                        "name": "Input",
+                        "props": {
+                          "id": "best_limit",
+                          "name": "best_limit",
+                          "type": "number",
+                          "min": 1,
+                          "max": 20,
+                          "className": "lg:col-span-1"
+                        }
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "id": "footer_actions",
+            "type": "basic",
+            "name": "Div",
+            "props": { "className": "sticky-footer-buttons" },
+            "children": [
+              {
+                "id": "cancel_button",
+                "type": "basic",
+                "name": "Button",
+                "props": { "type": "button", "className": "btn btn-secondary" },
+                "actions": [
+                  {
+                    "type": "click",
+                    "handler": "navigate",
+                    "params": { "path": "/admin/plugins" }
+                  }
+                ],
+                "children": [
+                  { "type": "basic", "name": "Span", "text": "$t:common.cancel" }
+                ]
+              },
+              {
+                "id": "save_button",
+                "type": "basic",
+                "name": "Button",
+                "props": {
+                  "type": "button",
+                  "disabled": "{{!_local.hasChanges || _local.isSaving}}",
+                  "className": "btn btn-primary flex-center gap-1.5"
+                },
+                "actions": [
+                  {
+                    "type": "click",
+                    "handler": "sequence",
+                    "actions": [
+                      {
+                        "handler": "setState",
+                        "params": { "target": "local", "isSaving": true, "errors": null }
+                      },
+                      {
+                        "handler": "apiCall",
+                        "auth_required": true,
+                        "target": "/api/plugins/custom-board_comments/admin/settings",
+                        "params": { "method": "PUT", "body": "{{_local.form}}" },
+                        "onSuccess": [
+                          {
+                            "handler": "setState",
+                            "params": { "target": "local", "isSaving": false, "hasChanges": false }
+                          },
+                          {
+                            "handler": "toast",
+                            "params": { "type": "success", "message": "$t:admin.plugins.settings.save_success" }
+                          },
+                          {
+                            "handler": "refetchDataSource",
+                            "params": { "dataSourceId": "settings" }
+                          }
+                        ],
+                        "onError": [
+                          {
+                            "handler": "setState",
+                            "params": { "target": "local", "isSaving": false }
+                          },
+                          {
+                            "handler": "toast",
+                            "params": { "type": "error", "message": "{{error.message || '$t:common.error'}}" }
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ],
+                "children": [
+                  { "type": "basic", "name": "Span", "text": "$t:common.save" }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

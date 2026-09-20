@@ -1,0 +1,19 @@
+{
+    "name": "@custom/board-comments",
+    "version": "0.1.16",
+    "description": "Custom board comment likes and sorting for Gnuboard7",
+    "private": true,
+    "type": "module",
+    "scripts": {
+        "build": "vite build",
+        "test": "vitest run",
+        "typecheck": "tsc --noEmit"
+    },
+    "devDependencies": {
+        "@types/node": "^22.20.2",
+        "jsdom": "^29.1.1",
+        "typescript": "^5.9.2",
+        "vite": "^7.1.5",
+        "vitest": "^3.2.4"
+    }
+}

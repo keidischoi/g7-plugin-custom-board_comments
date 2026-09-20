@@ -1,0 +1,92 @@
+{
+  "editor": {
+    "data_source": {
+      "settings": "Board comment extras"
+    }
+  },
+  "name": "Custom Board Comments",
+  "description": "Adds likes, best comments, and sorting to official board comments.",
+  "ui": {
+    "like": "Like",
+    "liked": "Liked",
+    "best": "Best",
+    "sort": "Sort",
+    "latest": "Latest",
+    "oldest": "Oldest",
+    "popular": "Most liked",
+    "login_to_like": "Sign in to like a comment.",
+    "sticker": "Sticker",
+    "image": "Image"
+  },
+  "settings": {
+    "title": "Board comment extras",
+    "description": "Show likes, best comments, and sorting on post pages without editing the theme.",
+    "notice": "Refresh a post page after saving. The sirsoft-board module must be active.",
+    "sections": {
+      "general": "General",
+      "best": "Best comments"
+    },
+    "options": {
+      "latest": "Latest",
+      "oldest": "Oldest",
+      "popular": "Most liked",
+      "pack_12": "12 stickers",
+      "pack_24": "24 stickers",
+      "pack_48": "48 stickers",
+      "pack_96": "96 stickers",
+      "pack_192": "192 stickers",
+      "pack_384": "384 stickers",
+      "full": "All"
+    },
+    "fields": {
+      "enabled": {
+        "label": "Enable comment extras",
+        "hint": "Shows likes, best comments, and sorting on post comment sections."
+      },
+      "allow_guest_likes": {
+        "label": "Allow guest likes",
+        "hint": "When off, only signed-in members can like. Guests are limited to one like per IP."
+      },
+      "style_enabled": {
+        "label": "Comment card styling",
+        "hint": "Applies like-button and best-badge styles."
+      },
+      "stickers_enabled": {
+        "label": "Sticker insert",
+        "hint": "Lets visitors insert stickers into the comment box."
+      },
+      "sticker_pack": {
+        "label": "Sticker pack",
+        "hint": "Choose 12, 24, 48, 96, and so on. Full is 700+ stickers."
+      },
+      "stickers_animated": {
+        "label": "Animated stickers",
+        "hint": "Only sticker icons bounce and wiggle with CSS. Turn off for still emoji. No remote GIF files."
+      },
+      "images_enabled": {
+        "label": "Image insert",
+        "hint": "Signed-in members can attach images to comments. 2MB max."
+      },
+      "default_sort": {
+        "label": "Default sort",
+        "hint": "The first comment order visitors see."
+      },
+      "board_slugs": {
+        "label": "Board slugs",
+        "hint": "Defaults to the free board. Comma-separated; leave empty to apply to every board."
+      },
+      "best_enabled": {
+        "label": "Enable best comments",
+        "hint": "Pins comments at or above the like threshold and shows a badge."
+      },
+      "best_threshold": {
+        "label": "Best-comment like threshold",
+        "hint": "Only comments with at least this many likes become best comments."
+      },
+      "best_limit": {
+        "label": "Maximum best comments",
+        "hint": "How many best comments to pin at the top."
+      }
+    }
+  }
+}

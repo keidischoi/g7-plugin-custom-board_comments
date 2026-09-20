@@ -1,0 +1,62 @@
+<?php
+
+namespace Plugins\Custom\BoardComments\Support;
+
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+final class MediaTable
+{
+    public const NAME = 'custom_board_comment_media';
+
+    public static function ensure(): bool
+    {
+        try {
+            if (Schema::hasTable(self::NAME)) {
+                return true;
+            }
+
+            if (! class_exists(Schema::class) || ! class_exists(Blueprint::class)) {
+                return false;
+            }
+
+            Schema::create(self::NAME, static function (Blueprint $table): void {
+                $table->id();
+                $table->string('user_id', 64)->default('');
+                $table->unsignedBigInteger('post_id')->default(0);
+                $table->string('disk_name', 80);
+                $table->string('mime', 40);
+                $table->unsignedInteger('size')->default(0);
+                $table->timestamp('created_at')->nullable();
+                $table->index('post_id', 'cbc_media_post');
+            });
+
+            return Schema::hasTable(self::NAME);
+        } catch (\Throwable) {
+            return false;
+        }
+    }
+
+    public static function directory(): string
+    {
+        $dirs = self::directories();
+        return $dirs[0];
+    }
+
+    /**
+     * @return list<string>
+     */
+    public static function directories(): array
+    {
+        $dirs = [];
+        if (function_exists('storage_path')) {
+            $dirs[] = storage_path('app/custom-board_comments/media');
+            $dirs[] = storage_path('app/plugins/custom-board_comments/media');
+            $dirs[] = storage_path('app/custom-board_comments/media');
+        } else {
+            $dirs[] = sys_get_temp_dir().'/custom-board_comments/media';
+        }
+        return $dirs;
+    }
+}
+
