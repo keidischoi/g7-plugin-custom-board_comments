@@ -29,6 +29,7 @@ foreach ($iterator as $file) {
 }
 
 expect('settings plugin id', \Plugins\Custom\BoardComments\Support\SettingsRules::PLUGIN_ID, 'custom-board_comments');
+expect('legacy settings plugin id', \Plugins\Custom\BoardComments\Support\SettingsRules::LEGACY_PLUGIN_ID, 'g7-plugin-custom-board_comments');
 expect('like table name', \Plugins\Custom\BoardComments\Support\LikeTable::NAME, 'custom_board_comment_likes');
 
 finish();

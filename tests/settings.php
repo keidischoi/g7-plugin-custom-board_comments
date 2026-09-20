@@ -8,6 +8,7 @@ use Plugins\Custom\BoardComments\Support\SettingsRules;
 
 $defaults = SettingsRules::normalize(null);
 expect('plugin id', SettingsRules::PLUGIN_ID, 'custom-board_comments');
+expect('legacy plugin id', SettingsRules::LEGACY_PLUGIN_ID, 'g7-plugin-custom-board_comments');
 expect('enabled default', $defaults['enabled'], true);
 expect('guest likes off', $defaults['allow_guest_likes'], false);
 expect('sort default', $defaults['default_sort'], 'latest');
@@ -45,6 +46,10 @@ expect('nested settings pack', SettingsRules::normalize(SettingsRules::firstSett
     [],
     ['custom-board_comments' => ['sticker_pack' => 'pack_48']],
 ]))['sticker_pack'], '48');
+expect('legacy folder settings pack', SettingsRules::normalize(SettingsRules::firstSettings([
+    [],
+    ['g7-plugin-custom-board_comments' => ['sticker_pack' => '24']],
+]))['sticker_pack'], '24');
 expect('empty active falls through', SettingsRules::firstSettings([[], ['sticker_pack' => '96']])['sticker_pack'] ?? null, '96');
 expect('stickers default on', $defaults['stickers_enabled'], true);
 expect('sticker pack default full', $defaults['sticker_pack'], 'full');

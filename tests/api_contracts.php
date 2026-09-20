@@ -24,6 +24,6 @@ expectFalse('no custom service provider', is_dir($root.'/src/Providers'));
 expectTrue('unique actor', str_contains($likeTable, 'cbc_likes_actor_unique'));
 expectTrue('actor rules', is_file($root.'/src/Support/ActorRules.php'));
 expect('no hard module dependency', $pluginJson['dependencies']['modules'] ?? ['x'], []);
-expectTrue('composer namespace', str_contains((string) file_get_contents($root.'/composer.json'), 'Plugins\\\\G7\\\\Plugin\\\\Custom\\\\BoardComments\\\\'));
+expectTrue('composer namespace', str_contains((string) file_get_contents($root.'/composer.json'), 'Plugins\\\\Custom\\\\BoardComments\\\\'));
 
 finish();

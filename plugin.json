@@ -2,10 +2,10 @@
     "identifier": "custom-board_comments",
     "vendor": "custom",
     "name": {
-        "ko": "게시판 댓글 확장",
+        "ko": "게시판 댓글",
         "en": "Custom Board Comments"
     },
-    "version": "0.1.21",
+    "version": "0.1.22",
     "license": "MIT",
     "description": {
         "ko": "공식 게시판 댓글에 추천, 베스트 댓글, 정렬, 스티커, 이미지 삽입을 테마 수정 없이 추가합니다.",
@@ -16,12 +16,12 @@
         "modules": {},
         "plugins": {}
     },
-    "github_url": "https://github.com/keidischoi/custom-board_comments",
-    "github_changelog_url": "https://github.com/keidischoi/custom-board_comments/blob/main/CHANGELOG.md",
+    "github_url": "https://github.com/keidischoi/g7-plugin-custom-board_comments",
+    "github_changelog_url": "https://github.com/keidischoi/g7-plugin-custom-board_comments/blob/main/CHANGELOG.md",
     "assets": {
         "js": {
             "entry": "resources/js/index.ts",
-            "output": "dist/js/plugin.iife.v021.js"
+            "output": "dist/js/plugin.iife.js"
         },
         "css": {
             "entry": "resources/css/plugin.css",

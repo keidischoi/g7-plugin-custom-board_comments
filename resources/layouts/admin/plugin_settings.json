@@ -1,5 +1,5 @@
 {
-  "version": "0.1.16",
+  "version": "0.1.22",
   "layout_name": "plugin_settings",
   "permissions": [
     "core.plugins.update"

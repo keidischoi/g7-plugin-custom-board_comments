@@ -14,9 +14,12 @@ PHP);
 $root = dirname(__DIR__);
 
 spl_autoload_register(static function (string $class) use ($root): void {
-    $prefix = 'Plugins\\G7\\Plugin\\Custom\\BoardComments\\';
+    $prefix = 'Plugins\\Custom\\BoardComments\\';
     if (! str_starts_with($class, $prefix)) {
-        return;
+        $prefix = 'Plugins\\G7\\Plugin\\Custom\\BoardComments\\';
+        if (! str_starts_with($class, $prefix)) {
+            return;
+        }
     }
     $rel = str_replace('\\', '/', substr($class, strlen($prefix)));
     foreach ([$root.'/src/'.$rel.'.php', $root.'/'.$rel.'.php'] as $file) {

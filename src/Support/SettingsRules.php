@@ -6,6 +6,9 @@ final class SettingsRules
 {
     public const PLUGIN_ID = 'custom-board_comments';
 
+    /** GitHub 저장소 이름으로 설치된 이전 폴더 */
+    public const LEGACY_PLUGIN_ID = 'g7-plugin-custom-board_comments';
+
     public const SORTS = ['latest', 'oldest', 'popular'];
 
     public const STICKER_PACKS = ['12', '24', '48', '96', '192', '384', 'full'];
@@ -117,8 +120,10 @@ final class SettingsRules
         if (! is_array($raw)) {
             return null;
         }
-        if (isset($raw[self::PLUGIN_ID])) {
-            return self::extractSettings($raw[self::PLUGIN_ID]);
+        foreach ([self::PLUGIN_ID, self::LEGACY_PLUGIN_ID] as $pluginId) {
+            if (isset($raw[$pluginId])) {
+                return self::extractSettings($raw[$pluginId]);
+            }
         }
         foreach (['form', 'settings', 'data', 'values', 'config', 'attributes', 'payload'] as $key) {
             if (isset($raw[$key]) && is_array($raw[$key])) {
@@ -126,12 +131,6 @@ final class SettingsRules
                 if ($inner !== null) {
                     return $inner;
                 }
-            }
-        }
-        if (isset($raw['custom-board_comments'])) {
-            $inner = self::extractSettings($raw['custom-board_comments']);
-            if ($inner !== null) {
-                return $inner;
             }
         }
 

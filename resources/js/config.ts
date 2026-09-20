@@ -1,4 +1,5 @@
 export const PLUGIN_ID = 'custom-board_comments';
+export const LEGACY_PLUGIN_ID = 'g7-plugin-custom-board_comments';
 export const SORTS = ['latest', 'oldest', 'popular'] as const;
 export const STICKER_PACKS = ['12', '24', '48', '96', '192', '384', 'full'] as const;
 
@@ -94,7 +95,11 @@ export function normalizeConfig(raw: unknown): PluginConfig {
 }
 
 export function readInlineConfig(win: G7Window = window): PluginConfig {
-    return normalizeConfig(win.G7Config?.plugins?.[PLUGIN_ID]);
+    const plugins = win.G7Config?.plugins ?? {};
+    return overlayConfig(
+        normalizeConfig(plugins[LEGACY_PLUGIN_ID]),
+        plugins[PLUGIN_ID],
+    );
 }
 
 export function applyStickerMotionClass(on: boolean, root: HTMLElement = document.documentElement): void {
