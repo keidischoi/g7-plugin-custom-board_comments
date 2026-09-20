@@ -1,4 +1,4 @@
-export const PLUGIN_ID = 'custom-board_comments';
+export const PLUGIN_ID = 'g7-plugin-custom-board_comments';
 export const SORTS = ['latest', 'oldest', 'popular'] as const;
 export const STICKER_PACKS = ['12', '24', '48', '96', '192', '384', 'full'] as const;
 
