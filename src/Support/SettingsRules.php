@@ -120,9 +120,18 @@ final class SettingsRules
         if (isset($raw[self::PLUGIN_ID])) {
             return self::extractSettings($raw[self::PLUGIN_ID]);
         }
-        foreach (['settings', 'data', 'values', 'config'] as $key) {
-            if (isset($raw[$key]) && is_array($raw[$key]) && ! self::looksLikePluginSettings($raw)) {
-                return self::extractSettings($raw[$key]);
+        foreach (['form', 'settings', 'data', 'values', 'config', 'attributes', 'payload'] as $key) {
+            if (isset($raw[$key]) && is_array($raw[$key])) {
+                $inner = self::extractSettings($raw[$key]);
+                if ($inner !== null) {
+                    return $inner;
+                }
+            }
+        }
+        if (isset($raw['custom-board_comments'])) {
+            $inner = self::extractSettings($raw['custom-board_comments']);
+            if ($inner !== null) {
+                return $inner;
             }
         }
 

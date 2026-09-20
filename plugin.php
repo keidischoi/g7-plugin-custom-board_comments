@@ -174,10 +174,8 @@ class Plugin extends AbstractPlugin
      */
     public function getDynamicTables(): array
     {
-        return [
-            'custom_board_comment_likes',
-            'custom_board_comment_media',
-        ];
+        // Keep likes/media tables and files after uninstall.
+        return [];
     }
 
     /**

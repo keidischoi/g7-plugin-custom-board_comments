@@ -35,6 +35,7 @@ class CommentMediaController
                 (int) $file->getSize(),
                 (string) $userId,
                 (int) $request->input('post_id', 0),
+                (string) $file->getClientOriginalName(),
             );
         } catch (RuntimeException $exception) {
             $status = $exception->getCode() >= 400 && $exception->getCode() < 600

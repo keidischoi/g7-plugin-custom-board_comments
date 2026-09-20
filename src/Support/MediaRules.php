@@ -33,6 +33,25 @@ final class MediaRules
         return '[[i:'.$id.']]';
     }
 
+    public static function safeOriginalName(?string $original, string $mime): string
+    {
+        $base = basename(str_replace('\\', '/', (string) $original));
+        $base = preg_replace('/[^A-Za-z0-9._\-\x{ac00}-\x{d7a3} ]+/u', '', $base) ?? '';
+        $base = trim($base);
+        $ext = self::extensionForMime($mime) ?? 'jpg';
+        $stem = pathinfo($base, PATHINFO_FILENAME);
+        $stem = trim((string) $stem);
+        if ($stem === '') {
+            $stem = 'image';
+        }
+        if (function_exists('mb_substr')) {
+            $stem = mb_substr($stem, 0, 60);
+        } elseif (strlen($stem) > 60) {
+            $stem = substr($stem, 0, 60);
+        }
+        return $stem.'.'.$ext;
+    }
+
     public static function stickerToken(string $id): string
     {
         $slug = strtolower(trim($id));

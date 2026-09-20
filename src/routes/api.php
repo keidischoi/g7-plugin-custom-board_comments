@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use Plugins\G7\Plugin\Custom\BoardComments\Http\Controllers\CommentLikeController;
 use Plugins\G7\Plugin\Custom\BoardComments\Http\Controllers\CommentMediaController;
+use Plugins\G7\Plugin\Custom\BoardComments\Http\Controllers\SettingsController;
 
 /*
 |--------------------------------------------------------------------------
@@ -14,6 +15,9 @@ use Plugins\G7\Plugin\Custom\BoardComments\Http\Controllers\CommentMediaControll
 | - Name: api.plugins.g7-plugin-custom-board_comments.
 |
 */
+
+Route::get('/admin/settings', [SettingsController::class, 'show'])->name('admin.settings.show');
+Route::match(['put', 'post'], '/admin/settings', [SettingsController::class, 'save'])->name('admin.settings.save');
 
 Route::get('/settings', [CommentLikeController::class, 'settings'])
     ->name('settings');

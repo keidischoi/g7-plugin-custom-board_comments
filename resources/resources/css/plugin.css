@@ -283,6 +283,3 @@ html.cbc-stickers-animated .cbc-sticker[data-cbc-motion="pop"],
 .cbc-comment-stack > * {
     margin-top: 0 !important;
 }
-
-.cbc-image-row{display:flex;flex-wrap:wrap;align-items:flex-start;gap:.45rem;margin:.4rem 0}
-.cbc-image{display:inline-block;max-width:min(5.25rem,30%);max-height:5rem;margin:0;vertical-align:top;cursor:zoom-in}

@@ -39,10 +39,24 @@ final class MediaTable
 
     public static function directory(): string
     {
-        if (function_exists('storage_path')) {
-            return storage_path('app/g7-plugin-custom-board_comments/media');
-        }
+        $dirs = self::directories();
+        return $dirs[0];
+    }
 
-        return sys_get_temp_dir().'/g7-plugin-custom-board_comments/media';
+    /**
+     * @return list<string>
+     */
+    public static function directories(): array
+    {
+        $dirs = [];
+        if (function_exists('storage_path')) {
+            $dirs[] = storage_path('app/g7-plugin-custom-board_comments/media');
+            $dirs[] = storage_path('app/plugins/g7-plugin-custom-board_comments/media');
+            $dirs[] = storage_path('app/custom-board_comments/media');
+        } else {
+            $dirs[] = sys_get_temp_dir().'/g7-plugin-custom-board_comments/media';
+        }
+        return $dirs;
     }
 }
+

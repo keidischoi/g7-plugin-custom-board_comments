@@ -79,34 +79,8 @@ function imageNode(id: number): HTMLImageElement {
     const img = document.createElement('img');
     img.setAttribute('data-cbc-media', 'image');
     img.className = 'cbc-image';
-    img.alt = '';
+    img.alt = '댓글 이미지';
     img.loading = 'lazy';
     img.src = imageUrl(id);
-    img.style.cursor = 'zoom-in';
-    img.addEventListener('click', (ev) => {
-        ev.preventDefault();
-        ev.stopPropagation();
-        const box = document.getElementById('cbc_image_lightbox') || (() => {
-            const el = document.createElement('div');
-            el.id = 'cbc_image_lightbox';
-            el.style.cssText = 'position:fixed;inset:0;z-index:2147483646;background:rgba(0,0,0,.82);display:flex;align-items:center;justify-content:center;padding:24px;cursor:zoom-out';
-            const big = document.createElement('img');
-            big.style.cssText = 'max-width:min(96vw,1400px);max-height:92vh;object-fit:contain;border-radius:12px';
-            el.appendChild(big);
-            el.addEventListener('click', () => el.remove());
-            document.body.appendChild(el);
-            return el;
-        })();
-        const big = box.querySelector('img');
-        if (big) big.setAttribute('src', img.src);
-        box.style.display = 'flex';
-        document.body.appendChild(box);
-    });
-    img.addEventListener('error', () => {
-        img.replaceWith(Object.assign(document.createElement('span'), {
-            className: 'cbc-image-missing',
-            textContent: '이미지 없음',
-        }));
-    });
     return img;
 }

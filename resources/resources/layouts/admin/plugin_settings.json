@@ -14,7 +14,7 @@
       "id": "settings",
       "label_key": "$t:g7-plugin-custom-board_comments.editor.data_source.settings",
       "type": "api",
-      "endpoint": "/api/plugins/g7-plugin-custom-board_comments/admin/settings",
+      "endpoint": "/api/admin/plugins/{{route.identifier}}/settings",
       "method": "GET",
       "auto_fetch": true,
       "auth_required": true,
@@ -502,7 +502,7 @@
                       {
                         "handler": "apiCall",
                         "auth_required": true,
-                        "target": "/api/plugins/g7-plugin-custom-board_comments/admin/settings",
+                        "target": "/api/admin/plugins/{{route.identifier}}/settings",
                         "params": { "method": "PUT", "body": "{{_local.form}}" },
                         "onSuccess": [
                           {

@@ -9,6 +9,7 @@ use Plugins\G7\Plugin\Custom\BoardComments\Support\CommentEnhanceRules;
 use Plugins\G7\Plugin\Custom\BoardComments\Support\LikeRules;
 use Plugins\G7\Plugin\Custom\BoardComments\Support\LikeTable;
 use Plugins\G7\Plugin\Custom\BoardComments\Support\SettingsRules;
+use Plugins\G7\Plugin\Custom\BoardComments\Support\SettingsStore;
 use RuntimeException;
 
 class CommentLikeService
@@ -22,6 +23,10 @@ class CommentLikeService
      */
     public function publicSettings(): array
     {
+        $path = SettingsStore::path();
+        if (is_file($path)) {
+            return SettingsStore::get();
+        }
         return SettingsRules::normalize($this->rawSettings());
     }
 
@@ -170,14 +175,27 @@ class CommentLikeService
         }
 
         $chunks = [];
+        $ids = [SettingsRules::PLUGIN_ID, 'custom-board_comments', 'g7-plugin-custom-board_comments'];
+        if (method_exists($this->pluginSettings, 'get')) {
+            foreach ($ids as $id) {
+                try { $chunks[] = $this->pluginSettings->get($id); } catch (\Throwable $e) {}
+            }
+        }
+        if (method_exists($this->pluginSettings, 'getSettings')) {
+            foreach ($ids as $id) {
+                try { $chunks[] = $this->pluginSettings->getSettings($id); } catch (\Throwable $e) {}
+            }
+        }
         if (method_exists($this->pluginSettings, 'getAllActiveSettings')) {
             $chunks[] = $this->pluginSettings->getAllActiveSettings();
         }
-        if (method_exists($this->pluginSettings, 'get')) {
-            $chunks[] = $this->pluginSettings->get(SettingsRules::PLUGIN_ID);
-        }
-        if (method_exists($this->pluginSettings, 'getSettings')) {
-            $chunks[] = $this->pluginSettings->getSettings(SettingsRules::PLUGIN_ID);
+        foreach ([
+            storage_path('app/plugins/g7-plugin-custom-board_comments/settings.json'),
+            storage_path('app/plugins/custom-board_comments/settings.json'),
+        ] as $path) {
+            if (is_file($path)) {
+                try { $chunks[] = json_decode((string) file_get_contents($path), true); } catch (\Throwable $e) {}
+            }
         }
 
         return SettingsRules::firstSettings($chunks);

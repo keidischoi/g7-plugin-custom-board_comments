@@ -14,7 +14,7 @@ class CommentMediaService
     /**
      * @return array{id: int, token: string, url: string, mime: string, size: int}
      */
-    public function store(string $binary, string $mime, int $size, string $userId, int $postId): array
+    public function store(string $binary, string $mime, int $size, string $userId, int $postId, ?string $originalName = null): array
     {
         if ($userId === '') {
             throw new RuntimeException('이미지를 올리려면 로그인하세요.', 401);
@@ -73,14 +73,16 @@ class CommentMediaService
             return null;
         }
 
-        $path = MediaTable::directory().'/'.$row->disk_name;
-        if (! is_file($path)) {
-            return null;
+        foreach (MediaTable::directories() as $dir) {
+            $path = $dir.'/'.$row->disk_name;
+            if (is_file($path)) {
+                return [
+                    'path' => $path,
+                    'mime' => (string) $row->mime,
+                ];
+            }
         }
 
-        return [
-            'path' => $path,
-            'mime' => (string) $row->mime,
-        ];
+        return null;
     }
 }

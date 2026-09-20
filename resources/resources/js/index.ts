@@ -81,19 +81,13 @@ async function fetchJson(url: string, init?: RequestInit): Promise<unknown> {
 }
 
 function unwrapData(payload: unknown): Record<string, unknown> {
-    let cur: unknown = payload;
-    for (let i = 0; i < 3; i += 1) {
-        if (!cur || typeof cur !== 'object') break;
-        const rec = cur as Record<string, unknown>;
-        if (rec.data && typeof rec.data === 'object' && !('sticker_pack' in rec) && !('stickerPack' in rec)) {
-            cur = rec.data;
-            continue;
+    if (payload && typeof payload === 'object' && 'data' in payload) {
+        const data = (payload as { data: unknown }).data;
+        if (data && typeof data === 'object') {
+            return data as Record<string, unknown>;
         }
-        break;
     }
-    const rec = (cur && typeof cur === 'object') ? cur as Record<string, unknown> : {};
-    const extra = rec.settings && typeof rec.settings === 'object' ? rec.settings as Record<string, unknown> : {};
-    return { ...rec, ...extra };
+    return (payload && typeof payload === 'object') ? payload as Record<string, unknown> : {};
 }
 
 function emptySummary(): LikeSummary {
