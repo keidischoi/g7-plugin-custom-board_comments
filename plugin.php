@@ -1,6 +1,6 @@
 <?php
 
-namespace Plugins\G7\Plugin\Custom\BoardComments;
+namespace Plugins\Custom\BoardComments;
 
 use App\Extension\AbstractPlugin;
 
@@ -9,7 +9,7 @@ use App\Extension\AbstractPlugin;
  */
 class Plugin extends AbstractPlugin
 {
-    public const IDENTIFIER = 'g7-plugin-custom-board_comments';
+    public const IDENTIFIER = 'custom-board_comments';
 
     /**
      * @return array<string, array<string, mixed>>
