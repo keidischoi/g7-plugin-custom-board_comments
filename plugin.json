@@ -1,6 +1,6 @@
 {
-    "identifier": "custom-board_comments",
-    "vendor": "custom",
+    "identifier": "g7-plugin-custom-board_comments",
+    "vendor": "g7",
     "name": {
         "ko": "게시판 댓글 확장",
         "en": "Custom Board Comments"
