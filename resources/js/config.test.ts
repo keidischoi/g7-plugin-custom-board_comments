@@ -73,7 +73,7 @@ describe('normalizeConfig', () => {
                     'g7-plugin-custom-board_comments': { sticker_pack: '24', stickers_animated: false },
                 },
             },
-        } as Window & { G7Config?: { plugins?: Record<string, unknown> } };
+        };
         expect(readInlineConfig(win)).toMatchObject({
             stickerPack: '24',
             stickersAnimated: false,
@@ -88,7 +88,7 @@ describe('normalizeConfig', () => {
                     'custom-board_comments': { sticker_pack: '96' },
                 },
             },
-        } as Window & { G7Config?: { plugins?: Record<string, unknown> } };
+        };
         expect(readInlineConfig(win).stickerPack).toBe('96');
     });
 });

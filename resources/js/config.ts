@@ -36,7 +36,7 @@ export const DEFAULT_CONFIG: PluginConfig = {
     imagesEnabled: true,
 };
 
-type G7Window = Window & {
+type G7Window = {
     G7Config?: {
         plugins?: Record<string, unknown>;
     };
@@ -94,7 +94,7 @@ export function normalizeConfig(raw: unknown): PluginConfig {
     };
 }
 
-export function readInlineConfig(win: G7Window = window): PluginConfig {
+export function readInlineConfig(win: G7Window = window as G7Window): PluginConfig {
     const plugins = win.G7Config?.plugins ?? {};
     return overlayConfig(
         normalizeConfig(plugins[LEGACY_PLUGIN_ID]),
