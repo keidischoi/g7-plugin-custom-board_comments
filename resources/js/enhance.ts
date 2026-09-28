@@ -343,25 +343,41 @@ export function applySort(
     return ordered;
 }
 
+const TOOLBAR_ICONS: Record<SortKind | 'sticker' | 'image', string> = {
+    latest: '🕒',
+    oldest: '📅',
+    popular: '👍',
+    image: '🖼️',
+    sticker: '😊',
+};
+
+/** 이모지 아이콘(스크린리더에는 숨김) + 글자 라벨로 된 버튼 안쪽 HTML. */
+function buttonInner(icon: string, label: string): string {
+    return `<span class="cbc-btn-icon" aria-hidden="true">${icon}</span><span class="cbc-btn-label">${label}</span>`;
+}
+
 function SORTS_HTML(copy: typeof COPY.ko, current: SortKind): string {
     const options: Array<[SortKind, string]> = [
         ['latest', copy.latest],
         ['oldest', copy.oldest],
         ['popular', copy.popular],
     ];
-    const buttons = options.map(([value, label]) => (
-        `<button type="button" class="cbc-sort${value === current ? ' is-active' : ''}" data-cbc-sort="${value}">${label}</button>`
-    )).join('');
+    const buttons = options.map(([value, label]) => {
+        const active = value === current;
+        return `<button type="button" class="cbc-sort${active ? ' is-active' : ''}" data-cbc-sort="${value}" aria-pressed="${active ? 'true' : 'false'}">${buttonInner(TOOLBAR_ICONS[value], label)}</button>`;
+    }).join('');
     const extras = [
-        `<button type="button" class="cbc-sort cbc-composer-btn" data-cbc-sticker="1">${copy.sticker}</button>`,
-        `<button type="button" class="cbc-sort cbc-composer-btn" data-cbc-image="1">${copy.image}</button>`,
+        `<button type="button" class="cbc-sort cbc-composer-btn" data-cbc-sticker="1" aria-haspopup="dialog" aria-expanded="false">${buttonInner(TOOLBAR_ICONS.sticker, copy.sticker)}</button>`,
+        `<button type="button" class="cbc-sort cbc-composer-btn" data-cbc-image="1">${buttonInner(TOOLBAR_ICONS.image, copy.image)}</button>`,
     ].join('');
-    return `<span class="cbc-toolbar-label">${copy.sortLabel}</span>${buttons}<span class="cbc-toolbar-gap"></span>${extras}`;
+    return `<span class="cbc-toolbar-label">${copy.sortLabel}</span>${buttons}<span class="cbc-toolbar-gap" aria-hidden="true"></span>${extras}`;
 }
 
 export function syncSortButtons(toolbar: HTMLElement, sort: SortKind): void {
     for (const button of toolbar.querySelectorAll<HTMLElement>('[data-cbc-sort]')) {
-        button.classList.toggle('is-active', button.getAttribute('data-cbc-sort') === sort);
+        const active = button.getAttribute('data-cbc-sort') === sort;
+        button.classList.toggle('is-active', active);
+        button.setAttribute('aria-pressed', active ? 'true' : 'false');
     }
 }
 

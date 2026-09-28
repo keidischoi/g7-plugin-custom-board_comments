@@ -1,5 +1,13 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { ensureComposerControls, findComposer, insertIntoComposer, STICKER_DISMISS_ARM_MS } from './composer';
+import {
+    computePanelPlacement,
+    ensureComposerControls,
+    findComposer,
+    insertIntoComposer,
+    PANEL_MARGIN,
+    PANEL_MAX_WIDTH,
+    STICKER_DISMISS_ARM_MS,
+} from './composer';
 import { imageToken, SIMPLE_STICKER_IDS, stickerToken } from './stickers';
 import { paintTokens } from './tokens';
 import { DEFAULT_CONFIG } from './config';
@@ -131,5 +139,59 @@ describe('sticker panel blur', () => {
         vi.advanceTimersByTime(STICKER_DISMISS_ARM_MS);
         document.querySelector('[data-cbc-sticker-id]')?.dispatchEvent(new FocusEvent('focusin', { bubbles: true }));
         expect(document.querySelector('[data-cbc-stickers]')).not.toBeNull();
+    });
+});
+
+describe('sticker panel placement', () => {
+    const box = (left: number, top: number, right: number, bottom: number) => ({ left, top, right, bottom });
+
+    afterEach(() => {
+        document.body.innerHTML = '';
+    });
+
+    it('aligns its right edge to the sticker button and grows leftward', () => {
+        const place = computePanelPlacement(box(560, 210, 630, 240), box(0, 100, 640, 900), { width: 1280, height: 900 });
+        expect(place.width).toBe(PANEL_MAX_WIDTH);
+        expect(place.left + place.width).toBe(630);
+        expect(place.top).toBe(248);
+    });
+
+    it('stays inside the comment card and the viewport when the window narrows', () => {
+        const place = computePanelPlacement(box(800, 210, 890, 240), box(20, 100, 880, 900), { width: 900, height: 700 });
+        expect(place.left).toBeGreaterThanOrEqual(20);
+        expect(place.left + place.width).toBeLessThanOrEqual(880);
+        expect(place.left + place.width).toBeLessThanOrEqual(900 - PANEL_MARGIN);
+    });
+
+    it('never runs past the right edge even if the button does', () => {
+        const place = computePanelPlacement(box(1200, 210, 1300, 240), null, { width: 1000, height: 800 });
+        expect(place.left + place.width).toBeLessThanOrEqual(1000 - PANEL_MARGIN);
+        expect(place.left).toBeGreaterThanOrEqual(PANEL_MARGIN);
+    });
+
+    it('fills the comment area width on narrow screens', () => {
+        const place = computePanelPlacement(box(300, 210, 374, 240), box(0, 100, 390, 900), { width: 390, height: 800 });
+        expect(place.left).toBe(PANEL_MARGIN);
+        expect(place.width).toBe(390 - PANEL_MARGIN * 2);
+    });
+
+    it('opens above the toolbar when there is no room below and limits its height', () => {
+        const place = computePanelPlacement(box(560, 600, 630, 630), null, { width: 1280, height: 700 });
+        expect(place.top).toBeNull();
+        expect(place.bottom).toBe(700 - 592);
+        expect(place.maxHeight).toBeLessThanOrEqual(600 - 8 - PANEL_MARGIN);
+    });
+
+    it('marks the sticker button expanded while the panel is open', () => {
+        const { toolbar } = openStickerPanel();
+        const button = toolbar.querySelector('[data-cbc-sticker]');
+        const panel = document.querySelector<HTMLElement>('[data-cbc-stickers]');
+        expect(button?.getAttribute('aria-expanded')).toBe('true');
+        expect(button?.getAttribute('aria-controls')).toBe(panel?.id);
+        expect(panel?.getAttribute('role')).toBe('dialog');
+        expect(panel?.style.width).toMatch(/px$/);
+        expect(panel?.style.maxHeight).toMatch(/px$/);
+        document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true, cancelable: true }));
+        expect(button?.getAttribute('aria-expanded')).toBe('false');
     });
 });

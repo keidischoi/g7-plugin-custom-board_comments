@@ -140,6 +140,9 @@ function toggleStickerPanel(
     panel.setAttribute('data-cbc-pack', config.stickerPack);
     panel.className = config.stickersAnimated ? 'cbc-stickers cbc-stickers--animated' : 'cbc-stickers';
     panel.tabIndex = -1;
+    panel.id = 'cbc-sticker-panel';
+    panel.setAttribute('role', 'dialog');
+    panel.setAttribute('aria-label', copy.sticker);
     panel.style.position = 'fixed';
     panel.style.zIndex = '2147483001';
     panel.innerHTML = stickersForPack(config.stickerPack).map((sticker) => (
@@ -149,8 +152,20 @@ function toggleStickerPanel(
         + `</div>`
     )).join('');
     document.body.appendChild(panel);
-    placePanel(panel, toolbar);
+    placePanel(panel, toolbar, section);
+    bindPanelReposition(panel, toolbar, section);
     bindStickerDismiss(panel);
+    const stickerBtn = toolbar.querySelector<HTMLElement>('[data-cbc-sticker]');
+    if (stickerBtn) {
+        stickerBtn.setAttribute('aria-expanded', 'true');
+        stickerBtn.setAttribute('aria-controls', panel.id);
+        stickerBtn.classList.add('is-open');
+        panel.addEventListener('cbc-close', () => {
+            stickerBtn.setAttribute('aria-expanded', 'false');
+            stickerBtn.removeAttribute('aria-controls');
+            stickerBtn.classList.remove('is-open');
+        }, { once: true });
+    }
     panel.querySelectorAll<HTMLElement>('[data-cbc-sticker-id]').forEach((button) => {
         const pick = (): void => {
             const id = button.getAttribute('data-cbc-sticker-id') ?? '';
@@ -231,10 +246,135 @@ function bindStickerDismiss(panel: HTMLElement): void {
     }, { signal });
 }
 
-function placePanel(panel: HTMLElement, toolbar: HTMLElement): void {
-    const rect = toolbar.getBoundingClientRect();
-    panel.style.top = `${Math.max(8, rect.bottom + 8)}px`;
-    panel.style.left = `${Math.max(8, Math.min(window.innerWidth - 420, rect.left))}px`;
+/** 스티커 창이 화면 가장자리와 띄울 최소 간격(px). */
+export const PANEL_MARGIN = 8;
+/** 스티커 창이 커질 수 있는 최대 너비(px, 36rem). */
+export const PANEL_MAX_WIDTH = 576;
+/** 이 너비보다 좁은 화면에서는 댓글 영역 폭을 꽉 채웁니다. */
+export const PANEL_NARROW_BREAKPOINT = 640;
+const PANEL_GAP = 8;
+const PANEL_MIN_HEIGHT = 160;
+const PANEL_MAX_HEIGHT = 416;
+
+type Box = { left: number; right: number; top: number; bottom: number };
+
+export type PanelPlacement = {
+    left: number;
+    width: number;
+    top: number | null;
+    bottom: number | null;
+    maxHeight: number;
+};
+
+/**
+ * 스티커 창 자리를 계산합니다(순수 함수).
+ *
+ * - 창의 오른쪽 끝을 버튼(anchor) 오른쪽 끝에 맞추고 왼쪽으로 자랍니다.
+ * - 가로는 댓글 카드(bounds)와 화면(viewport - 여백) 안으로 가둡니다.
+ * - 좁은 화면에서는 댓글 영역 폭을 꽉 채웁니다.
+ * - 아래 공간이 모자라고 위가 더 넓으면 버튼 위로 띄웁니다. 높이는 남은 공간까지만.
+ */
+export function computePanelPlacement(
+    anchor: Box,
+    bounds: Box | null,
+    viewport: { width: number; height: number },
+): PanelPlacement {
+    const minX = Math.max(PANEL_MARGIN, bounds ? bounds.left : PANEL_MARGIN);
+    const maxX = Math.min(viewport.width - PANEL_MARGIN, bounds ? bounds.right : viewport.width - PANEL_MARGIN);
+    // 카드가 화면 밖으로 밀려나 폭이 너무 좁아지면 화면 기준으로 되돌립니다.
+    const usable = maxX - minX >= 200
+        ? { minX, maxX }
+        : { minX: PANEL_MARGIN, maxX: viewport.width - PANEL_MARGIN };
+    const room = Math.max(0, usable.maxX - usable.minX);
+
+    let left: number;
+    let width: number;
+    if (viewport.width < PANEL_NARROW_BREAKPOINT) {
+        width = room;
+        left = usable.minX;
+    } else {
+        width = Math.min(PANEL_MAX_WIDTH, room);
+        const right = Math.min(usable.maxX, Math.max(usable.minX + width, anchor.right));
+        left = Math.max(usable.minX, right - width);
+    }
+
+    const below = viewport.height - PANEL_MARGIN - (anchor.bottom + PANEL_GAP);
+    const above = anchor.top - PANEL_GAP - PANEL_MARGIN;
+    if (below < PANEL_MIN_HEIGHT * 1.5 && above > below) {
+        return {
+            left,
+            width,
+            top: null,
+            bottom: viewport.height - (anchor.top - PANEL_GAP),
+            maxHeight: Math.min(PANEL_MAX_HEIGHT, Math.max(120, above)),
+        };
+    }
+    return {
+        left,
+        width,
+        top: Math.max(PANEL_MARGIN, anchor.bottom + PANEL_GAP),
+        bottom: null,
+        maxHeight: Math.min(PANEL_MAX_HEIGHT, Math.max(120, below)),
+    };
+}
+
+function viewportSize(): { width: number; height: number } {
+    return {
+        width: document.documentElement.clientWidth || window.innerWidth,
+        height: window.innerHeight || document.documentElement.clientHeight,
+    };
+}
+
+function placePanel(panel: HTMLElement, toolbar: HTMLElement, section: Element | null): void {
+    const button = toolbar.querySelector<HTMLElement>('[data-cbc-sticker]');
+    const anchorEl = button && !button.hidden ? button : toolbar;
+    const anchor = anchorEl.getBoundingClientRect();
+    const toolbarRect = toolbar.getBoundingClientRect();
+    const card = section instanceof HTMLElement && section.isConnected ? section.getBoundingClientRect() : null;
+    const place = computePanelPlacement(
+        { left: anchor.left, right: anchor.right, top: toolbarRect.top, bottom: toolbarRect.bottom },
+        card && card.width > 0 ? card : null,
+        viewportSize(),
+    );
+    panel.style.left = `${Math.round(place.left)}px`;
+    panel.style.right = 'auto';
+    panel.style.width = `${Math.round(place.width)}px`;
+    panel.style.maxHeight = `${Math.round(place.maxHeight)}px`;
+    panel.style.top = place.top === null ? 'auto' : `${Math.round(place.top)}px`;
+    panel.style.bottom = place.bottom === null ? 'auto' : `${Math.round(place.bottom)}px`;
+    panel.dataset.cbcSide = place.top === null ? 'above' : 'below';
+}
+
+/** 창 크기가 바뀌거나 스크롤하면 스티커 창 자리를 다시 잡습니다(프레임당 한 번). */
+function bindPanelReposition(panel: HTMLElement, toolbar: HTMLElement, section: Element | null): void {
+    const abort = new AbortController();
+    const { signal } = abort;
+    let frame: number | null = null;
+    const schedule = (event?: Event): void => {
+        // 스티커 창 안쪽 스크롤은 자리와 상관없습니다.
+        if (event && event.target instanceof Node && panel.contains(event.target)) {
+            return;
+        }
+        if (frame !== null) {
+            return;
+        }
+        frame = window.requestAnimationFrame(() => {
+            frame = null;
+            if (panel.isConnected) {
+                placePanel(panel, toolbar, section);
+            }
+        });
+    };
+    window.addEventListener('resize', schedule, { signal });
+    window.addEventListener('scroll', schedule, { capture: true, passive: true, signal });
+    window.visualViewport?.addEventListener('resize', schedule, { signal });
+    panel.addEventListener('cbc-close', () => {
+        if (frame !== null) {
+            window.cancelAnimationFrame(frame);
+            frame = null;
+        }
+        abort.abort();
+    }, { once: true });
 }
 
 function pickImage(

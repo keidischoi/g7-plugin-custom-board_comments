@@ -82,7 +82,10 @@ describe('enhance', () => {
         const section = findCommentSection();
         expect(section).not.toBeNull();
         const toolbar = ensureToolbar(section as Element, 'latest', copy);
-        expect(toolbar.querySelector('[data-cbc-sort="latest"]')?.textContent).toBe('최신순');
+        expect(toolbar.querySelector('[data-cbc-sort="latest"] .cbc-btn-label')?.textContent).toBe('최신순');
+        expect(toolbar.querySelector('[data-cbc-sort="latest"] .cbc-btn-icon')?.getAttribute('aria-hidden')).toBe('true');
+        expect(toolbar.querySelector('[data-cbc-sort="latest"]')?.getAttribute('aria-pressed')).toBe('true');
+        expect(toolbar.querySelector('[data-cbc-sort="oldest"]')?.getAttribute('aria-pressed')).toBe('false');
         expect(toolbar.parentElement).toBe(document.body);
         expect(toolbar.classList.contains('cbc-toolbar--overlay')).toBe(true);
     });
