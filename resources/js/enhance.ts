@@ -3,6 +3,7 @@ import { PLUGIN_ID } from './config';
 import { bestIds, pinBest, sortTree, visibleComments, type BoardComment } from './sort';
 import { stickerById } from './stickers';
 import { hideComposerUi } from './composer';
+import { unbindToolbarCollapse } from './collapse';
 
 export type LikeSummary = {
     counts: Record<string, number>;
@@ -216,7 +217,11 @@ export function ensureToolbar(section: Element | null, sort: SortKind, copy: typ
 }
 
 export function hideToolbar(): void {
-    document.querySelector('[data-cbc-toolbar]')?.remove();
+    const toolbar = document.querySelector<HTMLElement>('[data-cbc-toolbar]');
+    if (toolbar) {
+        unbindToolbarCollapse(toolbar);
+        toolbar.remove();
+    }
     hideComposerUi();
 }
 
@@ -227,10 +232,12 @@ export function placeToolbar(toolbar: HTMLElement, section: Element | null): voi
     toolbar.style.display = 'flex';
     if (heading instanceof HTMLElement) {
         const rect = heading.getBoundingClientRect();
-        const width = toolbar.offsetWidth || 240;
+        // 오른쪽 끝을 제목 오른쪽에 맞춥니다. 접힌 막대가 펼쳐질 때 왼쪽으로 자라서
+        // 스티커 버튼이 제자리에 있고, 너비를 읽지 않으므로 강제 레이아웃도 없습니다.
+        const viewport = document.documentElement.clientWidth || window.innerWidth;
         toolbar.style.top = `${Math.max(8, rect.bottom + 6)}px`;
-        toolbar.style.left = `${Math.max(8, rect.right - width)}px`;
-        toolbar.style.right = 'auto';
+        toolbar.style.left = 'auto';
+        toolbar.style.right = `${Math.max(8, viewport - rect.right)}px`;
         toolbar.style.bottom = 'auto';
         toolbar.dataset.cbcAnchored = '1';
         return;

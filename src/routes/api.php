@@ -16,8 +16,15 @@ use Plugins\Custom\BoardComments\Http\Controllers\SettingsController;
 |
 */
 
-Route::get('/admin/settings', [SettingsController::class, 'show'])->name('admin.settings.show');
-Route::match(['put', 'post'], '/admin/settings', [SettingsController::class, 'save'])->name('admin.settings.save');
+// 관리자 설정 — 코어 플러그인 설정 API 와 같은 권한 (조회: core.plugins.read / 저장: core.plugins.update)
+Route::middleware(['auth:sanctum'])->group(function () {
+    Route::get('/admin/settings', [SettingsController::class, 'show'])
+        ->middleware('permission:admin,core.plugins.read')
+        ->name('admin.settings.show');
+    Route::match(['put', 'post'], '/admin/settings', [SettingsController::class, 'save'])
+        ->middleware('permission:admin,core.plugins.update')
+        ->name('admin.settings.save');
+});
 
 Route::get('/settings', [CommentLikeController::class, 'settings'])
     ->name('settings');

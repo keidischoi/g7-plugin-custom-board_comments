@@ -1,6 +1,6 @@
 {
     "_meta": {
-        "version": "0.1.22",
+        "version": "0.1.23",
         "description": "게시판 댓글 플러그인 기본값과 프론트엔드 공개 설정"
     },
     "defaults": {
@@ -15,7 +15,8 @@
         "stickers_enabled": true,
         "sticker_pack": "full",
         "stickers_animated": true,
-        "images_enabled": true
+        "images_enabled": true,
+        "toolbar_collapsed": true
     },
     "frontend_schema": {
         "enabled": { "type": "boolean", "expose": true },
@@ -29,6 +30,7 @@
         "stickers_enabled": { "type": "boolean", "expose": true },
         "sticker_pack": { "type": "string", "expose": true },
         "stickers_animated": { "type": "boolean", "expose": true },
-        "images_enabled": { "type": "boolean", "expose": true }
+        "images_enabled": { "type": "boolean", "expose": true },
+        "toolbar_collapsed": { "type": "boolean", "expose": true }
     }
 }

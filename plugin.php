@@ -135,6 +135,16 @@ class Plugin extends AbstractPlugin
                 ],
                 'required' => false,
             ],
+            'toolbar_collapsed' => [
+                'type' => 'boolean',
+                'default' => true,
+                'label' => ['ko' => '입력 도구 접어 두기', 'en' => 'Collapse comment toolbar'],
+                'hint' => [
+                    'ko' => '댓글 위에 떠 있는 정렬·스티커·이미지 막대를 평소에는 스티커만 보이게 접어 둡니다. 마우스를 올리거나 탭하면 펼쳐집니다.',
+                    'en' => 'Keeps the floating sort/sticker/image bar collapsed to the sticker button until hovered, focused, or tapped.',
+                ],
+                'required' => false,
+            ],
         ];
     }
 
@@ -156,6 +166,7 @@ class Plugin extends AbstractPlugin
             'sticker_pack' => 'full',
             'stickers_animated' => true,
             'images_enabled' => true,
+            'toolbar_collapsed' => true,
         ];
     }
 

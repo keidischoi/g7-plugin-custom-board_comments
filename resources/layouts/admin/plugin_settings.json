@@ -1,5 +1,5 @@
 {
-  "version": "0.1.22",
+  "version": "0.1.23",
   "layout_name": "plugin_settings",
   "permissions": [
     "core.plugins.update"
@@ -34,7 +34,8 @@
     "stickers_enabled": { "type": "boolean", "default": true },
     "sticker_pack": { "type": "enum", "options": ["12", "24", "48", "96", "192", "384", "full"], "default": "full" },
     "stickers_animated": { "type": "boolean", "default": true },
-    "images_enabled": { "type": "boolean", "default": true }
+    "images_enabled": { "type": "boolean", "default": true },
+    "toolbar_collapsed": { "type": "boolean", "default": true }
   },
   "slots": {
     "content": [
@@ -277,6 +278,31 @@
                         "props": { "className": "lg:col-span-1 flex justify-end" },
                         "children": [
                           { "type": "composite", "name": "Toggle", "props": { "name": "images_enabled" } }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "id": "field_toolbar_collapsed",
+                    "type": "basic",
+                    "name": "Div",
+                    "props": { "className": "grid-2col lg:grid-cols-3 items-center px-6 py-4" },
+                    "children": [
+                      {
+                        "type": "basic",
+                        "name": "Div",
+                        "props": { "className": "lg:col-span-2" },
+                        "children": [
+                          { "type": "basic", "name": "Label", "props": { "className": "form-label" }, "text": "$t:custom-board_comments.settings.fields.toolbar_collapsed.label" },
+                          { "type": "basic", "name": "P", "props": { "className": "form-hint" }, "text": "$t:custom-board_comments.settings.fields.toolbar_collapsed.hint" }
+                        ]
+                      },
+                      {
+                        "type": "basic",
+                        "name": "Div",
+                        "props": { "className": "lg:col-span-1 flex justify-end" },
+                        "children": [
+                          { "type": "composite", "name": "Toggle", "props": { "name": "toolbar_collapsed" } }
                         ]
                       }
                     ]

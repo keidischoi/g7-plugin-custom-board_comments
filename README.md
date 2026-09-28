@@ -2,9 +2,9 @@
 
 그누보드7 공식 게시판(`sirsoft-board`) 댓글에 **추천**, **베스트 댓글**, **정렬**을 붙이는 플러그인입니다. 테마와 게시판 모듈 파일은 수정하지 않습니다.
 
-버전 **0.1.22**. 관리자에 보이는 이름은 **게시판 댓글**입니다. 설치 폴더는 `plugins/custom-board_comments`입니다. GitHub 저장소 이름은 `g7-plugin-custom-board_comments` 그대로입니다. 처음 연결 대상은 [자유게시판](https://3ds.liveon.synology.me/board/free) 입니다. 목록이 아니라 **글 제목을 연 화면**(`/board/free/{번호}`)에 댓글 정렬·스티커·이미지 버튼이 보입니다.
+버전 **0.1.23**. 관리자에 보이는 이름은 **게시판 댓글**입니다. 설치 폴더는 `plugins/custom-board_comments`입니다. GitHub 저장소 이름은 `g7-plugin-custom-board_comments` 그대로입니다. 처음 연결 대상은 [자유게시판](https://3ds.liveon.synology.me/board/free) 입니다. 목록이 아니라 **글 제목을 연 화면**(`/board/free/{번호}`)에 댓글 정렬·스티커·이미지 버튼이 보입니다.
 
-이전 버전은 설치·활성화 때 사이트 전체가 Laravel **Server Error**가 나거나, 글 상세에 정렬 바가 안 보일 수 있습니다. 그 경우 플러그인을 완전히 제거한 뒤 **0.1.22**만 다시 설치하세요. GitHub 저장소 이름으로 설치된 `plugins/g7-plugin-custom-board_comments`도 제거한 뒤 `plugins/custom-board_comments`로 다시 설치하세요.
+이전 버전은 설치·활성화 때 사이트 전체가 Laravel **Server Error**가 나거나, 글 상세에 정렬 바가 안 보일 수 있습니다. 그 경우 플러그인을 완전히 제거한 뒤 **0.1.23**만 다시 설치하세요. GitHub 저장소 이름으로 설치된 `plugins/g7-plugin-custom-board_comments`도 제거한 뒤 `plugins/custom-board_comments`로 다시 설치하세요.
 
 ## 기능
 
@@ -55,6 +55,8 @@ Prefix: `/api/plugins/custom-board_comments`
 | GET | `/posts/{postId}/likes?slug=` | 선택 | 게시글 댓글별 추천 수·내 추천·베스트 ID |
 | POST | `/media` | 회원 | 댓글 이미지 업로드. multipart `file`, `post_id` |
 | GET | `/media/{id}` | 없음 | 올린 이미지 표시 |
+| GET | `/admin/settings` | 관리자 (`core.plugins.read`) | 관리자 설정 조회 |
+| PUT/POST | `/admin/settings` | 관리자 (`core.plugins.update`) | 관리자 설정 저장 |
 
 비회원 추천이 꺼져 있으면 비로그인 POST는 401입니다.
 
@@ -74,6 +76,7 @@ Prefix: `/api/plugins/custom-board_comments`
 | `sticker_pack` | `full` | 12 / 24 / 48 / 96 / 192 / 384 / full |
 | `stickers_animated` | true | 스티커가 뛰고 흔들림 |
 | `images_enabled` | true | 이미지 삽입 |
+| `toolbar_collapsed` | true | 떠 있는 정렬·스티커·이미지 막대를 스티커만 보이게 접어 둠. 마우스·포커스·탭으로 펼침 |
 
 ## 테스트
 
@@ -105,7 +108,7 @@ npm run build
 | namespace | `Plugins\\Custom\\BoardComments` |
 | 설치 폴더 | `plugins/custom-board_comments` |
 | github_url | `https://github.com/keidischoi/g7-plugin-custom-board_comments` |
-| version | `0.1.22` |
+| version | `0.1.23` |
 
 ## 라이선스
 

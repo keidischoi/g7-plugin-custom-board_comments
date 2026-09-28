@@ -67,6 +67,10 @@
         "label": "Image insert",
         "hint": "Signed-in members can attach images to comments. 2MB max."
       },
+      "toolbar_collapsed": {
+        "label": "Collapse comment toolbar",
+        "hint": "Keeps the floating sort/sticker/image bar collapsed to the sticker button until hovered, focused, or tapped."
+      },
       "default_sort": {
         "label": "Default sort",
         "hint": "The first comment order visitors see."

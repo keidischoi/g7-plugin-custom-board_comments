@@ -55,6 +55,9 @@ expect('stickers default on', $defaults['stickers_enabled'], true);
 expect('sticker pack default full', $defaults['sticker_pack'], 'full');
 expect('stickers animated default on', $defaults['stickers_animated'], true);
 expect('images default on', $defaults['images_enabled'], true);
+expect('toolbar collapsed default on', $defaults['toolbar_collapsed'], true);
+expect('toolbar collapsed normalized default', SettingsRules::normalize([])['toolbar_collapsed'], true);
+expect('toolbar collapsed off', SettingsRules::normalize(['toolbar_collapsed' => '0'])['toolbar_collapsed'], false);
 
 expectTrue('all boards when empty', SettingsRules::appliesToBoard('free', ''));
 expect('blank slugs mean all boards', SettingsRules::normalize(['board_slugs' => ''])['board_slugs'], '');

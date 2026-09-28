@@ -33,7 +33,7 @@ expect('display name ko', $plugin['name']['ko'] ?? null, '게시판 댓글');
 expect('github url', $plugin['github_url'] ?? null, 'https://github.com/keidischoi/g7-plugin-custom-board_comments');
 expect('g7 version', $plugin['g7_version'] ?? null, '>=7.0.0');
 expectTrue('js asset', ($plugin['assets']['js']['output'] ?? '') === 'dist/js/plugin.iife.js');
-expect('plugin version', $plugin['version'] ?? null, '0.1.22');
+expect('plugin version', $plugin['version'] ?? null, '0.1.23');
 $iife = (string) file_get_contents($root.'/dist/js/plugin.iife.js');
 expectTrue('iife exists', $iife !== '');
 expectTrue('iife mounts overlay toolbar', str_contains($iife, 'cbc-toolbar--overlay') && str_contains($iife, 'data-cbc-boot'));
@@ -44,7 +44,7 @@ expectTrue('iife keeps sort ids', str_contains($iife, 'data-cbc-comment-id'));
 expectTrue('iife uses css sort order', str_contains($iife, 'cbc-comment-stack'));
 expectTrue('iife closes stickers', str_contains($iife, 'cbc-close') && str_contains($iife, 'focusin'));
 expectTrue('iife has pack sizes', str_contains($iife, '"12"') && str_contains($iife, '"96"') && str_contains($iife, '"384"') && str_contains($iife, 'cbc-stickers--animated'));
-expectTrue('iife wraps sticker faces', str_contains($iife, 'cbc-sticker-face') && str_contains($iife, '0.1.22'));
+expectTrue('iife wraps sticker faces', str_contains($iife, 'cbc-sticker-face') && str_contains($iife, '0.1.23'));
 expectTrue('iife accepts pack_12', str_contains($iife, 'pack_') && str_contains($iife, 'data-cbc-pack'));
 $css = (string) file_get_contents($root.'/dist/css/plugin.css');
 expectTrue('css has sticker motion', str_contains($css, 'cbc-stickers-animated') && str_contains($css, 'cbc-bob') && str_contains($css, 'cbc-sticker-icon') && str_contains($css, 'cbc-sticker-face'));
@@ -57,12 +57,16 @@ expectTrue('has enabled toggle', str_contains((string) file_get_contents($root.'
 $settingsLayout = (string) file_get_contents($root.'/resources/layouts/admin/plugin_settings.json');
 expectTrue('has sticker pack', str_contains($settingsLayout, '"name": "sticker_pack"'));
 expectTrue('sticker pack uses options binding', str_contains($settingsLayout, '"value": "12"') && str_contains($settingsLayout, '"value": "96"') && ! str_contains($settingsLayout, '"name": "Option"'));
+expectTrue('has toolbar collapse toggle', str_contains($settingsLayout, '"name": "toolbar_collapsed"'));
+expectTrue('layout settings api sends admin token', substr_count($settingsLayout, '"auth_required": true') >= 2);
 expectTrue('has animated toggle', str_contains((string) file_get_contents($root.'/resources/layouts/admin/plugin_settings.json'), '"name": "stickers_animated"'));
 
 $defaults = json_decode((string) file_get_contents($root.'/config/settings/defaults.json'), true);
 expect('defaults sort', $defaults['defaults']['default_sort'] ?? null, 'latest');
 expect('defaults free board', $defaults['defaults']['board_slugs'] ?? null, 'free');
 expectTrue('frontend expose likes', ($defaults['frontend_schema']['allow_guest_likes']['expose'] ?? false) === true);
+expectTrue('defaults toolbar collapsed', ($defaults['defaults']['toolbar_collapsed'] ?? null) === true);
+expectTrue('frontend expose toolbar collapsed', ($defaults['frontend_schema']['toolbar_collapsed']['expose'] ?? false) === true);
 expect('defaults sticker pack', $defaults['defaults']['sticker_pack'] ?? null, 'full');
 expectTrue('frontend expose pack', ($defaults['frontend_schema']['sticker_pack']['expose'] ?? false) === true);
 

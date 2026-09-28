@@ -25,6 +25,7 @@ import {
 import { boardPostApiUrl, parseBoardShowPath, isBoardPostApi, unwrapApiData } from './url';
 import { mutationNeedsCommentSync } from './observe';
 import { ensureComposerControls } from './composer';
+import { bindToolbarCollapse } from './collapse';
 import { paintTokens } from './tokens';
 import { pluginFetch } from './auth';
 import type { BoardComment } from './sort';
@@ -222,6 +223,7 @@ function boot(): void {
             const data = unwrapData(payload);
             return { token: String(data.token ?? '') };
         });
+        bindToolbarCollapse(toolbar, config.toolbarCollapsed);
 
         if (!section || comments.length === 0) {
             if (section) {
@@ -406,7 +408,7 @@ function boot(): void {
         }
     });
     observer.observe(document.documentElement, { childList: true, subtree: true });
-    document.documentElement.setAttribute('data-cbc-boot', '0.1.22');
+    document.documentElement.setAttribute('data-cbc-boot', '0.1.23');
 
     void (async () => {
         try {

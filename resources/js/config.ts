@@ -19,6 +19,7 @@ export type PluginConfig = {
     stickerPack: StickerPack;
     stickersAnimated: boolean;
     imagesEnabled: boolean;
+    toolbarCollapsed: boolean;
 };
 
 export const DEFAULT_CONFIG: PluginConfig = {
@@ -34,6 +35,7 @@ export const DEFAULT_CONFIG: PluginConfig = {
     stickerPack: 'full',
     stickersAnimated: true,
     imagesEnabled: true,
+    toolbarCollapsed: true,
 };
 
 type G7Window = {
@@ -91,6 +93,7 @@ export function normalizeConfig(raw: unknown): PluginConfig {
         stickerPack: normalizeStickerPack(pack),
         stickersAnimated: boolish(input.stickers_animated ?? input.stickersAnimated, true),
         imagesEnabled: boolish(input.images_enabled ?? input.imagesEnabled, true),
+        toolbarCollapsed: boolish(input.toolbar_collapsed ?? input.toolbarCollapsed, true),
     };
 }
 
@@ -144,6 +147,7 @@ export function overlayConfig(base: PluginConfig, raw: unknown): PluginConfig {
         sticker_pack: base.stickerPack,
         stickers_animated: base.stickersAnimated,
         images_enabled: base.imagesEnabled,
+        toolbar_collapsed: base.toolbarCollapsed,
     };
     for (const [key, value] of Object.entries(input)) {
         if (value !== undefined && value !== null && value !== '') {

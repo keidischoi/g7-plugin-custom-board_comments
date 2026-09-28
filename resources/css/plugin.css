@@ -100,6 +100,56 @@
     margin: 0 0.2rem;
 }
 
+/* 접히는 도구 막대 (toolbar_collapsed). 접히면 스티커 버튼만 남습니다. */
+.cbc-toolbar--collapsible {
+    max-width: calc(100vw - 16px);
+    transition: gap 0.22s ease, padding 0.22s ease, box-shadow 0.22s ease;
+}
+
+.cbc-toolbar--collapsible > [data-cbc-sticker] {
+    order: 10;
+}
+
+.cbc-toolbar--collapsible > :not([data-cbc-sticker]) {
+    max-width: 12rem;
+    overflow: hidden;
+    white-space: nowrap;
+    opacity: 1;
+    visibility: visible;
+    transition:
+        max-width 0.24s ease,
+        opacity 0.18s ease 0.06s,
+        padding 0.24s ease,
+        margin 0.24s ease,
+        border-width 0.24s ease,
+        visibility 0s linear 0s;
+}
+
+.cbc-toolbar--collapsible.is-collapsed {
+    gap: 0;
+    padding-left: 0.4rem;
+    cursor: pointer;
+}
+
+.cbc-toolbar--collapsible.is-collapsed > :not([data-cbc-sticker]) {
+    max-width: 0;
+    opacity: 0;
+    visibility: hidden;
+    padding-left: 0;
+    padding-right: 0;
+    margin-left: 0;
+    margin-right: 0;
+    border-width: 0;
+    pointer-events: none;
+    transition:
+        max-width 0.24s ease,
+        opacity 0.12s ease,
+        padding 0.24s ease,
+        margin 0.24s ease,
+        border-width 0.24s ease,
+        visibility 0s linear 0.24s;
+}
+
 .cbc-stickers {
     display: grid;
     grid-template-columns: repeat(8, minmax(0, 1fr));

@@ -31,6 +31,7 @@ final class SettingsRules
             'sticker_pack' => 'full',
             'stickers_animated' => true,
             'images_enabled' => true,
+            'toolbar_collapsed' => true,
         ];
     }
 
@@ -65,6 +66,7 @@ final class SettingsRules
             'sticker_pack' => $pack,
             'stickers_animated' => self::boolish($input['stickers_animated'] ?? $defaults['stickers_animated']),
             'images_enabled' => self::boolish($input['images_enabled'] ?? $defaults['images_enabled']),
+            'toolbar_collapsed' => self::boolish($input['toolbar_collapsed'] ?? $input['toolbarCollapsed'] ?? $defaults['toolbar_collapsed']),
         ];
     }
 
