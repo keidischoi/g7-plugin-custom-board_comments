@@ -48,17 +48,23 @@ class CommentMediaController
         return $this->ok($stored);
     }
 
-    public function show(int $id): BinaryFileResponse|JsonResponse
+    public function show(Request $request, int $id): BinaryFileResponse|JsonResponse
     {
         $file = $this->media->file($id);
         if ($file === null) {
             return $this->fail('이미지를 찾지 못했습니다.', 404);
         }
 
-        return response()->file($file['path'], [
+        // 0.1.25 한 번 올린 사진은 바뀌지 않음 → 30일 캐시 + ETag 304
+        $res = response()->file($file['path'], [
             'Content-Type' => $file['mime'],
-            'Cache-Control' => 'public, max-age=86400',
+            'Cache-Control' => 'public, max-age=2592000',
+            'X-Content-Type-Options' => 'nosniff',
         ]);
+        $res->setEtag(substr(sha1($id.'|'.$file['path'].'|'.(int) @filemtime($file['path']).'|'.(int) @filesize($file['path'])), 0, 24));
+        $res->isNotModified($request);
+
+        return $res;
     }
 
     private function ok(mixed $data): JsonResponse

@@ -33,7 +33,7 @@ expect('display name ko', $plugin['name']['ko'] ?? null, '게시판 댓글');
 expect('github url', $plugin['github_url'] ?? null, 'https://github.com/keidischoi/g7-plugin-custom-board_comments');
 expect('g7 version', $plugin['g7_version'] ?? null, '>=7.0.0');
 expectTrue('js asset', ($plugin['assets']['js']['output'] ?? '') === 'dist/js/plugin.iife.js');
-expect('plugin version', $plugin['version'] ?? null, '0.1.24');
+expect('plugin version', $plugin['version'] ?? null, '0.1.25');
 $iife = (string) file_get_contents($root.'/dist/js/plugin.iife.js');
 expectTrue('iife exists', $iife !== '');
 expectTrue('iife mounts overlay toolbar', str_contains($iife, 'cbc-toolbar--overlay') && str_contains($iife, 'data-cbc-boot'));
