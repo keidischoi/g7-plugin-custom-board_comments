@@ -20,6 +20,9 @@ export type PluginConfig = {
     stickersAnimated: boolean;
     imagesEnabled: boolean;
     toolbarCollapsed: boolean;
+    /** 0.2.0 바꾸기 게시판 (['*'] = 모든 게시판, [] = 끔) */
+    replaceSlugs: string[];
+    mirrorEnabled: boolean;
 };
 
 export const DEFAULT_CONFIG: PluginConfig = {
@@ -36,6 +39,8 @@ export const DEFAULT_CONFIG: PluginConfig = {
     stickersAnimated: true,
     imagesEnabled: true,
     toolbarCollapsed: true,
+    replaceSlugs: [],
+    mirrorEnabled: true,
 };
 
 type G7Window = {
@@ -60,6 +65,20 @@ export function parseSlugs(raw: unknown): string[] {
         slugs.push(slug);
     }
     return slugs;
+}
+
+export function parseReplaceSlugs(raw: unknown): string[] {
+    const parts = Array.isArray(raw) ? raw : String(raw ?? '').split(/[\s,]+/);
+    if (parts.some((part) => String(part).trim() === '*')) {
+        return ['*'];
+    }
+    return parseSlugs(parts);
+}
+
+/** 0.2.0: 이 게시판은 custom-comments 로 바꾸는 곳인지 (빈 목록 = 아무 데도 아님) */
+export function isReplacedBoard(slug: string, replaceSlugs: string[]): boolean {
+    const s = slug.trim().toLowerCase();
+    return s !== '' && (replaceSlugs.includes('*') || replaceSlugs.includes(s));
 }
 
 export function appliesToBoard(slug: string, slugs: string[]): boolean {
@@ -94,6 +113,8 @@ export function normalizeConfig(raw: unknown): PluginConfig {
         stickersAnimated: boolish(input.stickers_animated ?? input.stickersAnimated, true),
         imagesEnabled: boolish(input.images_enabled ?? input.imagesEnabled, true),
         toolbarCollapsed: boolish(input.toolbar_collapsed ?? input.toolbarCollapsed, true),
+        replaceSlugs: parseReplaceSlugs(input.replace_slugs ?? input.replaceSlugs ?? ''),
+        mirrorEnabled: boolish(input.mirror_enabled ?? input.mirrorEnabled, true),
     };
 }
 
@@ -148,6 +169,8 @@ export function overlayConfig(base: PluginConfig, raw: unknown): PluginConfig {
         stickers_animated: base.stickersAnimated,
         images_enabled: base.imagesEnabled,
         toolbar_collapsed: base.toolbarCollapsed,
+        replace_slugs: base.replaceSlugs,
+        mirror_enabled: base.mirrorEnabled,
     };
     for (const [key, value] of Object.entries(input)) {
         if (value !== undefined && value !== null && value !== '') {

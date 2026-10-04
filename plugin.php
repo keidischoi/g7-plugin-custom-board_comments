@@ -3,6 +3,9 @@
 namespace Plugins\Custom\BoardComments;
 
 use App\Extension\AbstractPlugin;
+use Plugins\Custom\BoardComments\Listeners\CommentAccessListener;
+use Plugins\Custom\BoardComments\Listeners\LayoutSwapListener;
+use Plugins\Custom\BoardComments\Listeners\MirrorListener;
 
 /**
  * 공식 게시판 댓글에 추천·베스트·정렬을 더하는 플러그인입니다.
@@ -10,6 +13,21 @@ use App\Extension\AbstractPlugin;
 class Plugin extends AbstractPlugin
 {
     public const IDENTIFIER = 'custom-board_comments';
+
+    /**
+     * 0.2.0 바꾸기 모드 (custom-comments 댓글로 공식 댓글 바꾸기 + 공식 댓글에 똑같이 남기기).
+     * 바꾸기 게시판이 비어 있으면(기본) 아무 일도 하지 않습니다.
+     *
+     * @return array<int, class-string>
+     */
+    public function getHookListeners(): array
+    {
+        return [
+            CommentAccessListener::class,
+            LayoutSwapListener::class,
+            MirrorListener::class,
+        ];
+    }
 
     /**
      * @return array<string, array<string, mixed>>
@@ -135,6 +153,26 @@ class Plugin extends AbstractPlugin
                 ],
                 'required' => false,
             ],
+            'replace_slugs' => [
+                'type' => 'string',
+                'default' => '',
+                'label' => ['ko' => '바꾸기 게시판 (custom-comments 댓글 쓰기)', 'en' => 'Replace boards (use custom-comments)'],
+                'hint' => [
+                    'ko' => '이 게시판들은 공식 댓글 칸 대신 custom-comments 댓글(이모지 · 스티커 · 이미지 · 좋아요)을 보입니다. 쉼표로 여러 개, * 는 모든 게시판, 비우면 끔. custom-comments 1.0.0+ 가 켜져 있어야 합니다.',
+                    'en' => 'These boards show custom-comments instead of the built-in comment section. Comma-separated, * for all, empty = off. Requires custom-comments 1.0.0+.',
+                ],
+                'required' => false,
+            ],
+            'mirror_enabled' => [
+                'type' => 'boolean',
+                'default' => true,
+                'label' => ['ko' => '게시판 댓글에 똑같이 남기기', 'en' => 'Mirror to built-in comments'],
+                'hint' => [
+                    'ko' => '바꾸기 게시판의 새 댓글 · 고침 · 지움을 공식 게시판 댓글에도 남깁니다 (댓글 수 · 알림 · 관리 · 검색 · 플러그인을 꺼도 남음). 끄면 더 남기지 않고, 이미 남긴 댓글은 그대로 둡니다.',
+                    'en' => 'Also writes new/edited/deleted comments on replace boards to the built-in board comments. When off, nothing is mirrored and existing mirrored rows stay.',
+                ],
+                'required' => false,
+            ],
             'toolbar_collapsed' => [
                 'type' => 'boolean',
                 'default' => true,
@@ -167,6 +205,8 @@ class Plugin extends AbstractPlugin
             'stickers_animated' => true,
             'images_enabled' => true,
             'toolbar_collapsed' => true,
+            'replace_slugs' => '',
+            'mirror_enabled' => true,
         ];
     }
 
@@ -197,7 +237,7 @@ class Plugin extends AbstractPlugin
         return [
             'author' => 'keidischoi',
             'license' => 'MIT',
-            'keywords' => ['board', 'comments', 'likes', 'best', 'sticker', 'image'],
+            'keywords' => ['board', 'comments', 'likes', 'best', 'sticker', 'image', 'custom-comments', 'mirror'],
         ];
     }
 }

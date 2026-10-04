@@ -24,7 +24,8 @@
     "notice": "저장 후 게시글 상세를 새로고침하면 방문자 화면에 반영됩니다. sirsoft-board 모듈이 활성화되어 있어야 합니다.",
     "sections": {
       "general": "기본",
-      "best": "베스트 댓글"
+      "best": "베스트 댓글",
+      "replace": "댓글 바꾸기 (custom-comments)"
     },
     "options": {
       "latest": "최신순",
@@ -90,6 +91,14 @@
       "best_limit": {
         "label": "베스트 댓글 최대 개수",
         "hint": "상단에 고정할 베스트 댓글 개수입니다."
+      },
+      "replace_slugs": {
+        "label": "바꾸기 게시판",
+        "hint": "이 게시판들은 공식 댓글 칸 대신 custom-comments 댓글(이모지 · 스티커 · 이미지 · 좋아요)을 보입니다. 쉼표로 여러 개, * 는 모든 게시판, 비우면 끔. custom-comments 1.0.0 이상이 켜져 있어야 합니다. 예전 공식 댓글은 artisan custom-board_comments:migrate 로 옮깁니다."
+      },
+      "mirror_enabled": {
+        "label": "게시판 댓글에 똑같이 남기기",
+        "hint": "바꾸기 게시판의 새 댓글 · 고침 · 지움을 공식 게시판 댓글에도 남깁니다 (댓글 수 · 알림 · 관리 · 검색 · 플러그인을 꺼도 남음). 스티커는 [스티커], 이미지는 주소 글로 남습니다. 끄면 더 남기지 않고 이미 남긴 댓글은 그대로 둡니다."
       }
     }
   }

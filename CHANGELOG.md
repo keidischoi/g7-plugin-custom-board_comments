@@ -1,5 +1,17 @@
 # 변경 이력
 
+## 0.2.0 — 2026-10-04
+
+- **바꾸기 모드** (설정 `replace_slugs`, 기본 비어 있음 = 꺼짐): 고른 게시판의 글 상세에서 공식 댓글 칸 대신 **custom-comments** 댓글(이모지 · 스티커 · 이미지 · 좋아요)을 보임. `custom-comments.target.access` 필터에 `board_post` 대상으로 답함 — 게시판 자체 권한(`sirsoft-board.{slug}.comments.read/write`, 관리자는 관리), 비밀글 · 블라인드 · 삭제 글 · 게시판 `use_comment` 를 따름
+- 레이아웃: `core.layout_extension.after_apply` 에서 sirsoft-basic 글 상세의 공식 댓글 칸(기본 · 갤러리 · 카드 3곳)을 찾아 같은 자리에 상자를 둠. 데이터 소스 `cbc_board_comments` 가 `replace=true` 일 때만 바뀜. 구조를 못 찾거나 편집기 화면이면 그대로. custom-comments 가 꺼져 있으면 바꾸지 않음
+- 제목 옆 댓글 수: 바꾸기 게시판은 custom-comments 댓글 수
+- **게시판 댓글에 똑같이 남기기** (설정 `mirror_enabled`, 관리자 설정 화면 토글, **기본 켬**): 바꾸기 게시판의 custom 댓글 등록 · 수정 · 삭제를 공식 게시판 `CommentService` 로 남김 (답글은 부모 짝, 깊이 한도 넘으면 한도 안 조상). 댓글 수 · 알림 · 관리자 화면 · 검색이 그대로 돌고 플러그인을 꺼도 댓글이 남음. 게시판 관리자 삭제 · 블라인드 · 복원은 짝 있는 custom 댓글에 되돌려 적용. 스티커는 `[스티커]`, 이미지는 `[이미지] 주소`. 끄면 더 남기지 않고 이미 남긴 댓글은 그대로
+- 짝 표 `custom_board_comment_links` (첫 사용 때 생성): custom 댓글 ↔ 공식 댓글, 출처(mirror · migrate · snapshot), 상태, 비회원 이름, 스냅숏
+- 글 삭제(`sirsoft-board.post.after_delete`) → `custom-comments.target.deleted` 로 custom 댓글 정리. 정리 전에 짝 표에 스냅숏 · 이미지 보관 → 글 복원 때 되살림
+- **옮기기 명령** `php artisan custom-board_comments:migrate [--board=free] [--post=ID] [--dry-run] [--include-secret]`: 예전 공식 댓글을 custom 댓글로 복사 (작성자 · 시간 · 답글 부모 유지, 비회원 이름 보관). 원래 댓글은 지우지 않음. 여러 번 돌려도 중복 없음. 남기기로 생긴 공식 댓글은 이미 짝이 있어 건너뜀
+- custom-comments 1.0.1 의 새 훅(`target_comment.after_update` / `after_delete`, `target_comments.presented`)을 씀. 1.0.0 이면 등록만 남김
+- 검사: `tests/replace.php` (규칙 · 실제 테마 레이아웃), `tests/replace_db.php` (SQLite + 진짜 custom-comments 컨트롤러, `G7_VENDOR` 필요)
+
 ## 0.1.25 — 2026-10-04
 
 - 이미지 속도: 댓글 사진 응답에 ETag/304 + 30일 캐시 (한 번 올린 사진은 바뀌지 않음), nosniff.

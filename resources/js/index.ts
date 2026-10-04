@@ -28,6 +28,7 @@ import { ensureComposerControls } from './composer';
 import { bindToolbarCollapse } from './collapse';
 import { paintTokens } from './tokens';
 import { pluginFetch } from './auth';
+import { hasMountBox, mountAll, pendingMounts } from './replace';
 import type { BoardComment } from './sort';
 
 type Runtime = {
@@ -171,6 +172,12 @@ function boot(): void {
         try {
         const ref = page();
         applyPluginClasses(config);
+        // 0.2.0 바꾸기 모드: custom-comments 상자가 있으면 공식 댓글 꾸미기는 하지 않고 상자만 붙임
+        if (ref && hasMountBox()) {
+            hideToolbar();
+            void mountAll().catch(() => 0);
+            return;
+        }
         if (!ref || !config.enabled || !appliesToBoard(ref.slug, config.boardSlugs)) {
             hideToolbar();
             return;
@@ -403,12 +410,12 @@ function boot(): void {
     window.addEventListener('resize', reposition);
 
     observer = new MutationObserver((mutations) => {
-        if (mutationNeedsCommentSync(mutations)) {
+        if (mutationNeedsCommentSync(mutations) || pendingMounts().length > 0) {
             scheduleSync();
         }
     });
     observer.observe(document.documentElement, { childList: true, subtree: true });
-    document.documentElement.setAttribute('data-cbc-boot', '0.1.24');
+    document.documentElement.setAttribute('data-cbc-boot', '0.2.0');
 
     void (async () => {
         try {

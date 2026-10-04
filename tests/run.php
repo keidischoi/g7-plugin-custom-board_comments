@@ -12,6 +12,8 @@ $files = [
     __DIR__.'/boot.php',
     __DIR__.'/media.php',
     __DIR__.'/actor.php',
+    __DIR__.'/replace.php',
+    __DIR__.'/replace_db.php',
 ];
 
 $failed = 0;

@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use Plugins\Custom\BoardComments\Http\Controllers\CommentLikeController;
 use Plugins\Custom\BoardComments\Http\Controllers\CommentMediaController;
+use Plugins\Custom\BoardComments\Http\Controllers\ModeController;
 use Plugins\Custom\BoardComments\Http\Controllers\SettingsController;
 
 /*
@@ -46,3 +47,8 @@ Route::post('/media', [CommentMediaController::class, 'store'])
 Route::get('/media/{id}', [CommentMediaController::class, 'show'])
     ->whereNumber('id')
     ->name('media.show');
+
+// 0.2.0 바꾸기 모드: 게시글 상세 데이터 소스 (공개, 늘 200)
+Route::get('/posts/{postId}/mode', [ModeController::class, 'show'])
+    ->whereNumber('postId')
+    ->name('posts.mode');

@@ -24,7 +24,8 @@
     "notice": "Refresh a post page after saving. The sirsoft-board module must be active.",
     "sections": {
       "general": "General",
-      "best": "Best comments"
+      "best": "Best comments",
+      "replace": "Replace comments (custom-comments)"
     },
     "options": {
       "latest": "Latest",
@@ -90,6 +91,14 @@
       "best_limit": {
         "label": "Maximum best comments",
         "hint": "How many best comments to pin at the top."
+      },
+      "replace_slugs": {
+        "label": "Replace boards",
+        "hint": "These boards show custom-comments (emoji, stickers, images, likes) instead of the built-in comment section. Comma-separated, * for all, empty = off. Requires custom-comments 1.0.0+. Move old comments with artisan custom-board_comments:migrate."
+      },
+      "mirror_enabled": {
+        "label": "Mirror to built-in comments",
+        "hint": "Also writes new, edited and deleted comments on replace boards to the built-in board comments (counts, notifications, admin, search, survives plugin off). Stickers become [스티커], images become links. When off, nothing more is mirrored; existing mirrored rows stay."
       }
     }
   }

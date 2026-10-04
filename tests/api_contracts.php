@@ -25,7 +25,12 @@ expectFalse('no unguarded admin settings route', (bool) preg_match("/^Route::(ge
 expectTrue('dynamic table', str_contains($likeTable, 'custom_board_comment_likes'));
 expectTrue('media dynamic table', str_contains($mediaTable, 'custom_board_comment_media'));
 expectFalse('no hook listeners', str_contains($pluginPhp, 'CommentDeletedCleanupListener'));
-expectFalse('no custom service provider', is_dir($root.'/src/Providers'));
+// 0.2.0: 서비스 프로바이더는 artisan 명령 등록만 (부팅 경로에 다른 일 없음)
+$providers = glob($root.'/src/Providers/*.php') ?: [];
+expect('one minimal service provider', array_map('basename', $providers), ['BoardCommentsServiceProvider.php']);
+$prov = (string) file_get_contents($root.'/src/Providers/BoardCommentsServiceProvider.php');
+expectTrue('provider only registers console command', str_contains($prov, 'runningInConsole()') && str_contains($prov, '$this->commands([MigrateCommand::class])') && ! str_contains($prov, 'function register('));
+expectTrue('mode route', str_contains($routes, "posts/{postId}/mode"));
 expectTrue('unique actor', str_contains($likeTable, 'cbc_likes_actor_unique'));
 expectTrue('actor rules', is_file($root.'/src/Support/ActorRules.php'));
 expect('no hard module dependency', $pluginJson['dependencies']['modules'] ?? ['x'], []);

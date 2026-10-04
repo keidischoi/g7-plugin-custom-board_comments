@@ -32,6 +32,10 @@ final class SettingsRules
             'stickers_animated' => true,
             'images_enabled' => true,
             'toolbar_collapsed' => true,
+            // 0.2.0 바꾸기 모드: 이 게시판들은 공식 댓글 대신 custom-comments 댓글을 씁니다 (비우면 끔, * = 모든 게시판)
+            'replace_slugs' => '',
+            // 0.2.0 바꾸기 모드에서 새 댓글을 공식 게시판 댓글에도 똑같이 남김 (댓글 수 · 알림 · 관리 · 검색 · 플러그인을 꺼도 남음)
+            'mirror_enabled' => true,
         ];
     }
 
@@ -67,6 +71,8 @@ final class SettingsRules
             'stickers_animated' => self::boolish($input['stickers_animated'] ?? $defaults['stickers_animated']),
             'images_enabled' => self::boolish($input['images_enabled'] ?? $defaults['images_enabled']),
             'toolbar_collapsed' => self::boolish($input['toolbar_collapsed'] ?? $input['toolbarCollapsed'] ?? $defaults['toolbar_collapsed']),
+            'replace_slugs' => self::normalizeReplaceString($input['replace_slugs'] ?? $input['replaceSlugs'] ?? $defaults['replace_slugs']),
+            'mirror_enabled' => self::boolish($input['mirror_enabled'] ?? $input['mirrorEnabled'] ?? $defaults['mirror_enabled']),
         ];
     }
 
@@ -144,7 +150,7 @@ final class SettingsRules
      */
     private static function looksLikePluginSettings(array $raw): bool
     {
-        foreach (['sticker_pack', 'stickerPack', 'stickers_animated', 'stickers_enabled', 'board_slugs', 'default_sort', 'allow_guest_likes', 'best_threshold'] as $key) {
+        foreach (['sticker_pack', 'stickerPack', 'stickers_animated', 'stickers_enabled', 'board_slugs', 'default_sort', 'allow_guest_likes', 'best_threshold', 'replace_slugs', 'mirror_enabled'] as $key) {
             if (array_key_exists($key, $raw)) {
                 return true;
             }
@@ -184,6 +190,38 @@ final class SettingsRules
         $allowed = self::parseSlugs($rawSlugs);
 
         return $allowed === [] || in_array(strtolower(trim($slug)), $allowed, true);
+    }
+
+    /**
+     * 0.2.0 바꾸기 모드 게시판 목록. 비어 있으면 아무 게시판도 바꾸지 않습니다 (적용 게시판 목록과 달리 「비움 = 전체」 가 아님).
+     * `*` 를 넣으면 모든 게시판.
+     *
+     * @return list<string>
+     */
+    public static function parseReplaceSlugs(mixed $raw): array
+    {
+        $parts = is_array($raw) ? $raw : (preg_split('/[\s,]+/', (string) $raw) ?: []);
+        if (in_array('*', array_map(static fn ($p): string => trim((string) $p), $parts), true)) {
+            return ['*'];
+        }
+
+        return self::parseSlugs($parts);
+    }
+
+    public static function isReplaced(string $slug, mixed $rawReplaceSlugs): bool
+    {
+        $slug = strtolower(trim($slug));
+        if ($slug === '') {
+            return false;
+        }
+        $list = self::parseReplaceSlugs($rawReplaceSlugs);
+
+        return $list === ['*'] || in_array($slug, $list, true);
+    }
+
+    private static function normalizeReplaceString(mixed $raw): string
+    {
+        return implode(', ', self::parseReplaceSlugs($raw));
     }
 
     private static function normalizeSlugString(mixed $raw): string

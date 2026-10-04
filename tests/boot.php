@@ -7,13 +7,17 @@ require __DIR__.'/bootstrap.php';
 $root = dirname(__DIR__);
 $pluginPhp = (string) file_get_contents($root.'/plugin.php');
 
-expectFalse('no custom service provider dir', is_dir($root.'/src/Providers'));
-expectFalse('no hook listener dir', is_dir($root.'/src/Listeners'));
+expect('0.2.0 listeners', array_map('basename', glob($root.'/src/Listeners/*.php') ?: []), ['CommentAccessListener.php', 'LayoutSwapListener.php', 'MirrorListener.php']);
+foreach (glob($root.'/src/Listeners/*.php') ?: [] as $lf) {
+    $lsrc = (string) file_get_contents($lf);
+    expectTrue(basename($lf).' implements HookListenerInterface', str_contains($lsrc, 'implements HookListenerInterface'));
+    expectTrue(basename($lf).' catches errors', str_contains($lsrc, 'catch (\\Throwable'));
+}
 expectFalse('no install migrations', is_dir($root.'/database/migrations'));
 expectTrue('plugin identifier is a literal', str_contains($pluginPhp, "IDENTIFIER = 'custom-board_comments'"));
 expectTrue('inline config values', str_contains($pluginPhp, "'board_slugs' => 'free'"));
 expectFalse('plugin.php does not import src classes', str_contains($pluginPhp, 'Plugins\\G7\\Plugin\\Custom\\BoardComments\\Support'));
-expectFalse('plugin.php has no hook listeners', str_contains($pluginPhp, 'getHookListeners'));
+expectTrue('plugin.php hook listeners are class-strings only (core checks class_exists)', (bool) preg_match('/function getHookListeners\(\): array\s*\{\s*return \[\s*CommentAccessListener::class,\s*LayoutSwapListener::class,\s*MirrorListener::class,\s*\];/', $pluginPhp));
 expectTrue('install skips artisan migrate', str_contains($pluginPhp, 'function getMigrations()'));
 expectTrue('like table helper exists', is_file($root.'/src/Support/LikeTable.php'));
 
