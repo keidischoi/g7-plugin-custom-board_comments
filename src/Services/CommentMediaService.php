@@ -17,26 +17,26 @@ class CommentMediaService
     public function store(string $binary, string $mime, int $size, string $userId, int $postId, ?string $originalName = null): array
     {
         if ($userId === '') {
-            throw new RuntimeException('이미지를 올리려면 로그인하세요.', 401);
+            throw new RuntimeException(__('custom-board_comments::messages.login_image'), 401);
         }
         if (! MediaRules::isAllowedMime($mime)) {
-            throw new RuntimeException('jpg, png, gif, webp만 올릴 수 있습니다.', 422);
+            throw new RuntimeException(__('custom-board_comments::messages.image_types'), 422);
         }
         if (! MediaRules::isAllowedSize($size)) {
-            throw new RuntimeException('이미지는 2MB 이하여야 합니다.', 422);
+            throw new RuntimeException(__('custom-board_comments::messages.image_size'), 422);
         }
         if (! MediaTable::ensure()) {
-            throw new RuntimeException('이미지 저장소를 아직 쓸 수 없습니다.', 503);
+            throw new RuntimeException(__('custom-board_comments::messages.no_storage'), 503);
         }
 
         $ext = MediaRules::extensionForMime($mime) ?? 'bin';
         $diskName = bin2hex(random_bytes(16)).'.'.$ext;
         $dir = MediaTable::directory();
         if (! is_dir($dir) && ! mkdir($dir, 0755, true) && ! is_dir($dir)) {
-            throw new RuntimeException('이미지 폴더를 만들지 못했습니다.', 503);
+            throw new RuntimeException(__('custom-board_comments::messages.no_folder'), 503);
         }
         if (file_put_contents($dir.'/'.$diskName, $binary) === false) {
-            throw new RuntimeException('이미지를 저장하지 못했습니다.', 503);
+            throw new RuntimeException(__('custom-board_comments::messages.save_failed'), 503);
         }
 
         $row = CommentMedia::query()->create([

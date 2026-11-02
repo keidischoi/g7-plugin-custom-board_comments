@@ -79,16 +79,16 @@ class CommentLikeService
     {
         $settings = $this->publicSettings();
         if (! $settings['enabled']) {
-            throw new RuntimeException('댓글 확장이 꺼져 있습니다.', 403);
+            throw new RuntimeException(__('custom-board_comments::messages.ext_off'), 403);
         }
 
         $actor = LikeRules::actor($userId, $guestHash, (bool) $settings['allow_guest_likes']);
         if ($actor === null) {
-            throw new RuntimeException('추천하려면 로그인하세요.', 401);
+            throw new RuntimeException(__('custom-board_comments::messages.login_like'), 401);
         }
 
         if (! $this->tableReady()) {
-            throw new RuntimeException('추천 테이블이 아직 없습니다. 플러그인을 다시 설치하세요.', 503);
+            throw new RuntimeException(__('custom-board_comments::messages.no_like_table'), 503);
         }
 
         $existing = CommentLike::query()

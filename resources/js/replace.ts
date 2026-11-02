@@ -103,7 +103,7 @@ export async function mountAll(doc: Document = document, win: CommentsWindow = w
                 const note = doc.createElement('div');
                 note.setAttribute('data-cbc-cc-fallback', '1');
                 note.className = 'cbc-cc-fallback';
-                note.textContent = '댓글을 불러오지 못했습니다. 새로고침해 주세요.';
+                note.textContent = (doc.documentElement.lang || '').toLowerCase().startsWith('en') ? 'Could not load comments. Please refresh.' : '댓글을 불러오지 못했습니다. 새로고침해 주세요.';
                 el.appendChild(note);
             }
         });

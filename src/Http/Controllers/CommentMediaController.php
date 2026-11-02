@@ -20,12 +20,12 @@ class CommentMediaController
     {
         $userId = ActorRules::fromRequest($request);
         if ($userId === '') {
-            return $this->fail('이미지를 올리려면 로그인하세요.', 401);
+            return $this->fail(__('custom-board_comments::messages.login_image'), 401);
         }
 
         $file = $request->file('file') ?? $request->file('image');
         if ($file === null) {
-            return $this->fail('이미지 파일이 필요합니다.', 422);
+            return $this->fail(__('custom-board_comments::messages.need_file'), 422);
         }
 
         try {
@@ -52,7 +52,7 @@ class CommentMediaController
     {
         $file = $this->media->file($id);
         if ($file === null) {
-            return $this->fail('이미지를 찾지 못했습니다.', 404);
+            return $this->fail(__('custom-board_comments::messages.not_found'), 404);
         }
 
         // 0.1.25 한 번 올린 사진은 바뀌지 않음 → 30일 캐시 + ETag 304
