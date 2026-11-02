@@ -39,7 +39,7 @@ class CommentLikeController
         $boardId = (int) $request->input('board_id', 0);
         $postId = (int) $request->input('post_id', 0);
         if ($postId <= 0 || $commentId <= 0) {
-            return $this->fail('게시글과 댓글 정보가 필요합니다.', 422);
+            return $this->fail(__('custom-board_comments::messages.need_ids'), 422);
         }
 
         $userId = ActorRules::fromRequest($request);

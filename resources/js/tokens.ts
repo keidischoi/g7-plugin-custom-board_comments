@@ -105,7 +105,7 @@ function imageNode(id: number): HTMLImageElement {
     img.addEventListener('error', () => {
         img.replaceWith(Object.assign(document.createElement('span'), {
             className: 'cbc-image-missing',
-            textContent: '이미지 없음',
+            textContent: (document.documentElement.lang || '').toLowerCase().startsWith('en') ? 'No image' : '이미지 없음',
         }));
     });
     return img;
