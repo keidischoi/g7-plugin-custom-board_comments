@@ -1,5 +1,9 @@
 # 변경 이력
 
+## 0.2.1 — 2026-11-02
+
+- 🌐 영어(en) 화면
+
 ## 0.2.0 — 2026-10-04
 
 - **바꾸기 모드** (설정 `replace_slugs`, 기본 비어 있음 = 꺼짐): 고른 게시판의 글 상세에서 공식 댓글 칸 대신 **custom-comments** 댓글(이모지 · 스티커 · 이미지 · 좋아요)을 보임. `custom-comments.target.access` 필터에 `board_post` 대상으로 답함 — 게시판 자체 권한(`sirsoft-board.{slug}.comments.read/write`, 관리자는 관리), 비밀글 · 블라인드 · 삭제 글 · 게시판 `use_comment` 를 따름

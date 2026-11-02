@@ -98,7 +98,7 @@
       },
       "mirror_enabled": {
         "label": "Mirror to built-in comments",
-        "hint": "Also writes new, edited and deleted comments on replace boards to the built-in board comments (counts, notifications, admin, search, survives plugin off). Stickers become [스티커], images become links. When off, nothing more is mirrored; existing mirrored rows stay."
+        "hint": "Also writes new, edited and deleted comments on replace boards to the built-in board comments (counts, notifications, admin, search, survives plugin off). Stickers become a sticker tag, images become links. When off, nothing more is mirrored; existing mirrored rows stay."
       }
     }
   }
